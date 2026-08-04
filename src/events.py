@@ -226,6 +226,9 @@ def newsworthy(e):
 
 
 # ---------- model extraction (primary path) ----------
+LLM_ERRORS = []
+
+
 def page_text(body):
     s = re.sub(r"<(script|style|noscript|svg)\b.*?</\1>", " ", body, flags=re.S | re.I)
     s = re.sub(r"</?(p|div|li|tr|h[1-6]|section|article|br|td)\b[^>]*>", "\n", s, flags=re.I)
@@ -241,7 +244,7 @@ def from_llm(body, base, org, sector):
     try:
         evs = llm.extract_events(org, base, page_text(body), TODAY.isoformat())
     except Exception as ex:
-        print(f"    llm failed for {org}: {type(ex).__name__}")
+        LLM_ERRORS.append(f"{org}: {type(ex).__name__}: {str(ex)[:120]}")
         return []
     out = []
     for x in evs:
@@ -335,6 +338,15 @@ if __name__ == "__main__":
     json.dump(uniq, open(f"{D}/events_latest.json", "w"), indent=1)
     import collections
     print(f"fetch errors: {errs}")
+    import llm as _llm
+    if _llm.available():
+        n_model = sum(1 for e in uniq if e.get("how") == "gemini")
+        print(f"model-extracted events: {n_model}   model errors: {len(LLM_ERRORS)}")
+        for m in LLM_ERRORS[:5]:
+            print(f"    ! {m}")
+        if n_model == 0 and LLM_ERRORS:
+            print("::error::Gemini produced nothing and errored on every page.")
+            raise SystemExit(1)
     print(f"events found: {len(uniq)}  ({dict(collections.Counter(e['how'] for e in uniq))})")
     hi = [e for e in uniq if e["confidence"] == "high"]
     print(f"high-confidence (machine-published): {len(hi)}\n")

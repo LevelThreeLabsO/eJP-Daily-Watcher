@@ -20,7 +20,7 @@ deterministic path and the digest says so.
 """
 import json, os, re, time
 
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
 
 _client = None
 
