@@ -36,6 +36,9 @@ jobs:
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          # The two jobs run on separate runners and cannot share a ledger, so the
+          # free tier's daily allowance is split between them here.
+          GEMINI_DAILY_BUDGET: "3"
 
   events:
     runs-on: ubuntu-latest
@@ -54,6 +57,8 @@ jobs:
         env:
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_DAILY_BUDGET: "12"
+          GEMINI_PAGES_PER_CALL: "10"
       - name: Persist the calendar cache
         run: |
           git config user.name "dailyphil-bot"

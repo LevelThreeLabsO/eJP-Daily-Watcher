@@ -299,12 +299,9 @@ def scrape(target):
     # Then the model, which is the only thing that works on hand-built conference
     # pages. Falls back to the regex pass only if there is no key.
     import llm as _llm
-    if _llm.available():
-        # The regex pass returns things like "Confirm that you are not a bot" as
-        # event titles. With a model available it is never worth its noise.
-        ev += from_llm(body, url, target["org"], target.get("sector", ""))
-    elif not ev:
-        ev += from_html(body, url)
+    if not _llm.available():
+        if not ev:
+            ev += from_html(body, url)          # no key: heuristic is all we have
     # keep only future-dated, dedupe by (date, title)
     seen, keep = set(), []
     for e in ev:
@@ -323,7 +320,7 @@ def scrape(target):
             # the model read the whole page; trust its call over the keyword score
             e["news_score"] = 6 if e.get("llm_newsworthy") else 0
         keep.append(e)
-    return {**target, "events": keep}
+    return {**target, "events": keep, "text": page_text(body)}
 
 
 def targets():
@@ -343,12 +340,67 @@ if __name__ == "__main__":
     post, preview = "--post" in sys.argv, "--preview" in sys.argv
     tg = targets()
     print(f"scanning {len(tg)} organizational calendars...")
-    allev, errs = [], 0
-    with cf.ThreadPoolExecutor(max_workers=4) as ex:
+    import llm as _llm
+    import hashlib
+    allev, errs, pages = [], 0, []
+    with cf.ThreadPoolExecutor(max_workers=8) as ex:
         for r in ex.map(scrape, tg):
             if r.get("error"):
                 errs += 1
+                continue
             allev.extend(r["events"])
+            if r.get("text"):
+                pages.append(r)
+
+    # --- model pass, batched and budgeted -------------------------------------
+    if _llm.available():
+        # Only pages that (a) changed since last run and (b) actually contain a
+        # date are worth spending a call on.
+        DATED = re.compile(rf"\b({MONTHS})\.?\s+\d{{1,2}}\b|\b20\d{{2}}-\d{{2}}-\d{{2}}\b", re.I)
+        todo = []
+        for p in pages:
+            sig = hashlib.sha1(p["text"].encode("utf8", "replace")).hexdigest()[:20]
+            hit = _cache.get(p["url"])
+            if hit and hit.get("sig") == sig:
+                _cache_hits[0] += 1
+                allev.extend(hit.get("events", []))
+                continue
+            if not DATED.search(p["text"][:20000]):
+                continue
+            p["sig"] = sig
+            todo.append(p)
+
+        per_call = int(os.environ.get("GEMINI_PAGES_PER_CALL", "10"))
+        budget = min(_llm.calls_left(), LLM_BUDGET[0])
+        batches = [todo[i:i + per_call] for i in range(0, len(todo), per_call)][:budget]
+        print(f"model pass: {len(todo)} changed pages -> {len(batches)} calls "
+              f"(budget {budget}, {_llm.calls_left()} left today)")
+        for bi, batch in enumerate(batches):
+            try:
+                evs = _llm.extract_events_batch(batch, TODAY.isoformat())
+            except Exception as ex_:
+                LLM_ERRORS.append(f"batch {bi}: {type(ex_).__name__}: {str(ex_)[:110]}")
+                break                                  # budget or quota gone; stop cleanly
+            per_page = {i: [] for i in range(len(batch))}
+            for x in evs:
+                si = x.get("source")
+                if not isinstance(si, int) or si not in per_page:
+                    continue
+                d = parse_date(x.get("date"))
+                if not in_window(d) or not x.get("title"):
+                    continue
+                per_page[si].append({
+                    "date": d.isoformat(), "title": str(x["title"])[:180],
+                    "place": (x.get("place") or "")[:80], "url": batch[si]["url"],
+                    "how": "gemini", "confidence": "model",
+                    "scale": x.get("scale", ""), "kind": x.get("kind", ""),
+                    "notable": x.get("notable", ""),
+                    "llm_newsworthy": bool(x.get("newsworthy")), "why": x.get("why", ""),
+                    "org": batch[si]["org"], "sector": batch[si].get("sector", ""),
+                    "news_score": 6 if x.get("newsworthy") else 0})
+            for i, p in enumerate(batch):
+                _cache[p["url"]] = {"sig": p["sig"], "events": per_page[i], "org": p["org"]}
+                allev.extend(per_page[i])
     # global dedupe
     seen, uniq = set(), []
     for e in sorted(allev, key=lambda x: (x["date"], x["org"])):
