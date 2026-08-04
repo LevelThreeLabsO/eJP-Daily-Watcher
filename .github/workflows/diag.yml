@@ -1,0 +1,15 @@
+name: Diagnostics
+on:
+  workflow_dispatch:
+jobs:
+  models:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - name: List models this key can use
+        run: python src/list_models.py
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
