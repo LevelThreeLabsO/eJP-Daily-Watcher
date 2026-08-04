@@ -1,0 +1,188 @@
+#!/usr/bin/env python3
+"""
+Gemini judgment layer — the same free-tier setup as the govt-feeds watcher.
+
+Two jobs the deterministic code provably cannot do:
+
+  extract_events()  Reading a calendar page and returning real events. The regex
+                    fallback returned "Confirm that you are not a bot" and a list
+                    of Connecticut towns as event titles. Only ~11% of curated
+                    convening sites publish schema.org markup, so this is the
+                    main path for events, not a garnish.
+
+  judge_gifts()     Identifying the donor behind a gift and deciding whether
+                    there is a Jewish or Israel angle. The editor's valuable case
+                    is a Jewish donor giving to a secular hospital or university —
+                    which requires knowing who the person is.
+
+Both degrade safely: with no GEMINI_API_KEY set, callers fall back to the
+deterministic path and the digest says so.
+"""
+import json, os, re, time, urllib.request
+
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
+KEY = os.environ.get("GEMINI_API_KEY", "").strip()
+ENDPOINT = ("https://generativelanguage.googleapis.com/v1beta/models/"
+            "{model}:generateContent")
+
+
+def available():
+    return bool(KEY)
+
+
+def _call(prompt, schema=None, temperature=0.1, retries=3):
+    if not KEY:
+        raise RuntimeError("GEMINI_API_KEY not set")
+    body = {"contents": [{"parts": [{"text": prompt}]}],
+            "generationConfig": {"temperature": temperature}}
+    if schema:
+        body["generationConfig"]["responseMimeType"] = "application/json"
+        body["generationConfig"]["responseSchema"] = schema
+    url = ENDPOINT.format(model=MODEL) + f"?key={KEY}"
+    last = None
+    for a in range(retries):
+        try:
+            req = urllib.request.Request(
+                url, data=json.dumps(body).encode(),
+                headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=90) as f:
+                d = json.load(f)
+            txt = d["candidates"][0]["content"]["parts"][0]["text"]
+            return json.loads(txt) if schema else txt
+        except Exception as e:
+            last = e
+            time.sleep(2 * (a + 1))
+    raise last
+
+
+# ---------------- events ----------------
+EVENT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "events": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "title": {"type": "string"},
+                    "date": {"type": "string", "description": "YYYY-MM-DD, start date"},
+                    "end_date": {"type": "string"},
+                    "place": {"type": "string"},
+                    "scale": {"type": "string", "enum": ["national", "regional", "local", "online"]},
+                    "kind": {"type": "string",
+                             "enum": ["conference", "gala", "festival", "exhibition", "webinar",
+                                      "mission", "award", "lecture", "other"]},
+                    "notable": {"type": "string",
+                                "description": "Named speakers or honorees, empty if none"},
+                    "newsworthy": {"type": "boolean"},
+                    "why": {"type": "string", "description": "One clause. Empty if not newsworthy."},
+                },
+                "required": ["title", "date", "scale", "kind", "newsworthy"],
+            },
+        }
+    },
+    "required": ["events"],
+}
+
+EVENT_PROMPT = """You are reading one organization's calendar page for the editor of Your Daily Phil, \
+a daily newsletter for the Jewish philanthropy and nonprofit sector. He compiles a section called \
+"What We're Watching": upcoming events his national readership of funders, federation executives and \
+nonprofit leaders would want on their radar.
+
+He wants two kinds of item:
+  - the significant institutional convenings (conferences, general assemblies, biennials, summits, \
+major galas, missions, award ceremonies)
+  - genuinely distinctive or offbeat cultural events (a Yiddish appreciation gala, a klezmer retreat, \
+a notable museum opening or film premiere)
+
+He does NOT want routine local programming: chapter book clubs, mahjong afternoons, baby playgroups, \
+support groups, walking tours, trivia nights, fitness classes, congregational services, admissions \
+webinars, or staff training sessions — even when a national organization hosts them.
+
+Today is {today}. Only return events dated today or later. Resolve relative or partial dates \
+("March 4", "next Tuesday") into YYYY-MM-DD using that. If a date is genuinely ambiguous, omit the \
+event rather than guessing.
+
+Ignore page furniture entirely: navigation, cookie banners, bot-check text, address lists, donation \
+appeals, newsletter signups.
+
+Organization: {org}
+Page: {url}
+
+--- PAGE TEXT ---
+{text}
+--- END ---
+
+Return every real upcoming event you find, with newsworthy=true only for those meeting the bar above."""
+
+
+def extract_events(org, url, page_text, today, max_chars=24000):
+    out = _call(EVENT_PROMPT.format(org=org, url=url, today=today,
+                                    text=page_text[:max_chars]),
+                schema=EVENT_SCHEMA)
+    return out.get("events", [])
+
+
+# ---------------- gifts ----------------
+GIFT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "results": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "donor": {"type": "string", "description": "Donor name(s), or empty if unnamed"},
+                    "recipient": {"type": "string"},
+                    "amount_usd": {"type": "number"},
+                    "is_gift": {"type": "boolean",
+                                "description": "A charitable gift, not an investment or budget item"},
+                    "jewish_angle": {"type": "string",
+                                     "enum": ["donor", "recipient", "both", "none", "unclear"]},
+                    "confidence": {"type": "string", "enum": ["high", "medium", "low"]},
+                    "note": {"type": "string", "description": "One clause for the editor."},
+                },
+                "required": ["id", "is_gift", "jewish_angle", "confidence"],
+            },
+        }
+    },
+    "required": ["results"],
+}
+
+GIFT_PROMPT = """You are screening philanthropy headlines for the editor of Your Daily Phil, a daily \
+newsletter covering Jewish philanthropy. He writes a "Major Gifts" section.
+
+What he most wants and cannot easily find: a large gift where the DONOR is Jewish or connected to the \
+Jewish communal world, but the RECIPIENT is secular — a university, hospital, museum or arts \
+institution. Big Jewish organizations already email him their own gift announcements, so those are \
+useful but less valuable.
+
+For each headline decide:
+  is_gift        — a charitable gift or pledge, not an investment, construction budget, revenue \
+figure, campaign total, or political contribution.
+  jewish_angle   — "donor" if the giver is Jewish or Jewish-communally connected; "recipient" if the \
+recipient is a Jewish institution; "both"; "none"; "unclear" if you cannot tell from the headline.
+  donor          — the person, couple, family or foundation giving. Empty if anonymous or unnamed.
+
+Be honest about uncertainty. Use "unclear" and confidence "low" rather than guessing someone's \
+background from a surname alone — a wrong call wastes the editor's time and could be offensive. \
+Only say "donor" when you actually recognize the person or the headline makes the connection explicit.
+
+Headlines:
+{items}
+
+Return one result per id."""
+
+
+def judge_gifts(items, batch=25):
+    """items: list of dicts with title/source. Returns list of verdicts."""
+    out = []
+    for i in range(0, len(items), batch):
+        chunk = items[i:i + batch]
+        listing = "\n".join(
+            f"{n}. {x['title']}  [source: {x.get('source','')}]"
+            for n, x in enumerate(chunk, start=i))
+        res = _call(GIFT_PROMPT.format(items=listing), schema=GIFT_SCHEMA)
+        out.extend(res.get("results", []))
+    return out
