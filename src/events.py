@@ -19,7 +19,7 @@ should read rather than a regex.
 import json, os, re, html, urllib.request, urllib.parse, datetime as dt
 import concurrent.futures as cf
 
-D = os.path.expanduser("~/ji-dailyphil-watcher/data")
+D = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
                     "(KHTML, like Gecko) Chrome/122.0 Safari/537.36",
       "Accept-Language": "en-US,en;q=0.9"}

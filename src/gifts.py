@@ -15,7 +15,7 @@ around identifying the donor, not the recipient.
 import json, os, re, html, time, urllib.request, urllib.parse, hashlib
 import concurrent.futures as cf
 
-D = os.path.expanduser("~/ji-dailyphil-watcher/data")
+D = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 UA = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
                     "(KHTML, like Gecko) Chrome/122.0 Safari/537.36"}
 

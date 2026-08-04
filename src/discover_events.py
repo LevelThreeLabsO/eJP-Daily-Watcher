@@ -3,7 +3,7 @@
 import json, os, re, urllib.request, urllib.parse, concurrent.futures as cf, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from sources_events import ALL
-D = os.path.expanduser("~/ji-dailyphil-watcher/data")
+D = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data")
 UA = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/122.0 Safari/537.36","Accept-Language":"en-US,en;q=0.9"}
 PATS = [r"event", r"calendar", r"conference", r"convention", r"summit", r"programs?/?$",
