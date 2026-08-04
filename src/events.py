@@ -379,7 +379,7 @@ if __name__ == "__main__":
             try:
                 evs = _llm.extract_events_batch(batch, TODAY.isoformat())
             except Exception as ex_:
-                LLM_ERRORS.append(f"batch {bi}: {type(ex_).__name__}: {str(ex_)[:110]}")
+                LLM_ERRORS.append(f"batch {bi}: {type(ex_).__name__}: {str(ex_)[:700]}")
                 break                                  # budget or quota gone; stop cleanly
             per_page = {i: [] for i in range(len(batch))}
             for x in evs:

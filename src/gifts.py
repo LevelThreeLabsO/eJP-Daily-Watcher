@@ -215,7 +215,7 @@ def enrich(items):
     except Exception as ex:
         # Quota exhausted or the API is down: fall back to the rule-based buckets
         # rather than failing the run. The digest is worse, not absent.
-        print(f"[model unavailable: {type(ex).__name__}: {str(ex)[:120]}]")
+        print(f"[model unavailable: {type(ex).__name__}: {str(ex)[:700]}]")
         print("[falling back to deterministic buckets]")
         return items
     by_id = {v["id"]: v for v in verdicts}
