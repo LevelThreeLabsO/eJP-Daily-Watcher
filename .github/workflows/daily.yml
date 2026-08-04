@@ -25,6 +25,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
       - name: Major Gifts
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
@@ -42,6 +43,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
       - name: What We're Watching
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then

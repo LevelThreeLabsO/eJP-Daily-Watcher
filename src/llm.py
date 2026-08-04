@@ -18,36 +18,44 @@ Two jobs the deterministic code provably cannot do:
 Both degrade safely: with no GEMINI_API_KEY set, callers fall back to the
 deterministic path and the digest says so.
 """
-import json, os, re, time, urllib.request
+import json, os, re, time
 
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
-KEY = os.environ.get("GEMINI_API_KEY", "").strip()
-ENDPOINT = ("https://generativelanguage.googleapis.com/v1beta/models/"
-            "{model}:generateContent")
+
+_client = None
 
 
 def available():
-    return bool(KEY)
+    return bool(os.environ.get("GEMINI_API_KEY", "").strip())
 
 
-def _call(prompt, schema=None, temperature=0.1, retries=3):
-    if not KEY:
-        raise RuntimeError("GEMINI_API_KEY not set")
-    body = {"contents": [{"parts": [{"text": prompt}]}],
-            "generationConfig": {"temperature": temperature}}
+def _get_client():
+    """Lazy so runs without a key need no dependency installed."""
+    global _client
+    if _client is None:
+        from google import genai
+        key = os.environ.get("GEMINI_API_KEY", "").strip()
+        if not key:
+            raise RuntimeError("GEMINI_API_KEY not set")
+        _client = genai.Client(api_key=key)
+    return _client
+
+
+def _call(prompt, schema=None, temperature=0.1, retries=3, max_tokens=8192):
+    from google.genai import types
+    cfg = types.GenerateContentConfig(temperature=temperature,
+                                      max_output_tokens=max_tokens)
     if schema:
-        body["generationConfig"]["responseMimeType"] = "application/json"
-        body["generationConfig"]["responseSchema"] = schema
-    url = ENDPOINT.format(model=MODEL) + f"?key={KEY}"
+        cfg.response_mime_type = "application/json"
+        cfg.response_schema = schema
     last = None
     for a in range(retries):
         try:
-            req = urllib.request.Request(
-                url, data=json.dumps(body).encode(),
-                headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=90) as f:
-                d = json.load(f)
-            txt = d["candidates"][0]["content"]["parts"][0]["text"]
+            r = _get_client().models.generate_content(
+                model=MODEL, contents=prompt, config=cfg)
+            txt = (r.text or "").strip()
+            if not txt:
+                return {} if schema else ""
             return json.loads(txt) if schema else txt
         except Exception as e:
             last = e
