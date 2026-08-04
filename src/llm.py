@@ -20,10 +20,11 @@ deterministic path and the digest says so.
 """
 import json, os, re, time, threading
 
-# gemini-3.5-flash allows only 20 requests/DAY on the free tier — unusable for a
-# 76-page sweep. The 2.0 generation carries a far larger free daily allowance and
-# is more than capable of extracting events and identifying donors.
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
+# Free-tier daily allowances, measured against this key:
+#   gemini-3.5-flash  -> 20 requests/day
+#   gemini-2.0-flash  -> 0 (no free tier at all)
+# The batched design needs about 6 calls/day, so 20 is comfortable.
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
 
 _client = None
 
