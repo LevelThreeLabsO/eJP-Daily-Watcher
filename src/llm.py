@@ -20,14 +20,17 @@ deterministic path and the digest says so.
 """
 import json, os, re, time, threading
 
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
+# gemini-3.5-flash allows only 20 requests/DAY on the free tier — unusable for a
+# 76-page sweep. The 2.0 generation carries a far larger free daily allowance and
+# is more than capable of extracting events and identifying donors.
+MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.0-flash")
 
 _client = None
 
 # The free tier is a low requests-per-minute allowance, and firing 76 calendar
 # pages at it concurrently exhausts it instantly. One global valve, so every
 # caller — threaded or not — shares the same budget.
-_MIN_INTERVAL = float(os.environ.get("GEMINI_MIN_INTERVAL", "6.5"))
+_MIN_INTERVAL = float(os.environ.get("GEMINI_MIN_INTERVAL", "4.2"))
 _lock = threading.Lock()
 _last = [0.0]
 
