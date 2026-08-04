@@ -315,7 +315,7 @@ def targets():
 if __name__ == "__main__":
     import sys
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-    post = "--post" in sys.argv
+    post, preview = "--post" in sys.argv, "--preview" in sys.argv
     tg = targets()
     print(f"scanning {len(tg)} organizational calendars...")
     allev, errs = [], 0
@@ -338,11 +338,17 @@ if __name__ == "__main__":
     print(f"events found: {len(uniq)}  ({dict(collections.Counter(e['how'] for e in uniq))})")
     hi = [e for e in uniq if e["confidence"] == "high"]
     print(f"high-confidence (machine-published): {len(hi)}\n")
-    if post:
+    if post or preview:
         from slack_client import SlackClient, events_digest
-        sc = SlackClient("SLACK_WWW")
-        sc.post(events_digest(uniq, days=30, limit=25))
-        print(f"posted to Slack (enabled={sc.enabled})")
+        msg = events_digest(uniq, days=30, limit=25)
+        if preview:
+            print("=" * 78 + "\nDRY RUN — this is what would post to the events channel\n" + "=" * 78)
+            print(msg)
+            print("=" * 78)
+        else:
+            sc = SlackClient("SLACK_WWW")
+            sc.post(msg)
+            print(f"posted to Slack (enabled={sc.enabled})")
     nxt = [e for e in uniq if parse_date(e["date"]) <= TODAY + dt.timedelta(days=60)]
     keep = [e for e in nxt if e["news_score"] >= 3]
     dropped = len(nxt) - len(keep)

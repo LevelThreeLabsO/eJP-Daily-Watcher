@@ -244,7 +244,7 @@ def enrich(items):
 if __name__ == "__main__":
     import sys, os as _os
     sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
-    days, post = 2, "--post" in sys.argv
+    days, post, preview = 2, "--post" in sys.argv, "--preview" in sys.argv
     for a in sys.argv[1:]:
         if a.startswith("--days="):
             days = int(a.split("=")[1])
@@ -252,11 +252,17 @@ if __name__ == "__main__":
     tri = triage(raw)
     tri = enrich(tri)
     json.dump(tri, open(f"{D}/gifts_latest.json", "w"), indent=1)
-    if post:
+    if post or preview:
         from slack_client import SlackClient, gifts_digest
-        sc = SlackClient("SLACK_GIFTS")
-        sc.post(gifts_digest(tri))
-        print(f"posted {len(tri)} gifts to Slack (enabled={sc.enabled})")
+        msg = gifts_digest(tri)
+        if preview:
+            print("=" * 78 + "\nDRY RUN — this is what would post to the gifts channel\n" + "=" * 78)
+            print(msg)
+            print("=" * 78)
+        else:
+            sc = SlackClient("SLACK_GIFTS")
+            sc.post(msg)
+            print(f"posted {len(tri)} gifts to Slack (enabled={sc.enabled})")
     print(f"{len(queries())} standing searches -> {len(raw)} unique stories -> {len(tri)} above threshold\n")
     import collections
     print(dict(collections.Counter(x["bucket"] for x in tri)))

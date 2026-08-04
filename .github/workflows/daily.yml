@@ -2,8 +2,13 @@ name: Daily Phil watchers
 
 on:
   workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Print the digest to the log without posting to Slack"
+        type: boolean
+        default: true
   schedule:
-    # 09:15 UTC ≈ 5:15am ET — lands before the Daily Phil is assembled.
+    # 09:15 UTC ≈ 5:15am ET, weekdays — before the Daily Phil is assembled.
     - cron: "15 9 * * 1-5"
 
 permissions:
@@ -20,7 +25,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
-      - run: python src/gifts.py --days=1 --post
+      - name: Major Gifts
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python src/gifts.py --days=1 --preview
+          else
+            python src/gifts.py --days=1 --post
+          fi
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -31,14 +42,13 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
-      - run: python src/events.py --post
+      - name: What We're Watching
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python src/events.py --preview
+          else
+            python src/events.py --post
+          fi
         env:
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      - name: Persist seen-state
-        run: |
-          git config user.name "dailyphil-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git add -A data/ || true
-          git diff --staged --quiet || git commit -m "state: $(date -u +%F)"
-          git push || true
