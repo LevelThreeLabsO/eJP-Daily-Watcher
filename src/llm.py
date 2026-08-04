@@ -18,11 +18,26 @@ Two jobs the deterministic code provably cannot do:
 Both degrade safely: with no GEMINI_API_KEY set, callers fall back to the
 deterministic path and the digest says so.
 """
-import json, os, re, time
+import json, os, re, time, threading
 
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
 
 _client = None
+
+# The free tier is a low requests-per-minute allowance, and firing 76 calendar
+# pages at it concurrently exhausts it instantly. One global valve, so every
+# caller — threaded or not — shares the same budget.
+_MIN_INTERVAL = float(os.environ.get("GEMINI_MIN_INTERVAL", "6.5"))
+_lock = threading.Lock()
+_last = [0.0]
+
+
+def _throttle():
+    with _lock:
+        wait = _MIN_INTERVAL - (time.time() - _last[0])
+        if wait > 0:
+            time.sleep(wait)
+        _last[0] = time.time()
 
 
 def available():
@@ -41,7 +56,7 @@ def _get_client():
     return _client
 
 
-def _call(prompt, schema=None, temperature=0.1, retries=3, max_tokens=8192):
+def _call(prompt, schema=None, temperature=0.1, retries=4, max_tokens=8192):
     from google.genai import types
     cfg = types.GenerateContentConfig(temperature=temperature,
                                       max_output_tokens=max_tokens)
@@ -51,6 +66,7 @@ def _call(prompt, schema=None, temperature=0.1, retries=3, max_tokens=8192):
     last = None
     for a in range(retries):
         try:
+            _throttle()
             r = _get_client().models.generate_content(
                 model=MODEL, contents=prompt, config=cfg)
             txt = (r.text or "").strip()
@@ -59,7 +75,11 @@ def _call(prompt, schema=None, temperature=0.1, retries=3, max_tokens=8192):
             return json.loads(txt) if schema else txt
         except Exception as e:
             last = e
-            time.sleep(2 * (a + 1))
+            msg = str(e)
+            if "429" in msg or "RESOURCE_EXHAUSTED" in msg:
+                time.sleep(20 * (a + 1))     # quota needs real time, not a blink
+            else:
+                time.sleep(2 * (a + 1))
     raise last
 
 

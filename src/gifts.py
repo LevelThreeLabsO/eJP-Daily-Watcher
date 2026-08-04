@@ -112,7 +112,7 @@ NOT_GIFT = re.compile(
     r"stake|shares|valuation|raises? \$[\d.,]+ ?(million|billion) (?:in )?(?:seed|series|round|funding))\b",
     re.I)
 # Non-USD amounts masquerading as dollars
-FOREIGN = re.compile(r"[₦₹£€¥₪]|\b(naira|rupee|shekel|pound|euro|yen|peso|rand|dirham|AFN|CAD|AUD)\b", re.I)
+FOREIGN = re.compile(r"[₦₹£€¥₪]|\b(naira|rupee|shekel|pound|euro|yen|peso|rand|dirham|won|yuan|ringgit|baht|zloty|krona|krone|AFN|CAD|AUD|KRW|CNY)\b", re.I)
 # Institutional campaign totals aren't a gift; political money isn't philanthropy.
 CAMPAIGN_TOTAL = re.compile(
     r"\b(surpass\w*|exceed\w*|reach\w*|tops?|hits?|closes?|completes?|wraps?)\b.{0,30}"

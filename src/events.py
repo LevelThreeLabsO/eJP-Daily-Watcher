@@ -278,9 +278,11 @@ def scrape(target):
             pass
     # Then the model, which is the only thing that works on hand-built conference
     # pages. Falls back to the regex pass only if there is no key.
-    llm_ev = from_llm(body, url, target["org"], target.get("sector", ""))
-    if llm_ev:
-        ev += llm_ev
+    import llm as _llm
+    if _llm.available():
+        # The regex pass returns things like "Confirm that you are not a bot" as
+        # event titles. With a model available it is never worth its noise.
+        ev += from_llm(body, url, target["org"], target.get("sector", ""))
     elif not ev:
         ev += from_html(body, url)
     # keep only future-dated, dedupe by (date, title)
@@ -322,7 +324,7 @@ if __name__ == "__main__":
     tg = targets()
     print(f"scanning {len(tg)} organizational calendars...")
     allev, errs = [], 0
-    with cf.ThreadPoolExecutor(max_workers=8) as ex:
+    with cf.ThreadPoolExecutor(max_workers=4) as ex:
         for r in ex.map(scrape, tg):
             if r.get("error"):
                 errs += 1
