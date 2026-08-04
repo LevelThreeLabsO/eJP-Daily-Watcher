@@ -421,8 +421,16 @@ if __name__ == "__main__":
         for m in LLM_ERRORS[:5]:
             print(f"    ! {m}")
         if n_model == 0 and LLM_ERRORS:
-            print("::error::Gemini produced nothing and errored on every page.")
-            raise SystemExit(1)
+            quota = any("RESOURCE_EXHAUSTED" in m or "429" in m or "budget" in m
+                        for m in LLM_ERRORS)
+            if quota:
+                # Out of daily allowance: ship what the free structured sources and
+                # the cache gave us and say so, rather than failing the run.
+                print("::warning::Gemini daily quota exhausted — digest built from "
+                      "schema.org/iCal and cache only.")
+            else:
+                print("::error::Gemini errored on every page for a non-quota reason.")
+                raise SystemExit(1)
     print(f"events found: {len(uniq)}  ({dict(collections.Counter(e['how'] for e in uniq))})")
     hi = [e for e in uniq if e["confidence"] == "high"]
     print(f"high-confidence (machine-published): {len(hi)}\n")

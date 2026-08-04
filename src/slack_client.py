@@ -61,7 +61,11 @@ def events_digest(events, days=21, limit=25):
     up.sort(key=lambda e: (e["date"], -e["news_score"]))
     if not up:
         return f"*What We're Watching* — no notable events in the next {days} days."
-    out = [f"*What We're Watching* — {len(up)} events in the next {days} days"]
+    modelled = any(e.get("how") == "gemini" for e in events)
+    head = f"*What We're Watching* — {len(up)} events in the next {days} days"
+    if not modelled:
+        head += "  _(structured calendars only — model quota spent)_"
+    out = [head]
     cur = None
     for e in up[:limit]:
         d = dt.date.fromisoformat(e["date"])
