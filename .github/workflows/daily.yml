@@ -54,3 +54,11 @@ jobs:
         env:
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      - name: Persist the calendar cache
+        run: |
+          git config user.name "dailyphil-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/ || true
+          git diff --staged --quiet || git commit -m "cache: $(date -u +%F)"
+          git pull --rebase --autostash -q || true
+          git push || true

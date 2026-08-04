@@ -227,6 +227,16 @@ def newsworthy(e):
 
 # ---------- model extraction (primary path) ----------
 LLM_ERRORS = []
+CACHE_PATH = os.path.join(D, "event_cache.json")
+_cache = json.load(open(CACHE_PATH)) if os.path.exists(CACHE_PATH) else {}
+_cache_hits = [0]
+# Free-tier quota is the binding constraint, so cap model calls per run. Sources
+# whose pages changed are always read; the rest rotate across days via the cache.
+LLM_BUDGET = [int(os.environ.get("GEMINI_MAX_CALLS", "45"))]
+
+
+def save_cache():
+    json.dump(_cache, open(CACHE_PATH, "w"), indent=1)
 
 
 def page_text(body):
@@ -238,11 +248,20 @@ def page_text(body):
 
 
 def from_llm(body, base, org, sector):
-    import llm
+    import llm, hashlib
     if not llm.available():
         return []
+    text = page_text(body)
+    sig = hashlib.sha1(text.encode("utf8", "replace")).hexdigest()[:20]
+    hit = _cache.get(base)
+    if hit and hit.get("sig") == sig:
+        _cache_hits[0] += 1
+        return hit.get("events", [])          # page hasn't changed since last read
+    if LLM_BUDGET[0] <= 0:
+        return hit.get("events", []) if hit else []
+    LLM_BUDGET[0] -= 1
     try:
-        evs = llm.extract_events(org, base, page_text(body), TODAY.isoformat())
+        evs = llm.extract_events(org, base, text, TODAY.isoformat())
     except Exception as ex:
         LLM_ERRORS.append(f"{org}: {type(ex).__name__}: {str(ex)[:120]}")
         return []
@@ -258,6 +277,7 @@ def from_llm(body, base, org, sector):
                     "notable": x.get("notable", ""),
                     "llm_newsworthy": bool(x.get("newsworthy")),
                     "why": x.get("why", "")})
+    _cache[base] = {"sig": sig, "events": out, "org": org}
     return out
 
 
@@ -339,7 +359,9 @@ if __name__ == "__main__":
         uniq.append(e)
     json.dump(uniq, open(f"{D}/events_latest.json", "w"), indent=1)
     import collections
-    print(f"fetch errors: {errs}")
+    save_cache()
+    print(f"fetch errors: {errs}   cache hits: {_cache_hits[0]}   "
+          f"model budget left: {LLM_BUDGET[0]}")
     import llm as _llm
     if _llm.available():
         n_model = sum(1 for e in uniq if e.get("how") == "gemini")
