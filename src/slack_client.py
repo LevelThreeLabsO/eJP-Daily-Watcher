@@ -28,7 +28,11 @@ def gifts_digest(items, limit=14):
              "explicitly Jewish": "Explicitly Jewish recipient",
              "large secular gift — check donor": "Large secular gift — worth checking the donor",
              "secular gift": "Other gifts"}
-    out = [f"*Major Gifts* — {len(items)} found in the last 24 hours"]
+    judged = any("jewish_angle" in x for x in items)
+    head = f"*Major Gifts* — {len(items)} found in the last 24 hours"
+    if not judged:
+        head += "  _(rule-based only — donor screening unavailable today)_"
+    out = [head]
     shown = 0
     for b in order:
         rows = [x for x in items if x["bucket"] == b]

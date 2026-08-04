@@ -210,7 +210,14 @@ def enrich(items):
     if not llm.available():
         print("[no GEMINI_API_KEY — deterministic buckets only]")
         return items
-    verdicts = llm.judge_gifts(items)
+    try:
+        verdicts = llm.judge_gifts(items)
+    except Exception as ex:
+        # Quota exhausted or the API is down: fall back to the rule-based buckets
+        # rather than failing the run. The digest is worse, not absent.
+        print(f"[model unavailable: {type(ex).__name__}: {str(ex)[:120]}]")
+        print("[falling back to deterministic buckets]")
+        return items
     by_id = {v["id"]: v for v in verdicts}
     keep = []
     for i, it in enumerate(items):
