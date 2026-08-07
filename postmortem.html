@@ -1,0 +1,342 @@
+<title>Why the Daily Phil Watchers Missed — A Postmortem</title>
+<style>
+:root {
+  color-scheme: light;
+  --ground:#f6f8fa; --surface:#ffffff; --sunken:#eef2f6;
+  --ink:#101820; --ink2:#46545f; --ink3:#6d7d89; --rule:#dbe3ea; --rule2:#eaeff4;
+  --s1:#2a78d6; --s2:#eb6834; --good:#0ca30c; --crit:#d03b3b; --warn:#a06800;
+  --display:'Iowan Old Style','Palatino Linotype',Palatino,'Book Antiqua',Georgia,serif;
+  --body:'Helvetica Neue',Helvetica,-apple-system,'Segoe UI',Arial,sans-serif;
+  --mono:ui-monospace,'SF Mono',SFMono-Regular,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark) { :root:where(:not([data-theme="light"])) {
+  color-scheme: dark;
+  --ground:#0e1418; --surface:#161d23; --sunken:#1b242b;
+  --ink:#e7eef4; --ink2:#a3b2be; --ink3:#7d8d99; --rule:#27323b; --rule2:#1f292f;
+  --s1:#3987e5; --s2:#d95926; --good:#3cbf3c; --crit:#e66767; --warn:#fab219;
+} }
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ground:#0e1418; --surface:#161d23; --sunken:#1b242b;
+  --ink:#e7eef4; --ink2:#a3b2be; --ink3:#7d8d99; --rule:#27323b; --rule2:#1f292f;
+  --s1:#3987e5; --s2:#d95926; --good:#3cbf3c; --crit:#e66767; --warn:#fab219;
+}
+* { box-sizing:border-box; }
+body { margin:0; background:var(--ground); color:var(--ink); font-family:var(--body);
+  font-size:16.5px; line-height:1.65; -webkit-font-smoothing:antialiased; }
+.wrap { max-width:1040px; margin:0 auto; padding:0 22px 90px; }
+.col { max-width:68ch; }
+h1,h2,h3 { font-family:var(--display); font-weight:600; text-wrap:balance; letter-spacing:-.01em; }
+h1 { font-size:clamp(1.9rem,4vw,2.9rem); line-height:1.09; margin:0 0 13px; }
+h2 { font-size:clamp(1.35rem,2.5vw,1.85rem); line-height:1.2; margin:0 0 7px; }
+h3 { font-size:1.09rem; margin:0 0 5px; }
+p { margin:0 0 1em; }
+a { color:var(--s1); }
+.eyebrow { font-family:var(--mono); font-size:.69rem; letter-spacing:.13em; text-transform:uppercase;
+  color:var(--ink3); margin:0 0 9px; }
+header.top { padding:56px 0 30px; border-bottom:1px solid var(--rule); }
+.stand { font-size:1.14rem; color:var(--ink2); max-width:64ch; margin:0 0 20px; }
+.meta { font-family:var(--mono); font-size:.75rem; color:var(--ink3); line-height:1.85; }
+section { padding:48px 0 0; }
+.panel { background:var(--surface); border:1px solid var(--rule); padding:20px 22px 16px; margin:22px 0; }
+.cap { font-size:.85rem; color:var(--ink3); margin:0 0 14px; max-width:72ch; }
+.scroller { overflow-x:auto; }
+.verdict { background:var(--surface); border:1px solid var(--rule);
+  border-left:3px solid var(--crit); padding:18px 22px; margin:26px 0; }
+.verdict p { margin:0; font-family:var(--display); font-size:1.14rem; }
+table { width:100%; border-collapse:collapse; font-size:.88rem; }
+th,td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--rule2); vertical-align:top; }
+th { font-family:var(--mono); font-size:.66rem; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--ink3); border-bottom:1px solid var(--rule); font-weight:400; }
+td.num { font-family:var(--mono); font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; }
+td.bad { color:var(--crit); } td.ok { color:var(--good); }
+tbody tr:hover { background:var(--sunken); }
+.bar { display:block; height:7px; background:var(--s1); border-radius:2px; min-width:2px; }
+.bar.dim { background:var(--rule); }
+.chip { display:inline-block; font-family:var(--mono); font-size:.66rem; letter-spacing:.05em;
+  text-transform:uppercase; padding:2px 7px; border:1px solid; border-radius:2px; white-space:nowrap; }
+.chip.crit { color:var(--crit); border-color:color-mix(in srgb,var(--crit) 45%,transparent); }
+.chip.ok { color:var(--good); border-color:color-mix(in srgb,var(--good) 45%,transparent); }
+.chip.warn { color:var(--warn); border-color:color-mix(in srgb,var(--warn) 50%,transparent); }
+.trace { background:var(--sunken); border:1px solid var(--rule); font-family:var(--mono);
+  font-size:.79rem; line-height:1.85; padding:14px 16px; margin:16px 0; overflow-x:auto; }
+.trace .kill { color:var(--crit); }
+.trace .pass { color:var(--good); }
+.grid2 { display:grid; gap:1px; background:var(--rule); border:1px solid var(--rule); margin:22px 0; }
+.card { background:var(--surface); padding:17px 19px; }
+.card p { margin:0 0 .55em; font-size:.93rem; color:var(--ink2); }
+.card p:last-child { margin-bottom:0; }
+.card .lab { font-family:var(--mono); font-size:.68rem; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--ink3); margin-bottom:4px; }
+ul,ol { padding-left:1.2em; margin:0 0 1em; }
+li { margin-bottom:.42em; }
+blockquote { margin:18px 0; padding:10px 0 10px 18px; border-left:2px solid var(--s2);
+  font-family:var(--display); font-size:1.06rem; max-width:64ch; color:var(--ink); }
+.quote-src { font-family:var(--body); font-size:.83rem; color:var(--ink3); margin-top:6px; }
+hr.div { border:0; border-top:1px solid var(--rule); margin:52px 0 0; }
+.foot { font-size:.86rem; color:var(--ink3); }
+.eg { font-size:.93rem; border-left:2px solid var(--rule); padding-left:14px; color:var(--ink2); margin:14px 0; }
+.eg b { color:var(--ink); font-weight:600; }
+</style>
+
+<div class="wrap">
+<header class="top">
+  <p class="eyebrow">Postmortem &middot; 5 Aug 2026 &middot; eJP Daily Phil watchers</p>
+  <h1>I built the wrong thing twice, and the evidence to know better was already on my desk</h1>
+  <p class="stand">The editor's feedback on this morning's two digests was specific enough to diagnose
+  properly. This is what went wrong, measured against eJP's own published sections rather than
+  against my impressions &mdash; plus the process change that would have caught it before a single
+  line of code was written.</p>
+  <p class="meta">
+    Test set &middot; 184 real "What We're Watching" items from 60 Daily Phil editions<br>
+    Traced &middot; the two Major Gifts misses the editor named, followed through the actual filters<br>
+    Sources verified &middot; 19 feeds probed, 13 working; CourtListener; gov.il
+  </p>
+</header>
+
+<div class="verdict">
+  <p>Of 184 real items eJP published in this section, <strong>22% could ever have been reached by an
+  organizational events calendar</strong> &mdash; and an organizational events calendar is the only
+  thing I built. The design ceiling was about one item in five before a single filter ran.</p>
+</div>
+
+<section>
+  <div class="col">
+    <p class="eyebrow">The measurement I should have taken first</p>
+    <h2>Their archive was a labeled test set the whole time</h2>
+    <p>Every Daily Phil edition carries this section &mdash; 60 out of 60 I sampled, averaging 3.1
+    items each. I could have pulled hundreds of real examples on day one, asked "which of these could
+    my pipeline reach?", and gotten a number. I never did. I built from the editor's description of
+    his manual routine and from my own assumptions about where events live.</p>
+    <p>Doing it now takes about a minute and produces this:</p>
+  </div>
+  <div class="panel">
+    <h3>What source would have to exist to catch each real item</h3>
+    <p class="cap">184 items, 60 editions. Non-exclusive &mdash; an item about an Israeli ministry
+    conference counts twice.</p>
+    <div class="scroller"><table>
+      <thead><tr><th>Source type needed</th><th style="text-align:right">Items</th>
+      <th style="text-align:right">Share</th><th style="width:34%">&nbsp;</th><th>Did I build it?</th></tr></thead>
+      <tbody>
+        <tr><td>Israeli press / government announcement</td><td class="num">84</td><td class="num">46%</td>
+          <td><i class="bar" style="width:46%"></i></td><td><span class="chip crit">no</span></td></tr>
+        <tr><td>Conference / convening calendar</td><td class="num">74</td><td class="num">40%</td>
+          <td><i class="bar" style="width:40%"></i></td><td><span class="chip ok">yes</span></td></tr>
+        <tr><td>US Jewish org press release</td><td class="num">29</td><td class="num">16%</td>
+          <td><i class="bar" style="width:16%"></i></td><td><span class="chip warn">partly</span></td></tr>
+        <tr><td>US government / policy calendar</td><td class="num">18</td><td class="num">10%</td>
+          <td><i class="bar" style="width:10%"></i></td><td><span class="chip crit">no</span></td></tr>
+        <tr><td>Court docket</td><td class="num">3</td><td class="num">2%</td>
+          <td><i class="bar dim" style="width:2%"></i></td><td><span class="chip crit">no</span></td></tr>
+        <tr><td>None of the above</td><td class="num">40</td><td class="num">22%</td>
+          <td><i class="bar dim" style="width:22%"></i></td><td>&mdash;</td></tr>
+      </tbody>
+    </table></div>
+    <p class="foot" style="margin:10px 0 0">Two numbers matter most. <strong>68% of real items are
+    anchored to today</strong> &mdash; "concludes today", "begins today", "this evening", "earlier
+    today". And <strong>only 22% are reachable from an events calendar alone</strong>, which is the
+    entirety of what I built.</p>
+  </div>
+</section>
+
+<hr class="div">
+
+<section>
+  <div class="col">
+    <p class="eyebrow">Error one</p>
+    <h2>What We're Watching is a today brief, not a calendar</h2>
+    <p>I built a rolling 30-day forward calendar. The section is a same-day news brief. Those are
+    different products, and the difference shows in the language of every real item:</p>
+  </div>
+  <div class="eg">
+    <p>Israel's <b>Education Ministry</b>, <b>Ministry of Immigration and Absorption</b> and <b>Nefesh
+    B'Nefesh</b> launched the <b>National Educator's Aliyah Program</b> <b>earlier today</b>, seeking
+    to fast-track&hellip; as the country works to fill a shortage of 4,000 teachers.</p>
+    <p>The <b>Jewish Federations of North America</b>'s National Young Leadership Cabinet retreat
+    <b>concludes today</b> in Minneapolis.</p>
+    <p><b>Oral arguments begin today</b> in a federal court in Washington in <b>National Ben Gamla
+    Jewish Charter School Foundation, Inc. v. Drummond</b>&hellip;</p>
+    <p><b>This evening</b>, the remains of Zionist visionary Theodor Herzl's grandparents will be
+    reinterred in Israel's Mount Herzl National Cemetery.</p>
+  </div>
+  <div class="col">
+    <p>Read those four and count the sources. One &mdash; the JFNA retreat &mdash; could come from an
+    organizational events page. The other three come from an Israeli ministry announcement, a federal
+    court docket, and Israeli press. My system could not have produced three of the four items on the
+    day the editor complained.</p>
+    <p>Three separate mistakes compound here:</p>
+    <ul>
+      <li><strong>Wrong window.</strong> I shipped events up to 30 days out. Their reader wants to
+      know what is happening <em>today</em>, including what is <em>ending</em> today &mdash; a concept
+      my model never even had, because a calendar entry has a start date and I never tracked spans.</li>
+      <li><strong>Wrong register.</strong> Their items are sentences with news context and a stake.
+      Mine were rows: title, date, org. Even a correct event, formatted as a calendar row, isn't
+      usable copy.</li>
+      <li><strong>Wrong altitude.</strong> I sent HUC admissions webinars, Hadassah chapter mahjong
+      afternoons and "Baby &amp; Me Yoga" to a channel read by people who fund national institutions.
+      I had already written a filter for exactly this and it wasn't strict enough, because I was
+      filtering a source that was 90% wrong rather than choosing a better source.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="div">
+
+<section>
+  <div class="col">
+    <p class="eyebrow">Error two</p>
+    <h2>Major Gifts: two misses, traced through the actual code</h2>
+    <p>The editor named two stories eJP ran that I didn't surface. They failed for completely
+    different reasons, and only one of them is fixable.</p>
+    <h3>Miss 1 &mdash; Bank of Jerusalem's donation to Soroka</h3>
+    <p>This one is squarely my fault. The story <em>was</em> in Google News, from the Jerusalem Post,
+    inside my search window. I ran the real headline back through my own filters:</p>
+  </div>
+  <div class="trace">
+"Bank of Jerusalem to donate hundreds of thousands of shekels to Soroka"<br><br>
+&nbsp;&nbsp;gift language present ...... <span class="pass">PASS</span><br>
+&nbsp;&nbsp;not business news ......... <span class="pass">PASS</span><br>
+&nbsp;&nbsp;not political ............. <span class="pass">PASS</span><br>
+&nbsp;&nbsp;dollar amount parsed ...... <span class="kill">0</span> &nbsp;&larr; "hundreds of thousands" has no numeral<br>
+&nbsp;&nbsp;Jewish-relevance match .... <span class="kill">NONE</span> &nbsp;&larr; "Jerusalem", "Soroka" absent from my vocabulary<br>
+&nbsp;&nbsp;&rarr; guard: no amount AND no Jewish angle &nbsp;<span class="kill">DROPPED</span>
+  </div>
+  <div class="col">
+    <p>Two independent failures in one headline. My amount parser only understands numerals, so a gift
+    described in words scores zero. And my Jewish-relevance vocabulary listed "Israel", "Israeli" and
+    "Hebrew" but not <em>Jerusalem</em> &mdash; nor any Israeli city, hospital or university. Soroka is
+    one of the largest medical centers in Israel and my code had never heard of it.</p>
+    <p>There is a third, worse bug sitting next to it. My currency filter rejects any headline
+    containing "shekel", on the theory that non-dollar amounts are foreign noise. For a publication
+    where Israel appears in 84% of coverage, that filter is actively hostile. It only spared this
+    story by accident &mdash; the headline said "shekels" plural and my pattern matched the singular.</p>
+    <h3>Miss 2 &mdash; the Satmar philanthropist's $1M legal aid fund</h3>
+    <p>This one I want to be straight about rather than promise away. I searched for it in Google News
+    across four query formulations: zero results. I then pulled 250 headlines from 12 Jewish, Israeli
+    and haredi feeds &mdash; JNS, JPost, JTA, Forward, Algemeiner, Ynet, Matzav, Yeshiva World News,
+    Yated, Jewish Press, Collive and eJP itself. The story is in none of them.</p>
+    <p>So it most likely reached eJP the way my own audit said most of their news arrives: directly.
+    The audit found <strong>73% of eJP news stories quote an interview eJP conducted itself</strong>,
+    and the editor told us plainly that organizations announcing a big gift "are gonna send it to us
+    anyway." A real share of Major Gifts will never be publicly scrapeable, and a tool that claims
+    otherwise is lying.</p>
+    <p>What I <em>should</em> do is add the haredi press properly &mdash; five of those feeds work and
+    none were in the build &mdash; and then be honest that the inbox-sourced items are the editor's,
+    not the machine's.</p>
+    <h3>And the noise I did send</h3>
+    <p>Memphis Zoo's $50M matching gift. A $5.5M gift to protect a bald eagle's habitat. Those
+    outranked Jewish items because I sorted by dollar size and treated Jewish relevance as a
+    <em>label</em> applied afterwards. It should be a <em>gate</em> applied first. A $200M gift with no
+    Jewish angle is worth less to this newsletter than a $1M gift with one, and my ranking asserted
+    the opposite.</p>
+  </div>
+</section>
+
+<hr class="div">
+
+<section>
+  <div class="col">
+    <p class="eyebrow">The root cause</p>
+    <h2>I did the research, then ignored it</h2>
+    <p>This is the part worth dwelling on, because the filter bugs are symptoms.</p>
+    <p>Three days ago I read all 1,204 of eJP's news articles and wrote up what the archive showed.
+    Among the findings:</p>
+  </div>
+  <blockquote>
+    Israel appears in 84% of all news stories. The most-linked domains are Jewish press &mdash; Jewish
+    Insider, Times of Israel, JTA, Jerusalem Post, Haaretz, Forward, Ynet, JNS. Hebrew-language
+    business press barely appears: Calcalist five stories, Globes four.
+    <div class="quote-src">&mdash; my own audit of eJP's news archive, 3 Aug</div>
+  </blockquote>
+  <div class="col">
+    <p>Then I built a gift finder whose sources were generic English-language Google News searches for
+    American universities, hospitals and museums, and an events aggregator built on US federation
+    calendars. Not one Israeli outlet. Not one haredi outlet. No Hebrew. I had measured that this
+    publication is overwhelmingly about Israel and then built two systems that structurally could not
+    see Israel.</p>
+    <p>Why: I took the editor's description of his manual workflow &mdash; "I type in university
+    million dollar donation, hospital million dollar donation" &mdash; as the specification. It isn't
+    the specification. It is the <em>workaround he uses because he has no better tool</em>, and it
+    covers the one slice of the beat that generic search happens to reach. Automating someone's
+    workaround reproduces its blind spots at scale.</p>
+    <p>The same mistake produced the events failure. I asked "where do event listings live?" and
+    answered "organizational calendars", which is true and nearly irrelevant. The right question was
+    "where do the items in this section actually come from?" &mdash; answerable in one minute from
+    their archive, and the answer is Israeli press and news, not calendars.</p>
+  </div>
+</section>
+
+<hr class="div">
+
+<section>
+  <div class="col">
+    <p class="eyebrow">The fix</p>
+    <h2>What changes</h2>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <p class="lab">What We're Watching &middot; sources</p>
+      <p>Add the 13 verified feeds &mdash; JPost (60 items/pull), JNS, JTA, Forward, Algemeiner, Ynet,
+      plus the five haredi outlets. These carry the Israeli ministry announcements, the reinterments,
+      the primary-day items and the Monsey benefits that calendars never will.</p>
+      <p>Add CourtListener for a tracked-case docket calendar: I confirmed it holds
+      <em>National Ben Gamla Jewish Charter School Foundation v. Drummond</em> with its filing date.
+      Only 2% of items are court-derived, so this is small and cheap, not a pillar.</p>
+      <p>Keep conference calendars, but only the national ones, and track <em>end</em> dates so
+      "concludes today" becomes possible. Israeli government sites block scraping (gov.il returns 403),
+      so ministry news arrives via the press feeds instead.</p>
+    </div>
+    <div class="card">
+      <p class="lab">What We're Watching &middot; shape</p>
+      <p>Window collapses from 30 days to today, plus what ends today and what opens today.</p>
+      <p>Output becomes a written sentence with the stake stated &mdash; who, what, where, why a funder
+      cares &mdash; not a calendar row. The model writes it; the facts come from the source.</p>
+      <p>Altitude gate is explicit: national or international significance, or genuinely singular
+      (a reinterment at Mount Herzl qualifies; a chapter book club never does).</p>
+    </div>
+    <div class="card">
+      <p class="lab">Major Gifts &middot; relevance first</p>
+      <p>Invert the pipeline. Jewish or Israel relevance becomes the gate; dollar size becomes the
+      sort <em>within</em> what passes. The Memphis Zoo never appears again.</p>
+      <p>Vocabulary expands from a dozen words to the actual entity space: Israeli cities, Israeli
+      hospitals (Soroka, Hadassah, Sheba, Ichilov, Rambam), Israeli universities, and the haredi world
+      &mdash; Satmar, Belz, Bobov, Lakewood, Monsey, kollel.</p>
+      <p>Shekels and NIS become first-class amounts, not grounds for rejection. Non-numeric gifts
+      ("hundreds of thousands", "seven figures") stop scoring zero.</p>
+    </div>
+    <div class="card">
+      <p class="lab">Both &middot; measured against their archive</p>
+      <p>The test set is now built: 184 items across 60 editions, and the same can be done for Major
+      Gifts. Every change gets scored on what share of real published items it would have surfaced.</p>
+      <p>Dedupe against eJP's own RSS, so the digest never suggests something they already published.</p>
+      <p>Target: reach 70%+ of the archive items before this posts to a live channel. Today's design
+      tops out near 22%.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+<section>
+  <div class="col">
+    <p class="eyebrow">The process change that matters</p>
+    <h2>Backtest before building, not after complaining</h2>
+    <p>Everything above was discoverable on day one. The lesson isn't "add Israeli sources" &mdash;
+    it's that I shipped two digests without ever checking my output against the thing it was meant to
+    replace, when a copy of the thing it was meant to replace was sitting in a public API I had
+    already scraped 1,204 times.</p>
+    <p>So the rule going forward, for this and anything else I build for eJP: <strong>find the
+    existing human output, turn it into a scored test set, and report the score before asking anyone
+    to look at a digest.</strong> "Here are 30 events I found" is not a result. "Here are 30 events,
+    which is 74% of what you published that week, and here are the 8 I missed and why" is.</p>
+    <h3>What I'd tell you not to expect</h3>
+    <p>Even done properly, some fraction of Major Gifts arrives in the editor's inbox from
+    organizations that want coverage, and some comes from his own sources. The Satmar item looks like
+    one of those. The honest goal is to remove the tedium &mdash; the morning of Googling &mdash; and
+    to catch the Israeli and haredi items he currently has no systematic way to see. Not to replace
+    his judgment or his phone.</p>
+    <p class="foot">Nothing has posted to either Slack channel. Both jobs run in dry-run mode into the
+    GitHub Actions log, and I'd keep them there until the backtest number is respectable.</p>
+  </div>
+</section>
+</div>

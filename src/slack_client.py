@@ -51,29 +51,62 @@ def gifts_digest(items, limit=14):
     return "\n".join(out)
 
 
-def events_digest(events, days=21, limit=25):
+def events_digest(events, days=0, limit=25):
+    """
+    Today only. The section is a same-day brief — 63% of eJP's real items are
+    anchored to today ("concludes today", "this evening", "kicked off last
+    night") — so a forward calendar is the wrong product entirely.
+    """
     import datetime as dt
     today = dt.date.today()
-    horizon = today + dt.timedelta(days=days)
-    up = [e for e in events
-          if e.get("news_score", 0) >= 3
-          and today <= dt.date.fromisoformat(e["date"]) <= horizon]
-    up.sort(key=lambda e: (e["date"], -e["news_score"]))
-    if not up:
-        return f"*What We're Watching* — no notable events in the next {days} days."
-    modelled = any(e.get("how") == "gemini" for e in events)
-    head = f"*What We're Watching* — {len(up)} events in the next {days} days"
-    if not modelled:
-        head += "  _(structured calendars only — model quota spent)_"
-    out = [head]
-    cur = None
-    for e in up[:limit]:
-        d = dt.date.fromisoformat(e["date"])
-        wk = d.strftime("Week of %b %d")
-        if wk != cur:
-            out.append(f"\n*{wk}*"); cur = wk
-        mark = "" if e["confidence"] == "high" else " ⟨unconfirmed⟩"
-        place = f" · {e['place']}" if e.get("place") else ""
-        out.append(f"• {d.strftime('%a %b %-d')} — <{e['url']}|{e['title'][:110]}>\n"
-                   f"   _{e['org']}{place}_{mark}")
+
+    def d(x):
+        return dt.date.fromisoformat(x["date"])
+
+    def ends(x):
+        e = x.get("end_date")
+        try:
+            return dt.date.fromisoformat(e) if e else d(x)
+        except Exception:
+            return d(x)
+
+    # A Zoom webinar is not a thing a funder plans a day around. Online-only
+    # items are dropped unless they clear a much higher bar on their own.
+    import re as _re
+    ONLINE = _re.compile(r"\b(zoom|webinar|virtual|online|livestream|web ?cast)\b", _re.I)
+
+    def online_only(e):
+        blob = f"{e.get('place','')} {e.get('title','')} {e.get('kind','')} {e.get('scale','')}"
+        return bool(ONLINE.search(blob))
+
+    live = []
+    for e in events:
+        if e.get("news_score", 0) < 3:
+            continue
+        if online_only(e) and e.get("news_score", 0) < 6:
+            continue
+        try:
+            start, end = d(e), ends(e)
+        except Exception:
+            continue
+        if start <= today <= end:
+            e["_phase"] = ("opens" if start == today else
+                           "concludes" if end == today else "continues")
+            live.append(e)
+    live.sort(key=lambda e: (e["_phase"] != "opens", -e.get("news_score", 0)))
+
+    stamp = today.strftime("%A, %B %-d")
+    if not live:
+        return f"*What We're Watching* — {stamp}\n_Nothing on the radar for today._"
+    out = [f"*What We're Watching* — {stamp}"]
+    VERB = {"opens": "begins today", "concludes": "concludes today", "continues": "is underway"}
+    for e in live[:limit]:
+        where = f" in {e['place'].split(',')[0].strip()}" if e.get("place") else ""
+        note = f" {e['notable']}" if e.get("notable") else ""
+        flag = "" if e.get("confidence") in ("high", "model") else "  ⟨unconfirmed⟩"
+        src = e.get("url", "")
+        host = _re.sub(r"^www\.", "", _re.sub(r"^https?://([^/]+).*$", r"\1", src)) if src else ""
+        via = f"  <{src}|source: {host}>" if src else ""
+        out.append(f"• *{e['org']}*'s {e['title'][:120]} "
+                   f"{VERB[e['_phase']]}{where}.{note}{via}{flag}")
     return "\n".join(out)
