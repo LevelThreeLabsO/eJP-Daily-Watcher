@@ -1,6 +1,6 @@
 {
  "https://srenetwork.org/event-calendar/list": {
-  "sig": "0a85a294063f566f7676",
+  "sig": "31f34a5aed0383872adb",
   "events": [
    {
     "date": "2026-08-18",
@@ -150,7 +150,7 @@
   "org": "Jewish Council for Public Affairs"
  },
  "https://standwithus.com/events/international-conference-2026": {
-  "sig": "3da550b1ef9db6e952a2",
+  "sig": "2ae7e6f5a4f3ba72c815",
   "events": [],
   "org": "StandWithUs"
  },
@@ -353,7 +353,7 @@
   "org": "Israel Policy Forum"
  },
  "https://jstreet.org/events-calendar": {
-  "sig": "dd42872bce66c4735b34",
+  "sig": "032c13da27c166076372",
   "events": [],
   "org": "J Street"
  },
@@ -502,7 +502,7 @@
   "org": "Rabbinical Assembly"
  },
  "https://www.ou.org/understanding-teen-drinking-risks-prevention-and-community-responsibility": {
-  "sig": "d2034373e6bf0a5fb0bd",
+  "sig": "c862b83f1c04ced7e04e",
   "events": [],
   "org": "Orthodox Union"
  },
@@ -534,12 +534,12 @@
   "org": "Foundation for Jewish Camp"
  },
  "https://www.hartman.org.il/events": {
-  "sig": "01df63bb9101fbc68a44",
+  "sig": "d15ae0783c7b85e1f1cb",
   "events": [
    {
     "date": "2026-09-08",
     "title": "The Road to the Israeli Elections",
-    "place": "Online",
+    "place": "Virtual Event",
     "url": "https://www.hartman.org.il/events",
     "how": "gemini",
     "confidence": "model",
@@ -563,7 +563,7 @@
     "kind": "conference",
     "notable": "",
     "llm_newsworthy": true,
-    "why": "A significant regional leadership conference hosted by the Shalom Hartman Institute.",
+    "why": "Significant institutional convening for regional and national leaders.",
     "org": "Shalom Hartman Institute",
     "sector": "education",
     "news_score": 6
@@ -782,23 +782,23 @@
   "org": "Nefesh B'Nefesh"
  },
  "https://www.z3project.org/events": {
-  "sig": "682653f3aa5487495379",
+  "sig": "384796e5ede548af03a0",
   "events": [
    {
     "date": "2026-09-02",
     "title": "Choosing Hope: A conversation with Luai Ahmed",
-    "place": "OFJCC, Palo Alto",
+    "place": "OFJCC, Palo Alto, CA",
     "url": "https://www.z3project.org/events",
     "how": "gemini",
     "confidence": "model",
     "scale": "local",
     "kind": "lecture",
     "notable": "",
-    "llm_newsworthy": true,
-    "why": "A distinctive cultural and intellectual event featuring a prominent Yemeni journalist discussing coexistence, co-hosted by Z3 and StandWithUs.",
+    "llm_newsworthy": false,
+    "why": "",
     "org": "Z3 Project",
     "sector": "israel",
-    "news_score": 6
+    "news_score": 0
    }
   ],
   "org": "Z3 Project"
@@ -809,17 +809,98 @@
   "org": "Maccabi USA"
  },
  "https://www.hadassah.org/events": {
-  "sig": "4edb4d13ebc049109ec6",
-  "events": [],
+  "sig": "fba0c11a630b93ff86eb",
+  "events": [
+   {
+    "date": "2026-08-11",
+    "title": "Hadassah Game Day",
+    "place": "Orlando, FL",
+    "url": "https://www.hadassah.org/events",
+    "how": "gemini",
+    "confidence": "model",
+    "scale": "local",
+    "kind": "other",
+    "notable": "",
+    "llm_newsworthy": false,
+    "why": "",
+    "org": "Hadassah",
+    "sector": "national",
+    "news_score": 0
+   },
+   {
+    "date": "2026-08-12",
+    "title": "Monthly Mahjong Night (August)",
+    "place": "Walnut Creek, CA",
+    "url": "https://www.hadassah.org/events",
+    "how": "gemini",
+    "confidence": "model",
+    "scale": "local",
+    "kind": "other",
+    "notable": "",
+    "llm_newsworthy": false,
+    "why": "",
+    "org": "Hadassah",
+    "sector": "national",
+    "news_score": 0
+   },
+   {
+    "date": "2026-08-12",
+    "title": "Games Day",
+    "place": "Plainview, NY",
+    "url": "https://www.hadassah.org/events",
+    "how": "gemini",
+    "confidence": "model",
+    "scale": "local",
+    "kind": "other",
+    "notable": "",
+    "llm_newsworthy": false,
+    "why": "",
+    "org": "Hadassah",
+    "sector": "national",
+    "news_score": 0
+   },
+   {
+    "date": "2026-08-12",
+    "title": "Trip to the Theater",
+    "place": "Commack, NY",
+    "url": "https://www.hadassah.org/events",
+    "how": "gemini",
+    "confidence": "model",
+    "scale": "local",
+    "kind": "other",
+    "notable": "",
+    "llm_newsworthy": false,
+    "why": "",
+    "org": "Hadassah",
+    "sector": "national",
+    "news_score": 0
+   },
+   {
+    "date": "2026-08-13",
+    "title": "Happy Hour with Austin August",
+    "place": "Austin, TX",
+    "url": "https://www.hadassah.org/events",
+    "how": "gemini",
+    "confidence": "model",
+    "scale": "local",
+    "kind": "other",
+    "notable": "",
+    "llm_newsworthy": false,
+    "why": "",
+    "org": "Hadassah",
+    "sector": "national",
+    "news_score": 0
+   }
+  ],
   "org": "Hadassah"
  },
  "https://www.ncjw.org/events": {
-  "sig": "4a61d1c3c8cc409f4af8",
+  "sig": "624908b5083fa00064cc",
   "events": [
    {
     "date": "2026-09-16",
     "title": "Voter. Voting. Voted! Preparing for 2026 Elections in the United States and Israel",
-    "place": "Online",
+    "place": "Virtual",
     "url": "https://www.ncjw.org/events",
     "how": "gemini",
     "confidence": "model",
@@ -835,7 +916,7 @@
    {
     "date": "2026-08-12",
     "title": "All Options Pastoral Training August 2026 Application",
-    "place": "Online",
+    "place": "Virtual",
     "url": "https://www.ncjw.org/events",
     "how": "gemini",
     "confidence": "model",
@@ -851,11 +932,11 @@
    {
     "date": "2026-08-22",
     "title": "NCJW and Abortion Access Now Philadelphia Training",
-    "place": "Philadelphia",
+    "place": "Philadelphia, PA",
     "url": "https://www.ncjw.org/events",
     "how": "gemini",
     "confidence": "model",
-    "scale": "local",
+    "scale": "regional",
     "kind": "other",
     "notable": "",
     "llm_newsworthy": false,
@@ -1354,40 +1435,8 @@
   "org": "JCC Association"
  },
  "https://thejewishmuseum.org/programs": {
-  "sig": "2b5f1ec0e165ea18503d",
+  "sig": "39c1716f9a3a04f4eae6",
   "events": [
-   {
-    "date": "2026-08-10",
-    "title": "Becoming Jewish: Warhol\u2019s Liz and Marilyn",
-    "place": "New York, NY",
-    "url": "https://thejewishmuseum.org/programs",
-    "how": "gemini",
-    "confidence": "model",
-    "scale": "local",
-    "kind": "lecture",
-    "notable": "",
-    "llm_newsworthy": false,
-    "why": "",
-    "org": "Jewish Museum (NY)",
-    "sector": "museum",
-    "news_score": 0
-   },
-   {
-    "date": "2026-08-23",
-    "title": "Access Family Workshop: Modernity and Opulence: Women of the Wiener Werkst\u00e4tte",
-    "place": "New York, NY",
-    "url": "https://thejewishmuseum.org/programs",
-    "how": "gemini",
-    "confidence": "model",
-    "scale": "local",
-    "kind": "other",
-    "notable": "",
-    "llm_newsworthy": false,
-    "why": "",
-    "org": "Jewish Museum (NY)",
-    "sector": "museum",
-    "news_score": 0
-   },
    {
     "date": "2026-09-14",
     "title": "Virtual Curator Talk",
@@ -1411,33 +1460,49 @@
     "url": "https://thejewishmuseum.org/programs",
     "how": "gemini",
     "confidence": "model",
-    "scale": "national",
+    "scale": "local",
     "kind": "lecture",
     "notable": "",
     "llm_newsworthy": true,
-    "why": "A high-profile conversation between the Jewish Museum's Director James S. Snyder and world-renowned artist and author Edmund de Waal.",
+    "why": "High-profile cultural conversation between the museum director and a world-renowned artist/author.",
     "org": "Jewish Museum (NY)",
     "sector": "museum",
     "news_score": 6
+   },
+   {
+    "date": "2026-08-23",
+    "title": "Access Family Workshop: Modernity and Opulence: Women of the Wiener Werkst\u00e4tte",
+    "place": "New York, NY",
+    "url": "https://thejewishmuseum.org/programs",
+    "how": "gemini",
+    "confidence": "model",
+    "scale": "local",
+    "kind": "other",
+    "notable": "",
+    "llm_newsworthy": false,
+    "why": "",
+    "org": "Jewish Museum (NY)",
+    "sector": "museum",
+    "news_score": 0
    }
   ],
   "org": "Jewish Museum (NY)"
  },
  "https://theweitzman.org/eventcalendar": {
-  "sig": "78c743e19c6530c3ddd9",
+  "sig": "eb55de45b450f604f7ee",
   "events": [
    {
-    "date": "2026-11-16",
-    "title": "Only in America Gala honoring the Wilf Family",
-    "place": "Weitzman National Museum of American Jewish History, Philadelphia, PA",
+    "date": "2026-10-01",
+    "title": "An Evening with Evan Gershkovich",
+    "place": "Philadelphia, PA",
     "url": "https://theweitzman.org/eventcalendar",
     "how": "gemini",
     "confidence": "model",
     "scale": "national",
-    "kind": "gala",
-    "notable": "Honoring the Wilf family",
+    "kind": "lecture",
+    "notable": "",
     "llm_newsworthy": true,
-    "why": "Major national museum gala honoring a prominent philanthropic family.",
+    "why": "High-profile event featuring recently freed journalist Evan Gershkovich, highly relevant to the national Jewish community.",
     "org": "Weitzman National Museum of American Jewish History",
     "sector": "museum",
     "news_score": 6
@@ -1446,28 +1511,12 @@
   "org": "Weitzman National Museum of American Jewish History"
  },
  "https://museumoftolerance.com/events": {
-  "sig": "2034aeef036e3f02e961",
+  "sig": "5733c4ead55277960d03",
   "events": [
-   {
-    "date": "2026-08-09",
-    "title": "Speaker Series: Karen Roseman",
-    "place": "Los Angeles, CA",
-    "url": "https://museumoftolerance.com/events",
-    "how": "gemini",
-    "confidence": "model",
-    "scale": "local",
-    "kind": "lecture",
-    "notable": "",
-    "llm_newsworthy": false,
-    "why": "",
-    "org": "Museum of Tolerance",
-    "sector": "museum",
-    "news_score": 0
-   },
    {
     "date": "2026-08-16",
     "title": "Speaker Series: Andy Pasztor",
-    "place": "Los Angeles, CA",
+    "place": "Museum of Tolerance, Los Angeles, CA",
     "url": "https://museumoftolerance.com/events",
     "how": "gemini",
     "confidence": "model",
@@ -1483,7 +1532,7 @@
    {
     "date": "2026-08-23",
     "title": "Speaker Series: Sara Goldman (en espa\u00f1ol)",
-    "place": "Los Angeles, CA",
+    "place": "Museum of Tolerance, Los Angeles, CA",
     "url": "https://museumoftolerance.com/events",
     "how": "gemini",
     "confidence": "model",
@@ -1499,7 +1548,7 @@
    {
     "date": "2026-08-23",
     "title": "Speaker Series: Karen Roseman",
-    "place": "Los Angeles, CA",
+    "place": "Museum of Tolerance, Los Angeles, CA",
     "url": "https://museumoftolerance.com/events",
     "how": "gemini",
     "confidence": "model",
@@ -1515,7 +1564,7 @@
    {
     "date": "2026-08-30",
     "title": "Speaker Series: Aviyah Farkas",
-    "place": "Los Angeles, CA",
+    "place": "Museum of Tolerance, Los Angeles, CA",
     "url": "https://museumoftolerance.com/events",
     "how": "gemini",
     "confidence": "model",
@@ -1532,7 +1581,7 @@
   "org": "Museum of Tolerance"
  },
  "https://www.cjh.org/programs/programs": {
-  "sig": "e7d707783440eb7b1940",
+  "sig": "ac108115b2cfa65248d9",
   "events": [],
   "org": "Center for Jewish History"
  },
@@ -1821,12 +1870,12 @@
   "org": "Yiddish Book Center"
  },
  "https://ajhs.org/exhibitions-programs/program-events": {
-  "sig": "d4950c890b6c6ef03ad7",
+  "sig": "8c3702355c25db69de39",
   "events": [
    {
     "date": "2026-09-17",
     "title": "At Lunch with Daniel Okrent",
-    "place": "AJHS (Virtual)",
+    "place": "Online",
     "url": "https://ajhs.org/exhibitions-programs/program-events",
     "how": "gemini",
     "confidence": "model",
@@ -1842,7 +1891,7 @@
    {
     "date": "2026-10-22",
     "title": "At Lunch with Joel Dinerstein",
-    "place": "AJHS (Virtual)",
+    "place": "Online",
     "url": "https://ajhs.org/exhibitions-programs/program-events",
     "how": "gemini",
     "confidence": "model",
@@ -1858,7 +1907,7 @@
    {
     "date": "2026-11-04",
     "title": "Book Talk \u2013 Jewish Women at Home in the World",
-    "place": "AJHS (Virtual)",
+    "place": "Online",
     "url": "https://ajhs.org/exhibitions-programs/program-events",
     "how": "gemini",
     "confidence": "model",
@@ -1874,7 +1923,23 @@
    {
     "date": "2026-11-11",
     "title": "Book Talk \u2013 Able to Be American",
-    "place": "AJHS (Virtual)",
+    "place": "Online",
+    "url": "https://ajhs.org/exhibitions-programs/program-events",
+    "how": "gemini",
+    "confidence": "model",
+    "scale": "online",
+    "kind": "lecture",
+    "notable": "",
+    "llm_newsworthy": false,
+    "why": "",
+    "org": "American Jewish Historical Society",
+    "sector": "archive",
+    "news_score": 0
+   },
+   {
+    "date": "2026-12-09",
+    "title": "Book Talk \u2013 Interfaith Friends and Ideological Foes",
+    "place": "Online",
     "url": "https://ajhs.org/exhibitions-programs/program-events",
     "how": "gemini",
     "confidence": "model",
@@ -1965,7 +2030,7 @@
   "org": "Israel Film Center"
  },
  "https://www.jewishbookcouncil.org/events": {
-  "sig": "2c7c4245a388a1d0b66b",
+  "sig": "bf00db34dda04283df00",
   "events": [
    {
     "date": "2026-10-15",
@@ -1975,13 +2040,13 @@
     "how": "gemini",
     "confidence": "model",
     "scale": "online",
-    "kind": "webinar",
+    "kind": "other",
     "notable": "",
-    "llm_newsworthy": false,
-    "why": "Routine online book discussion event.",
+    "llm_newsworthy": true,
+    "why": "A major national literary event featuring prominent author Bruce Feiler and high-profile Rabbi Angela Buchdahl for a community-wide read.",
     "org": "Jewish Book Council",
     "sector": "books",
-    "news_score": 0
+    "news_score": 6
    }
   ],
   "org": "Jewish Book Council"
