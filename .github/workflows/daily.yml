@@ -19,51 +19,35 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  gifts:
+  digest:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - run: pip install -r requirements.txt
-      - name: Major Gifts
+
+      - name: Collect candidates
+        run: python src/feeds.py
+
+      - name: Sort into sections and post
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            python src/gifts.py --days=1 --preview
+            python src/digest.py --preview
           else
-            python src/gifts.py --days=1 --post
+            python src/digest.py --post
           fi
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          # The two jobs run on separate runners and cannot share a ledger, so the
-          # free tier's daily allowance is split between them here.
-          GEMINI_DAILY_BUDGET: "3"
-
-  events:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11" }
-      - run: pip install -r requirements.txt
-      - name: What We're Watching
-        run: |
-          if [ "${{ inputs.dry_run }}" = "true" ]; then
-            python src/events.py --preview
-          else
-            python src/events.py --post
-          fi
-        env:
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          GEMINI_DAILY_BUDGET: "12"
-          GEMINI_PAGES_PER_CALL: "10"
-      - name: Persist the calendar cache
+          GEMINI_DAILY_BUDGET: "10"
+
+      - name: Persist state
         run: |
           git config user.name "dailyphil-bot"
           git config user.email "bot@users.noreply.github.com"
           git add data/ || true
-          git diff --staged --quiet || git commit -m "cache: $(date -u +%F)"
+          git diff --staged --quiet || git commit -m "state: $(date -u +%F)"
           git pull --rebase --autostash -q || true
           git push || true

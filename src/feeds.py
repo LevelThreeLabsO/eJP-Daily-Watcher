@@ -32,26 +32,38 @@ FEEDS = {
     "Yated":              "https://yated.com/feed/",
     "Collive":            "https://collive.com/feed/",
     "Chronicle of Philanthropy": "https://www.philanthropy.com/feed",
+    "Philanthropy News Digest": "https://philanthropynewsdigest.org/feeds/rss/news",
+    "Nonprofit Quarterly":      "https://nonprofitquarterly.org/feed/",
+    "Devex":                    "https://www.devex.com/news.rss",
     "eJP":                "https://ejewishphilanthropy.com/feed/",   # for dedupe, not intake
 }
 
 # Google News standing searches. Vocabulary comes from eJP's own archive, not guesses:
 # Major Gifts is 57% general philanthropy, so the net stays wide on the secular side too.
 QUERIES = [
-    # gifts — Jewish / Israel
-    '"million" (gift OR donation OR donates OR pledges) (Jewish OR Israel OR synagogue OR yeshiva)',
-    '(NIS OR shekel OR shekels) (million OR donation OR gift) Israel',
-    'philanthropist (Jewish OR Israeli) (donates OR pledges OR gives) million',
-    'Israeli (hospital OR university OR nonprofit) donation million',
-    'haredi OR Hasidic OR Orthodox philanthropist million fund',
-    # gifts — general philanthropy (57% of the section)
-    '"million gift" (university OR hospital OR museum OR foundation)',
-    'philanthropy "largest gift" OR "record gift" million',
-    'foundation commits million initiative launch',
-    # events / what we're watching
-    'Jewish conference OR summit OR "general assembly" OR gala this week',
-    'Israel (conference OR summit OR delegation OR mission) begins OR opens',
-    'Jewish federation OR JCC OR Hillel (conference OR summit OR retreat)',
+    # Gifts. Deliberately NOT keyed on "million" — every query used to require that
+    # word, which made "Rice receives major gift from Krafts" and "Embassy Donates
+    # Medical Supplies" invisible. Search for the ACT of giving; let the model judge.
+    'philanthropy gift donation',
+    '"major gift" OR "largest gift" OR "record gift"',
+    '(donates OR donated OR gifts OR gifted) to (university OR hospital OR museum OR college)',
+    'foundation (grant OR grants OR awards OR commits) nonprofit',
+    '(pledged OR pledges OR commits) (to build OR to launch OR to fund)',
+    'philanthropist (gives OR donates OR pledges)',
+    '"relief fund" OR "emergency fund" launched donations',
+    'donor (gives OR gave OR donates) center OR institute OR program',
+    'bequest OR estate gift OR "planned giving" million',
+    # Jewish / Israel — same principle, no amount required
+    'Jewish (donation OR gift OR grant OR philanthropy OR endowment)',
+    'Israel (donation OR gift OR grant OR pledge) nonprofit OR hospital OR university',
+    '(NIS OR shekel OR shekels) (donation OR gift OR grant OR pledge)',
+    'haredi OR Hasidic OR Orthodox (philanthropist OR donor OR fund)',
+    'embassy OR bank OR corporation donates (supplies OR equipment OR services)',
+    'federation OR JCC OR Hillel OR yeshiva (gift OR grant OR donation)',
+    # Events happening now
+    'Jewish (conference OR summit OR "general assembly" OR gala OR retreat) opens OR begins OR concludes',
+    'Israel (conference OR summit OR delegation OR mission OR ceremony) begins OR opens OR concludes',
+    '(Jewish OR Israeli) organization (announces OR launches OR unveils) program OR initiative',
 ]
 
 
