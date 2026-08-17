@@ -25,6 +25,9 @@ import json, os, re, time, threading
 #   gemini-2.0-flash  -> 0 (no free tier at all)
 # The batched design needs about 6 calls/day, so 20 is comfortable.
 MODEL = os.environ.get("GEMINI_MODEL", "gemini-3.5-flash")
+# 503 "high demand" on one model is common; try the next rather than give up.
+FALLBACKS = [m for m in os.environ.get(
+    "GEMINI_FALLBACKS", "gemini-3.5-flash-lite,gemini-2.5-flash,gemini-3-flash-preview").split(",") if m]
 
 _client = None
 
@@ -103,7 +106,7 @@ def _get_client():
     return _client
 
 
-def _call(prompt, schema=None, temperature=0.1, retries=4, max_tokens=8192):
+def _call(prompt, schema=None, temperature=0.1, retries=6, max_tokens=8192):
     from google.genai import types
     cfg = types.GenerateContentConfig(temperature=temperature,
                                       max_output_tokens=max_tokens)
@@ -113,12 +116,14 @@ def _call(prompt, schema=None, temperature=0.1, retries=4, max_tokens=8192):
     if calls_left() <= 0:
         raise BudgetExhausted(f"daily Gemini budget of {DAILY_BUDGET} already used")
     last = None
+    models = [MODEL] + FALLBACKS
     for a in range(retries):
+        model = models[min(a, len(models) - 1)]
         try:
             _throttle()
             _spend()
             r = _get_client().models.generate_content(
-                model=MODEL, contents=prompt, config=cfg)
+                model=model, contents=prompt, config=cfg)
             txt = (r.text or "").strip()
             if not txt:
                 return {} if schema else ""
@@ -128,6 +133,9 @@ def _call(prompt, schema=None, temperature=0.1, retries=4, max_tokens=8192):
             msg = str(e)
             if "429" in msg or "RESOURCE_EXHAUSTED" in msg:
                 time.sleep(20 * (a + 1))     # quota needs real time, not a blink
+            elif "503" in msg or "UNAVAILABLE" in msg or "high demand" in msg:
+                print(f"  {model} unavailable, trying {models[min(a+1,len(models)-1)]}", flush=True)
+                time.sleep(8 * (a + 1))
             else:
                 time.sleep(2 * (a + 1))
     raise last
