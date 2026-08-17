@@ -121,9 +121,9 @@ def _call(prompt, schema=None, temperature=0.1, retries=6, max_tokens=8192):
         model = models[min(a, len(models) - 1)]
         try:
             _throttle()
-            _spend()
             r = _get_client().models.generate_content(
                 model=model, contents=prompt, config=cfg)
+            _spend()          # only a completed call counts against the daily cap
             txt = (r.text or "").strip()
             if not txt:
                 return {} if schema else ""
