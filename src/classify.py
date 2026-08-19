@@ -129,7 +129,7 @@ HEADLINES:
 
 
 
-def classify(pool, today, batch=90):
+def classify(pool, today, batch=260):
     picks = []
     for i in range(0, len(pool), batch):
         chunk = pool[i:i + batch]
