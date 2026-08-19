@@ -159,17 +159,6 @@ def collect(days=1):
     return prefilter(already_published(uniq))
 
 
-if __name__ == "__main__":
-    got = collect()
-    json.dump(got, open(f"{D}/feed_pool.json", "w"), indent=1)
-    import collections
-    print(f"candidate pool: {len(got)} unique items")
-    print("by source:", dict(collections.Counter(x["source"] for x in got).most_common(12)))
-    print("\nsample:")
-    for x in got[:12]:
-        print(f"  [{x['source'][:18]:<19}] {x['title'][:96]}")
-
-
 # ---------------------------------------------------------------------------
 # Deterministic pre-filter. Every pattern below was tested against eJP's full
 # archive of 1,096 WWW items and 428 gift items; none removes more than 1% of
@@ -221,3 +210,14 @@ def prefilter(items):
             continue
         out.append(x)
     return out
+
+
+if __name__ == "__main__":
+    got = collect()
+    json.dump(got, open(f"{D}/feed_pool.json", "w"), indent=1)
+    import collections
+    print(f"candidate pool: {len(got)} unique items")
+    print("by source:", dict(collections.Counter(x["source"] for x in got).most_common(12)))
+    print("\nsample:")
+    for x in got[:12]:
+        print(f"  [{x['source'][:18]:<19}] {x['title'][:96]}")
