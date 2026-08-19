@@ -37,55 +37,96 @@ SCHEMA = {
     "required": ["picks"],
 }
 
-PROMPT = """You are helping compile Your Daily Phil, eJewishPhilanthropy's daily newsletter. Its \
-readers are major Jewish philanthropists, foundation staff, federation executives and nonprofit \
-leaders. You are filling two sections from a pool of today's news headlines.
+PROMPT = """You are compiling two sections of Your Daily Phil, eJewishPhilanthropy's daily newsletter \
+for major Jewish philanthropists, foundation staff, federation executives and nonprofit leaders.
 
 TODAY IS {today}.
 
-SECTION 1 — "What We're Watching"
-Things happening TODAY. Not next week, not next month. An item qualifies if it starts today, \
-concludes today, or is underway today. Typical items:
-  - a national or international convening beginning, running or ending today
-  - a government or institutional announcement made today (Israeli ministries especially)
-  - a court hearing, vote, election or ruling happening today
-  - a notable cultural or commemorative moment today
-Roughly 44% of real items are Israel-related, 35% American Jewish, 21% general interest. \
-Include American items generously — this is not an Israel-only section.
-EXCLUDE: routine local programming, chapter events, webinars, Zoom classes, admissions sessions, \
-support groups, anything a national readership of funders would not plan a day around.
+Everything below is measured from eJP's own archive of 1,096 published "What We're Watching" items \
+and 428 "Major Gifts" items. Match it.
 
-SECTION 2 — "Major Gifts"
-Gifts, pledges, grants and major philanthropic commitments. IMPORTANT: only about 43% of these are \
-Jewish or Israel-related — the rest is general philanthropy (a big university gift, a hospital \
-donation, a foundation's new commitment, a billionaire's giving plans). Include both.
-  - There is NO dollar minimum. 18% of real items carry no figure at all ("hundreds of thousands", \
-"an undisclosed sum", donated equipment or supplies).
-  - Amounts in shekels/NIS are completely normal and must be included.
-  - Corporate and institutional donors count, not only individuals.
-EXCLUDE: political fundraising, investment rounds, company revenue, construction budgets, \
-government appropriations, and institutional campaign totals that aren't a single gift.
+════════ SECTION 1 — "What We're Watching" ════════
 
-Anything not clearly fitting either section is "neither". Be selective — a typical edition runs \
-about 3 watching items and 2 gifts. Do not pad.
+THE TEST: something a person or institution CONVENED, SCHEDULED or is FORMALLY OBSERVING, that is \
+happening today. Not "something that happened." If nobody put it on a calendar, it does not belong.
 
-For anything you pick, write "line" as ONE sentence in eJP's voice: name the organization and \
-people, state the amount and recipient or the time framing, and say plainly what is happening. \
-Examples of the register:
-  "The Jewish Federations of North America's National Young Leadership Cabinet retreat concludes \
-today in Minneapolis."
-  "The Rohr Jewish Learning Institute's annual National Jewish Retreat kicked off last night and \
-runs through Sunday in Miami."
-  "Bank Hapoalim pledged NIS 5 million ($1.66 million) toward Rimon Farms' project to build \
-therapeutic agricultural farms in Nahal Oz and Holit for western Negev communities affected by the \
-Oct. 7 attacks."
+What actually appears, by measured share of the archive:
+  31%  conferences, summits, conventions, general assemblies, retreats, convenings
+  16%  Israeli government and political set-pieces — Knesset votes, party primaries, ministry
+       program launches, an official state visit or ceremony
+  14%  galas, benefit dinners, award ceremonies, tributes
+  10%  US political set-pieces — a scheduled Senate vote, primary day, a White House meeting
+  10%  campus and education events
+   9%  festivals, film screenings, exhibition openings, cultural premieres
+   8%  commemorations, memorials, yahrzeits, religious observances at scale
+   2%  scheduled court hearings and oral arguments
+   1%  organized disaster-relief efforts by Jewish organizations
 
-Never invent a fact that isn't in the headline or summary. If the date is unclear, say so in "why" \
-and mark confidence low rather than guessing.
+Timing, measured: 59% are anchored to today ("today", "tonight", "this evening"). 18% use span
+framing ("kicks off today and runs through Sunday", "concludes this afternoon", "is underway").
+8% are tomorrow. Prefer today; tomorrow is acceptable when notable.
+
+Scale: local is fine IF it is a real convened event with a named organization — a city film
+festival's opening night, a 150-rabbi conference, a historical society hosting an author all
+appear. What disqualifies a small event is being routine programming, not being small.
+
+NEVER include (these are 0% or near-0% of the archive):
+  - antisemitism incidents, vandalism, assaults, a crowd's behavior at a match — ZERO of 1,096
+  - military operations, strikes, arrests, casualties, troop deployments
+  - a politician's statement, accusation or opinion
+  - obituaries, unless a formal memorial event is being held
+  - routine local programming: classes, webinars, playgroups, support groups, mahjong, book clubs
+  - Zoom-only events unless genuinely major
+  - sports results, crime, weather, general world news
+
+════════ SECTION 2 — "Major Gifts" ════════
+
+Gifts, pledges, grants and philanthropic commitments.
+
+  - 43% Jewish or Israel-related, 57% general philanthropy. BOTH BELONG. A large gift to a
+    secular university, hospital, museum or theater is squarely in this section.
+  - THERE IS NO DOLLAR FLOOR. Median is $5.3M, but 16% of gifts with a figure are UNDER $1M and
+    the smallest is $9,500. A $430,000 grant to launch a campus Hillel ran; so did $255,000 in
+    small community grants.
+  - 18% carry NO dollar figure at all. "Hundreds of thousands of shekels", "an undisclosed sum",
+    donated medical supplies, a donated artwork, donated organs. These count.
+  - Shekels and NIS are normal. Write both currencies when the source gives both.
+  - Donors can be individuals, couples, families, foundations, corporations, banks, embassies or
+    governments. Crowdfunding campaigns for a named cause count.
+
+NEVER include:
+  - political fundraising, campaign money, PACs
+  - investment rounds, company revenue, earnings, acquisitions
+  - government appropriations and budget line items
+  - construction budgets
+  - an institution's total annual fundraising, unless one gift is the story
+  - a foundation's routine small-grant roundup with no notable recipient or donor
+
+════════ OUTPUT ════════
+
+A typical edition runs about 3 watching items and 2 gifts. Be selective; do not pad. If nothing
+qualifies, return nothing for that section.
+
+Write each "line" as ONE sentence in eJP's voice. Name the organization in full and the people
+involved. State the amount and recipient, or the time framing. Say plainly what is happening.
+
+  "The Jewish Federations of North America's National Young Leadership Cabinet retreat concludes
+   today in Minneapolis."
+  "The second annual Sephardic Rabbinic Conference kicks off today in New York City, bringing
+   together over 150 rabbis and communal figures."
+  "The Nashville Jewish Film Festival will host its opening night celebrations this evening."
+  "A three-year, $430,000 grant from The Leon Levine Foundation will underwrite the first executive
+   director and early programming at Clemson University's new professionally staffed Hillel."
+  "Bank Hapoalim pledged NIS 5 million ($1.66 million) toward Rimon Farms' project to build
+   therapeutic agricultural farms in Nahal Oz and Holit for western Negev communities."
+
+Never invent a fact not present in the headline or summary. If you cannot tell whether it is
+happening today, mark confidence low and say why.
 
 HEADLINES:
 {items}
 """
+
 
 
 def classify(pool, today, batch=90):
