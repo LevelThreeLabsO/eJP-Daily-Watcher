@@ -197,6 +197,42 @@ def from_google(days=2, workers=10):
     return out
 
 
+def age_hours(item, now=None):
+    """Hours since publication, or None when the feed gives no usable date."""
+    import email.utils as eu
+    now = now or dt.datetime.now(dt.timezone.utc)
+    raw = (item.get("published") or "").strip()
+    if not raw:
+        return None
+    for parse in (eu.parsedate_to_datetime,
+                  lambda s: dt.datetime.fromisoformat(s.replace("Z", "+00:00"))):
+        try:
+            d = parse(raw)
+            if d.tzinfo is None:
+                d = d.replace(tzinfo=dt.timezone.utc)
+            return (now - d).total_seconds() / 3600.0
+        except Exception:
+            continue
+    return None
+
+
+def within_window(items, max_age_h=26.0):
+    """
+    Rachel works a strict +/-24h window. Google News is bounded by when:2d but the
+    RSS feeds are not, so without this a three-day-old item can land in today's
+    digest. Items with no parseable date are kept — dropping them would lose whole
+    feeds — but they are marked so the model can weigh them.
+    """
+    out = []
+    for x in items:
+        a = age_hours(x)
+        x["age_hours"] = round(a, 1) if a is not None else None
+        if a is not None and a > max_age_h:
+            continue
+        out.append(x)
+    return out
+
+
 def norm(t):
     t = re.sub(r"\s*[-–—|]\s*[^-–—|]{2,40}$", "", t)
     return re.sub(r"[^a-z0-9 ]", "", t.lower()).strip()
@@ -221,7 +257,7 @@ def collect(days=2):
             continue
         seen.add(k)
         uniq.append(x)
-    return prefilter(already_published(uniq))
+    return within_window(prefilter(already_published(uniq)))
 
 
 # ---------------------------------------------------------------------------

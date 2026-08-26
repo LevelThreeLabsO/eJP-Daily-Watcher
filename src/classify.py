@@ -146,6 +146,12 @@ ethnicity from a surname alone — it is unreliable and offensive when wrong. If
 set jewish_angle to unclear and confidence to low, and let the editor check. A flagged maybe is
 useful; a confident guess is not.
 
+FRESHNESS: each headline shows how many hours ago it was published. This section runs early in the
+morning, before the newsletter is assembled, so prefer items that point FORWARD — something opening,
+convening, concluding or being observed today — over a wire report of something that already
+finished. A story filed 20 hours ago about a concluded negotiation is not "what we're watching."
+If the only thing an item tells you is that something already happened, leave it out.
+
 Never invent a fact not present in the headline or summary. If you cannot tell whether it is
 happening today, mark confidence low and say why.
 
@@ -161,6 +167,7 @@ def classify(pool, today, batch=260):
         chunk = pool[i:i + batch]
         listing = "\n".join(
             f"{n}. {x['title']}"
+            + (f"  ({x['age_hours']}h ago)" if x.get("age_hours") is not None else "")
             + (f"\n   [{x.get('source','')}] {x.get('summary','')[:190]}" if x.get("summary") else
                f"  [{x.get('source','')}]")
             for n, x in enumerate(chunk, start=i))
