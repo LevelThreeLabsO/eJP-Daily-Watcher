@@ -66,6 +66,11 @@ Timing, measured: 59% are anchored to today ("today", "tonight", "this evening")
 framing ("kicks off today and runs through Sunday", "concludes this afternoon", "is underway").
 8% are tomorrow. Prefer today; tomorrow is acceptable when notable.
 
+GEOGRAPHY: the section covers Jewish communities in the US, Israel, Europe, South America,
+Australia, Canada and South Africa. Measured: 45% Israel, 45% US, and roughly 6% is diaspora
+outside both — a London gala, a Buenos Aires commemoration, a Melbourne conference, a Montreal
+council vote. Actively look for those; they are easy to miss and they belong.
+
 Scale: local is fine IF it is a real convened event with a named organization — a city film
 festival's opening night, a 150-rabbi conference, a historical society hosting an author all
 appear. What disqualifies a small event is being routine programming, not being small.
@@ -93,6 +98,16 @@ Gifts, pledges, grants and philanthropic commitments.
   - Shekels and NIS are normal. Write both currencies when the source gives both.
   - Donors can be individuals, couples, families, foundations, corporations, banks, embassies or
     governments. Crowdfunding campaigns for a named cause count.
+  - These forms all count, with their measured share of the archive:
+        19%  capital projects — a new wing, building, campus or center funded by a gift
+        19%  grant awards
+        15%  research awards, endowed chairs, professorships, fellowships, scholarships
+         8%  NAMING announcements — a building, center or program named for a donor
+         5%  endowments
+         2%  crowdfunding campaigns that hit a milestone
+         2%  bequests and estate gifts
+  - Geography: about 6% of gifts are diaspora — a London gala's total, a Vancouver synagogue
+    bequest, a Venezuelan community campaign. Include them.
 
 NEVER include:
   - political fundraising, campaign money, PACs
@@ -119,6 +134,17 @@ involved. State the amount and recipient, or the time framing. Say plainly what 
    director and early programming at Clemson University's new professionally staffed Hillel."
   "Bank Hapoalim pledged NIS 5 million ($1.66 million) toward Rimon Farms' project to build
    therapeutic agricultural farms in Nahal Oz and Holit for western Negev communities."
+
+DONOR IDENTIFICATION (the step eJP's team currently does by hand):
+For a gift with no obvious Jewish or Israel connection on the recipient side, consider whether the
+DONOR is Jewish or connected to the Jewish communal world — that is what makes a gift to a secular
+university or hospital belong here. Say so in "why" when it is the reason you picked it.
+
+Judge this on what you actually know about the person: their known philanthropy, their communal
+roles, their own public statements about their background. NEVER infer someone's religion or
+ethnicity from a surname alone — it is unreliable and offensive when wrong. If you do not know,
+set jewish_angle to unclear and confidence to low, and let the editor check. A flagged maybe is
+useful; a confident guess is not.
 
 Never invent a fact not present in the headline or summary. If you cannot tell whether it is
 happening today, mark confidence low and say why.

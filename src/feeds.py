@@ -54,6 +54,17 @@ FEEDS = {
     "New York Jewish Week":    "https://www.jta.org/category/ny/feed",
     "Boulder Jewish News":     "https://boulderjewishnews.org/feed/",
     "Jewish Link":             "https://jewishlink.news/feed/",
+    # Diaspora. Rachel scans Europe, South America and Australia explicitly, and the
+    # archive backs her: diaspora-only items are 6.2% of Major Gifts and 3.3% of WWW.
+    "Australian Jewish News":  "https://ajn.timesofisrael.com/feed/",
+    "J-Wire Australia":        "https://www.jwire.com.au/feed/",
+    "European Jewish Congress":"https://eurojewcong.org/feed/",
+    "Jewish News UK":          "https://www.jewishnews.co.uk/feed/",
+    "SA Jewish Report":        "https://www.sajr.co.za/feed/",
+    # South America — Spanish-language. The archive's Latin American items
+    # (Venezuela earthquake campaign, Buenos Aires commemorations) surface here first.
+    "Enlace Judio (MX)":       "https://www.enlacejudio.com/feed/",
+    "Agencia AJN (AR)":        "https://agenciaajn.com/feed/",
     "eJP":                "https://ejewishphilanthropy.com/feed/",   # for dedupe, not intake
 }
 
@@ -95,6 +106,29 @@ QUERIES = [
     'city council OR state legislature (resolution OR vote) Israel OR Gaza OR antisemitism',
     'Hillel OR Chabad OR Birthright (scholarship OR award OR program OR launch)',
     'synagogue OR temple (bequest OR endowment OR legacy gift OR estate)',
+
+    # --- Rachel's own Google searches, verbatim. She runs these daily, news only,
+    # past 24 hours, then screens the donor names by hand.
+    '"Jewish donor"',
+    '"Jewish philanthropist"',
+    '"Jewish community" endowment',
+    'donor Jewish gift',
+
+    # --- Gift categories she names that the archive confirms and I was not querying:
+    # naming announcements 8%, research awards/chairs 15%, capital projects 19%.
+    '(named for OR "will bear the name" OR "naming gift" OR renamed) (center OR building OR wing OR school OR institute)',
+    '(endowed OR endowment) (chair OR professorship OR fund OR scholarship)',
+    '"research award" OR "research grant" OR "endowed chair" OR professorship university',
+    '(new OR renovated) (wing OR pavilion OR building OR campus OR center) (gift OR donor OR donated)',
+    'crowdfunding campaign raised (community OR synagogue OR family)',
+
+    # --- Diaspora, by region. Rachel asks for national or international interest in
+    # Jewish communities across the US, Europe, South America and Australia.
+    'Jewish community (Europe OR London OR Paris OR Berlin OR Vienna OR Budapest) event OR gift OR opening',
+    'Jewish community (Australia OR Sydney OR Melbourne) event OR donation OR conference',
+    'Jewish community (Argentina OR Brazil OR Mexico OR Chile OR "Buenos Aires") event OR donation',
+    'Jewish community Canada (Toronto OR Montreal OR Vancouver) event OR gift OR synagogue',
+    'Jewish (federation OR community) (South Africa OR Johannesburg OR India OR Morocco)',
 ]
 
 
@@ -142,7 +176,7 @@ def from_feeds(workers=10):
     return out
 
 
-def from_google(days=1, workers=8):
+def from_google(days=2, workers=10):
     def one(q):
         u = ("https://news.google.com/rss/search?"
              + urllib.parse.urlencode({"q": f"{q} when:{days}d", "hl": "en-US",
@@ -177,7 +211,7 @@ def already_published(items):
     return [x for x in items if norm(x["title"]) not in mine]
 
 
-def collect(days=1):
+def collect(days=2):
     items = from_feeds() + from_google(days=days)
     items = [x for x in items if x["source"] != "eJP"]
     seen, uniq = set(), []
