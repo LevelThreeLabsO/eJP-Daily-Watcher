@@ -35,6 +35,25 @@ FEEDS = {
     "Philanthropy News Digest": "https://philanthropynewsdigest.org/feeds/rss/news",
     "Nonprofit Quarterly":      "https://nonprofitquarterly.org/feed/",
     "Devex":                    "https://www.devex.com/news.rss",
+    "Times of Israel":    "https://www.timesofisrael.com/feed/",
+    "Haaretz":            "https://www.haaretz.com/cmlink/1.4605102",
+    "Jewish Chronicle UK":"https://www.thejc.com/rss",
+    "Jewish Insider":     "https://jewishinsider.com/feed/",
+    # Local and regional Jewish papers. These are where "a JCC hosts a speaker",
+    # "the federation runs a program", "the film festival opens" actually get
+    # covered — 8 of last week's 11 misses were this kind of item, and the general
+    # news feeds never carry them.
+    "Washington Jewish Week":  "https://www.washingtonjewishweek.com/feed/",
+    "Jewish Journal LA":       "https://jewishjournal.com/feed/",
+    "Cleveland Jewish News":   "https://www.clevelandjewishnews.com/search/?f=rss&t=article&l=50&s=start_time&sd=desc",
+    "Baltimore Jewish Times":  "https://www.jewishtimes.com/feed/",
+    "Canadian Jewish News":    "https://thecjn.ca/feed/",
+    "Jewish Exponent":         "https://www.jewishexponent.com/feed/",
+    "Atlanta Jewish Times":    "https://www.atlantajewishtimes.com/feed/",
+    "J. Bay Area":             "https://jweekly.com/feed/",
+    "New York Jewish Week":    "https://www.jta.org/category/ny/feed",
+    "Boulder Jewish News":     "https://boulderjewishnews.org/feed/",
+    "Jewish Link":             "https://jewishlink.news/feed/",
     "eJP":                "https://ejewishphilanthropy.com/feed/",   # for dedupe, not intake
 }
 
@@ -64,6 +83,18 @@ QUERIES = [
     'Jewish (conference OR summit OR "general assembly" OR gala OR retreat) opens OR begins OR concludes',
     'Israel (conference OR summit OR delegation OR mission OR ceremony) begins OR opens OR concludes',
     '(Jewish OR Israeli) organization (announces OR launches OR unveils) program OR initiative',
+    # Event-shaped, not transaction-shaped. Last week 8 of 11 misses were a local
+    # institution hosting something; none of the queries above would ever find them.
+    '(JCC OR "Jewish Community Center" OR federation OR synagogue) (hosts OR hosting OR presents OR welcomes)',
+    '"Jewish film festival" OR "Jewish book festival" OR "Jewish music festival"',
+    '(Jewish OR Israeli) author OR speaker OR survivor (speaks OR speaking OR appears) event',
+    'former hostage OR lone soldier (speaks OR event OR community)',
+    '"Jewish community" (event OR program OR series OR launch) this week',
+    'rabbi OR rabbinic (conference OR convention OR gathering OR mission)',
+    'Israeli (film OR play OR exhibit OR documentary) premiere OR opening OR screening',
+    'city council OR state legislature (resolution OR vote) Israel OR Gaza OR antisemitism',
+    'Hillel OR Chabad OR Birthright (scholarship OR award OR program OR launch)',
+    'synagogue OR temple (bequest OR endowment OR legacy gift OR estate)',
 ]
 
 
