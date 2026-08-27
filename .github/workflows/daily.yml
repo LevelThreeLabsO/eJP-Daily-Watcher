@@ -8,8 +8,11 @@ on:
         type: boolean
         default: true
   schedule:
-    # 09:15 UTC ≈ 5:15am ET, weekdays — before the Daily Phil is assembled.
-    - cron: "15 9 * * 1-5"
+    # GitHub silently drops scheduled runs under load, and :00/:15/:30 are the
+    # worst minutes for it — 27 Aug never fired at all. Odd minutes, plus a backup
+    # 50 minutes later. The posted-today guard below stops the backup double-posting.
+    - cron: "37 9 * * 1-5"    # ~5:37am ET
+    - cron: "23 10 * * 1-5"   # backup, ~6:23am ET
 
 permissions:
   contents: write
@@ -27,10 +30,24 @@ jobs:
         with: { python-version: "3.11" }
       - run: pip install -r requirements.txt
 
+      - name: Skip if today's digest already went out
+        id: guard
+        run: |
+          TODAY=$(date -u +%F)
+          if [ -f data/last_posted.txt ] && [ "$(cat data/last_posted.txt)" = "$TODAY" ] \
+             && [ "${{ inputs.dry_run }}" != "true" ]; then
+            echo "already posted $TODAY — skipping"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: Collect candidates
+        if: steps.guard.outputs.skip != 'true' 
         run: python src/feeds.py
 
       - name: Sort into sections and post
+        if: steps.guard.outputs.skip != 'true'
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python src/digest.py --preview
@@ -44,7 +61,11 @@ jobs:
           GEMINI_DAILY_BUDGET: "10"
 
       - name: Persist state
+        if: always()
         run: |
+          if [ "${{ inputs.dry_run }}" != "true" ] && [ "${{ steps.guard.outputs.skip }}" != "true" ]; then
+            date -u +%F > data/last_posted.txt
+          fi
           git config user.name "dailyphil-bot"
           git config user.email "bot@users.noreply.github.com"
           git add data/ || true
