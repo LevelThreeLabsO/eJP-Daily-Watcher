@@ -77,6 +77,14 @@ if __name__ == "__main__":
     print(f"\n=== {n_w} watching / {n_g} gifts ===\n")
     print(www); print(); print(gifts)
     if post:
-        SlackClient("SLACK_WWW").post(www)
+        late = os.environ.get("LATE_RUN", "").lower() == "true"
         SlackClient("SLACK_GIFTS").post(gifts)
-        print("\nposted to both channels")
+        if late:
+            print("\nlate run — events half suppressed, gifts posted")
+            SlackClient("SLACK_WWW").post(
+                f"_The {dt.date.today():%b %-d} events digest was skipped — this run fired "
+                f"{dt.datetime.utcnow():%H:%M} UTC, too late to be useful as a morning brief. "
+                f"Major Gifts still went out._")
+        else:
+            SlackClient("SLACK_WWW").post(www)
+            print("\nposted to both channels")

@@ -30,16 +30,27 @@ jobs:
         with: { python-version: "3.11" }
       - run: pip install -r requirements.txt
 
-      - name: Skip if today's digest already went out
+      - name: Decide whether to run and whether it is still morning
         id: guard
         run: |
           TODAY=$(date -u +%F)
+          HOUR=$(date -u +%-H)
           if [ -f data/last_posted.txt ] && [ "$(cat data/last_posted.txt)" = "$TODAY" ] \
              && [ "${{ inputs.dry_run }}" != "true" ]; then
             echo "already posted $TODAY — skipping"
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+          # "What We're Watching" is a morning brief about today. GitHub delayed the
+          # 28 Aug run by 11.6 hours and it landed at 5pm ET, by which point the day's
+          # events had already happened. Past 13:00 UTC (9am ET) the events half is
+          # suppressed; gifts are not time-of-day sensitive and still go.
+          if [ "$HOUR" -ge 13 ]; then
+            echo "late run (${HOUR}:00 UTC) — suppressing the events half"
+            echo "late=true" >> $GITHUB_OUTPUT
+          else
+            echo "late=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Collect candidates
@@ -57,6 +68,7 @@ jobs:
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
+          LATE_RUN: ${{ steps.guard.outputs.late }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_DAILY_BUDGET: "10"
 
