@@ -1,32 +1,83 @@
 name: Watchdog
 
-# The digest failing silently is the worst outcome — it happened for days before
-# anyone noticed. This checks that today's digest actually went out and says so
-# in Slack if it did not.
+# A backstop, not just an alarm. GitHub's scheduler drops and delays runs, so this
+# runs on a SEPARATE schedule in a SEPARATE workflow — if the main digest did not go
+# out today, this one does the work itself rather than only reporting the failure.
 on:
   workflow_dispatch:
   schedule:
-    - cron: "47 13 * * 1-5"    # ~9:47am ET, after every attempt has had its chance
+    - cron: "51 11 * * 1-5"    # ~7:51am ET — still morning, before it is too late
+    - cron: "47 13 * * 1-5"    # ~9:47am ET — last chance, gifts only by then
 
 permissions:
-  contents: read
+  contents: write
+
+concurrency:
+  group: dailyphil            # shares the main group so the two never collide
+  cancel-in-progress: false
 
 jobs:
-  check:
+  backstop:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+
       - name: Did today's digest go out?
+        id: check
         run: |
           TODAY=$(date -u +%F)
           LAST=$(cat data/last_posted.txt 2>/dev/null || echo "never")
-          echo "today=$TODAY  last_posted=$LAST"
-          if [ "$LAST" != "$TODAY" ]; then
-            curl -s -X POST -H 'Content-Type: application/json' \
-              -d "{\"text\":\":rotating_light: No Daily Phil digest went out today ($TODAY). Last successful run: $LAST. <https://github.com/LevelThreeLabsO/eJP-Daily-Watcher/actions|Check Actions> — GitHub's scheduler has been dropping runs.\"}" \
-              "${{ secrets.SLACK_GIFTS }}" || true
-            echo "::warning::no digest today"
+          HOUR=$(date -u +%-H)
+          echo "today=$TODAY  last_posted=$LAST  hour=$HOUR"
+          if [ "$LAST" = "$TODAY" ]; then
+            echo "digest already went out today — nothing to do"
+            echo "needed=false" >> $GITHUB_OUTPUT
           else
-            echo "digest went out today"
+            echo "::warning::no digest yet today — running it now"
+            echo "needed=true" >> $GITHUB_OUTPUT
           fi
+          if [ "$HOUR" -ge 13 ]; then echo "late=true" >> $GITHUB_OUTPUT; else echo "late=false" >> $GITHUB_OUTPUT; fi
+
+      - uses: actions/setup-python@v5
+        if: steps.check.outputs.needed == 'true'
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+        if: steps.check.outputs.needed == 'true'
+
+      - name: Collect candidates
+        if: steps.check.outputs.needed == 'true'
+        timeout-minutes: 8
+        run: python src/feeds.py
+
+      - name: Post the digest the scheduler missed
+        if: steps.check.outputs.needed == 'true'
+        timeout-minutes: 6
+        run: python src/digest.py --post
+        env:
+          SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
+          SLACK_WWW: ${{ secrets.SLACK_WWW }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_DAILY_BUDGET: "10"
+          LATE_RUN: ${{ steps.check.outputs.late }}
+
+      - name: Record it
+        if: success() && steps.check.outputs.needed == 'true'
+        run: date -u +%F > data/last_posted.txt
+
+      - name: Persist state
+        if: always() && steps.check.outputs.needed == 'true'
+        run: |
+          git config user.name "dailyphil-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/ || true
+          git diff --staged --quiet || git commit -m "watchdog state: $(date -u +%F)"
+          git pull --rebase --autostash -q || true
+          git push || true
+
+      - name: Alert if even the backstop could not post
+        if: failure()
+        run: |
+          curl -s -X POST -H 'Content-Type: application/json' \
+            -d "{\"text\":\":rotating_light: Daily Phil watchdog ran because no digest went out, and it failed too. <https://github.com/LevelThreeLabsO/eJP-Daily-Watcher/actions/runs/${{ github.run_id }}|Log>\"}" \
+            "${{ secrets.SLACK_GIFTS }}" || true
