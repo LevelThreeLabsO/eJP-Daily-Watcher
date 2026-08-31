@@ -8,29 +8,34 @@ on:
         type: boolean
         default: true
   schedule:
-    # GitHub silently drops scheduled runs under load, and :00/:15/:30 are the
-    # worst minutes for it — 27 Aug never fired at all. Odd minutes, plus a backup
-    # 50 minutes later. The posted-today guard below stops the backup double-posting.
-    - cron: "37 9 * * 1-5"    # ~5:37am ET
-    - cron: "23 10 * * 1-5"   # backup, ~6:23am ET
+    # GitHub's scheduler is unreliable for private repos: 27 Aug never fired and
+    # 28 Aug fired 11.6 hours late. Three attempts spread across the morning, on odd
+    # minutes (round minutes are the most heavily contended). The posted-today guard
+    # means only the first one to actually land does any work.
+    - cron: "37 9 * * 1-5"     # ~5:37am ET
+    - cron: "23 10 * * 1-5"    # ~6:23am ET
+    - cron: "11 12 * * 1-5"    # ~8:11am ET, last useful moment for a morning brief
 
 permissions:
   contents: write
 
+# A run that hangs must never block the next one. On 25 Aug a run sat for six
+# hours and everything queued behind it.
 concurrency:
   group: dailyphil
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   digest:
     runs-on: ubuntu-latest
+    timeout-minutes: 15          # nothing here legitimately takes longer than ~6
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
       - run: pip install -r requirements.txt
 
-      - name: Decide whether to run and whether it is still morning
+      - name: Decide whether to run, and whether it is still morning
         id: guard
         run: |
           TODAY=$(date -u +%F)
@@ -42,23 +47,22 @@ jobs:
           else
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
-          # "What We're Watching" is a morning brief about today. GitHub delayed the
-          # 28 Aug run by 11.6 hours and it landed at 5pm ET, by which point the day's
-          # events had already happened. Past 13:00 UTC (9am ET) the events half is
-          # suppressed; gifts are not time-of-day sensitive and still go.
+          # Past 13:00 UTC (9am ET) a morning brief about today's events is useless.
           if [ "$HOUR" -ge 13 ]; then
-            echo "late run (${HOUR}:00 UTC) — suppressing the events half"
+            echo "late run (${HOUR}:00 UTC) — events half will be suppressed"
             echo "late=true" >> $GITHUB_OUTPUT
           else
             echo "late=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Collect candidates
-        if: steps.guard.outputs.skip != 'true' 
+        if: steps.guard.outputs.skip != 'true'
+        timeout-minutes: 8
         run: python src/feeds.py
 
       - name: Sort into sections and post
         if: steps.guard.outputs.skip != 'true'
+        timeout-minutes: 6
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python src/digest.py --preview
@@ -68,19 +72,27 @@ jobs:
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
-          LATE_RUN: ${{ steps.guard.outputs.late }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_DAILY_BUDGET: "10"
+          LATE_RUN: ${{ steps.guard.outputs.late }}
+
+      - name: Record that today went out
+        if: success() && steps.guard.outputs.skip != 'true' && inputs.dry_run != true
+        run: date -u +%F > data/last_posted.txt
 
       - name: Persist state
         if: always()
         run: |
-          if [ "${{ inputs.dry_run }}" != "true" ] && [ "${{ steps.guard.outputs.skip }}" != "true" ]; then
-            date -u +%F > data/last_posted.txt
-          fi
           git config user.name "dailyphil-bot"
           git config user.email "bot@users.noreply.github.com"
           git add data/ || true
           git diff --staged --quiet || git commit -m "state: $(date -u +%F)"
           git pull --rebase --autostash -q || true
           git push || true
+
+      - name: Tell Slack if the run failed
+        if: failure()
+        run: |
+          curl -s -X POST -H 'Content-Type: application/json' \
+            -d "{\"text\":\":warning: Daily Phil watcher run failed — <https://github.com/LevelThreeLabsO/eJP-Daily-Watcher/actions/runs/${{ github.run_id }}|see the log>\"}" \
+            "${{ secrets.SLACK_GIFTS }}" || true

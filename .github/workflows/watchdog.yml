@@ -1,0 +1,32 @@
+name: Watchdog
+
+# The digest failing silently is the worst outcome — it happened for days before
+# anyone noticed. This checks that today's digest actually went out and says so
+# in Slack if it did not.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "47 13 * * 1-5"    # ~9:47am ET, after every attempt has had its chance
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Did today's digest go out?
+        run: |
+          TODAY=$(date -u +%F)
+          LAST=$(cat data/last_posted.txt 2>/dev/null || echo "never")
+          echo "today=$TODAY  last_posted=$LAST"
+          if [ "$LAST" != "$TODAY" ]; then
+            curl -s -X POST -H 'Content-Type: application/json' \
+              -d "{\"text\":\":rotating_light: No Daily Phil digest went out today ($TODAY). Last successful run: $LAST. <https://github.com/LevelThreeLabsO/eJP-Daily-Watcher/actions|Check Actions> — GitHub's scheduler has been dropping runs.\"}" \
+              "${{ secrets.SLACK_GIFTS }}" || true
+            echo "::warning::no digest today"
+          else
+            echo "digest went out today"
+          fi
