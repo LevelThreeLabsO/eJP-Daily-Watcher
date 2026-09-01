@@ -28,7 +28,7 @@ concurrency:
 jobs:
   digest:
     runs-on: ubuntu-latest
-    timeout-minutes: 15          # nothing here legitimately takes longer than ~6
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -62,7 +62,7 @@ jobs:
 
       - name: Sort into sections and post
         if: steps.guard.outputs.skip != 'true'
-        timeout-minutes: 6
+        timeout-minutes: 15
         run: |
           if [ "${{ inputs.dry_run }}" = "true" ]; then
             python src/digest.py --preview

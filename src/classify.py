@@ -161,14 +161,14 @@ HEADLINES:
 
 
 
-def classify(pool, today, batch=260):
+def classify(pool, today, batch=200):
     picks = []
     for i in range(0, len(pool), batch):
         chunk = pool[i:i + batch]
         listing = "\n".join(
             f"{n}. {x['title']}"
             + (f"  ({x['age_hours']}h ago)" if x.get("age_hours") is not None else "")
-            + (f"\n   [{x.get('source','')}] {x.get('summary','')[:190]}" if x.get("summary") else
+            + (f"\n   [{x.get('source','')}] {x.get('summary','')[:110]}" if x.get("summary") else
                f"  [{x.get('source','')}]")
             for n, x in enumerate(chunk, start=i))
         out = llm._call(PROMPT.format(today=today, items=listing),

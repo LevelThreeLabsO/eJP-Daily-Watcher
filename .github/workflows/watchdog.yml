@@ -19,7 +19,7 @@ concurrency:
 jobs:
   backstop:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
@@ -52,7 +52,7 @@ jobs:
 
       - name: Post the digest the scheduler missed
         if: steps.check.outputs.needed == 'true'
-        timeout-minutes: 6
+        timeout-minutes: 15
         run: python src/digest.py --post
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
