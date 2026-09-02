@@ -106,7 +106,7 @@ def _get_client():
     return _client
 
 
-def _call(prompt, schema=None, temperature=0.1, retries=6, max_tokens=8192):
+def _call(prompt, schema=None, temperature=0.1, retries=8, max_tokens=8192):
     from google.genai import types
     cfg = types.GenerateContentConfig(temperature=temperature,
                                       max_output_tokens=max_tokens)
@@ -134,8 +134,12 @@ def _call(prompt, schema=None, temperature=0.1, retries=6, max_tokens=8192):
             if "429" in msg or "RESOURCE_EXHAUSTED" in msg:
                 time.sleep(20 * (a + 1))     # quota needs real time, not a blink
             elif "503" in msg or "UNAVAILABLE" in msg or "high demand" in msg:
-                print(f"  {model} unavailable, trying {models[min(a+1,len(models)-1)]}", flush=True)
-                time.sleep(8 * (a + 1))
+                # Capacity, not a fault in the request. Cycle models and back off
+                # properly — a 503 on every model at once usually clears in a minute.
+                nxt = models[min(a + 1, len(models) - 1)]
+                wait = min(15 * (a + 1), 75)
+                print(f"  {model} at capacity, waiting {wait}s then trying {nxt}", flush=True)
+                time.sleep(wait)
             else:
                 time.sleep(2 * (a + 1))
     raise last
