@@ -8,13 +8,12 @@ on:
         type: boolean
         default: true
   schedule:
-    # GitHub's scheduler is unreliable for private repos: 27 Aug never fired and
-    # 28 Aug fired 11.6 hours late. Three attempts spread across the morning, on odd
-    # minutes (round minutes are the most heavily contended). The posted-today guard
-    # means only the first one to actually land does any work.
-    - cron: "37 9 * * 1-5"     # ~5:37am ET
-    - cron: "23 10 * * 1-5"    # ~6:23am ET
-    - cron: "11 12 * * 1-5"    # ~8:11am ET, last useful moment for a morning brief
+    # Target delivery is 6:00am ET. EDT is UTC-4, so 09:45 UTC starts it and it
+    # lands by ~09:55 UTC = 5:55am ET. The later entries are only fallbacks for
+    # when GitHub's scheduler drops the first one; they no-op if it already went.
+    - cron: "45 9 * * 1-5"     # ~5:45am ET  <- the one that should win
+    - cron: "12 10 * * 1-5"    # ~6:12am ET
+    - cron: "41 10 * * 1-5"    # ~6:41am ET
 
 permissions:
   contents: write
@@ -35,24 +34,16 @@ jobs:
         with: { python-version: "3.11" }
       - run: pip install -r requirements.txt
 
-      - name: Decide whether to run, and whether it is still morning
+      - name: Skip if today already went out
         id: guard
         run: |
           TODAY=$(date -u +%F)
-          HOUR=$(date -u +%-H)
           if [ -f data/last_posted.txt ] && [ "$(cat data/last_posted.txt)" = "$TODAY" ] \
              && [ "${{ inputs.dry_run }}" != "true" ]; then
             echo "already posted $TODAY — skipping"
             echo "skip=true" >> $GITHUB_OUTPUT
           else
             echo "skip=false" >> $GITHUB_OUTPUT
-          fi
-          # Past 13:00 UTC (9am ET) a morning brief about today's events is useless.
-          if [ "$HOUR" -ge 13 ]; then
-            echo "late run (${HOUR}:00 UTC) — events half will be suppressed"
-            echo "late=true" >> $GITHUB_OUTPUT
-          else
-            echo "late=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Collect candidates
@@ -74,7 +65,6 @@ jobs:
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_DAILY_BUDGET: "10"
-          LATE_RUN: ${{ steps.guard.outputs.late }}
 
       - name: Record that today went out
         if: success() && steps.guard.outputs.skip != 'true' && inputs.dry_run != true

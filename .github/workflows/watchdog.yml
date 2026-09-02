@@ -6,8 +6,7 @@ name: Watchdog
 on:
   workflow_dispatch:
   schedule:
-    - cron: "51 11 * * 1-5"    # ~7:51am ET — still morning, before it is too late
-    - cron: "47 13 * * 1-5"    # ~9:47am ET — last chance, gifts only by then
+    - cron: "20 11 * * 1-5"    # ~7:20am ET — backstop if all three above were dropped
 
 permissions:
   contents: write
@@ -28,7 +27,6 @@ jobs:
         run: |
           TODAY=$(date -u +%F)
           LAST=$(cat data/last_posted.txt 2>/dev/null || echo "never")
-          HOUR=$(date -u +%-H)
           echo "today=$TODAY  last_posted=$LAST  hour=$HOUR"
           if [ "$LAST" = "$TODAY" ]; then
             echo "digest already went out today — nothing to do"
@@ -37,7 +35,6 @@ jobs:
             echo "::warning::no digest yet today — running it now"
             echo "needed=true" >> $GITHUB_OUTPUT
           fi
-          if [ "$HOUR" -ge 13 ]; then echo "late=true" >> $GITHUB_OUTPUT; else echo "late=false" >> $GITHUB_OUTPUT; fi
 
       - uses: actions/setup-python@v5
         if: steps.check.outputs.needed == 'true'
@@ -59,7 +56,6 @@ jobs:
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_DAILY_BUDGET: "10"
-          LATE_RUN: ${{ steps.check.outputs.late }}
 
       - name: Record it
         if: success() && steps.check.outputs.needed == 'true'
