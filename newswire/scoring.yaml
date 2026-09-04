@@ -1,0 +1,202 @@
+# Relevance vocabulary for the eJP newswire. Data, not logic — poll.py re-reads this
+# every run.
+#
+# Built from eJewishPhilanthropy's own archive: 1,102 published "What We're Watching"
+# items and 435 "Major Gifts" items, Jan 2021 to Sep 2026. The word frequencies below
+# are measured from those, not guessed. Run `python3 poll.py --selftest` after editing:
+# it reports recall against the real published items and the pass rate against a
+# negative set drawn from the same feeds, so a word you add shows its cost too.
+#
+# TWO STREAMS. Unlike the Circuit newswire's single beat, this routes into two channels
+# with separate thresholds, because the sections have genuinely different tests:
+#
+#   major_gift  — did somebody GIVE something? A transaction.
+#   watching    — did somebody CONVENE something happening today? An event on a calendar.
+#
+# An item can only land in one. Gifts win ties: "Federation gala raises $2M" is a gift
+# story with an event attached, and the gifts channel is where the desk expects it.
+
+default_threshold: 4
+money_points: 1
+money_pattern: '\$|\bNIS\b|\bshekel|\bmillion\b|\bbillion\b|\bthousand\b|\d+\s?%|£|€|₪'
+judge: false
+
+# ---------------------------------------------------------------------------
+# STREAM 1 — MAJOR GIFTS
+# ---------------------------------------------------------------------------
+# Threshold 4. The giving verb alone is 3, so it needs one companion signal: an amount,
+# a recipient type, or a donor word. That admits "Rice receives major gift from Krafts"
+# (verb 3 + recipient 2 = 5) while rejecting "Fund manager raises $2bn for new vehicle"
+# (money 1 + no giving verb, no recipient = 1).
+#
+# NO DOLLAR FLOOR ANYWHERE. 18% of real gift items carry no figure at all — donated
+# medical supplies, a donated artwork, donated organs, "an undisclosed sum". Money is
+# worth 1 point, never a requirement.
+gift_threshold: 4
+gift_require_anchor: [giving]
+gift_axes:
+  # The act itself. Measured: donated (116), gift (48), grant (48+41), awarded (41),
+  # raised (29), donation (24), pledged (21), committed (18), endowment (14).
+  - name: giving
+    points: 3
+    terms: [donate, donated, donates, donating, donation, donor, donors,
+            gift, gifted, gifts, gifting, grant, granted, grants, grantee,
+            pledge, pledged, pledges, bequest, bequeath, bequeathed,
+            endow, endowed, endowment, philanthropist, philanthropy, philanthropic,
+            benefactor, gave, gives, giving, contributed, contribution,
+            award, awarded, awards, commit, committed, committing, commitment, allocate, allocated,
+            earmark, earmarked, designate, designated, underwrite, underwritten,
+            "matching gift", "in memory of",
+            raise, raised, raising, fundraise, fundraising, funder, funders,
+            "stepped up", "came forward", subsidize, subsidise, sponsor, sponsored]
+  # Who or what receives it. A giving verb plus a recipient is a gift story.
+  - name: recipient
+    points: 2
+    terms: [university, college, hospital, medical center, museum, theater, theatre,
+            school, academy, yeshiva, seminary, synagogue, temple, congregation,
+            federation, JCC, "Jewish Community Center", Hillel, Chabad, campus,
+            foundation, nonprofit, charity, institute, library, orchestra, symphony,
+            clinic, shelter, food bank, camp, archive, "day school"]
+  # The forms the archive shows: capital projects 19%, research awards and chairs 15%,
+  # naming announcements 8%, endowments 5%, bequests 2%. Rachel named all of these and
+  # the old collector queried none of them.
+  - name: gift_form
+    points: 2
+    terms: [wing, pavilion, building, campus, center, centre, chair, professorship,
+            fellowship, scholarship, scholarships, "research award", "research grant",
+            "endowed chair", "naming gift", "named for", "will bear the name", renamed,
+            dedication, dedicated, "capital campaign", estate, legacy, trust,
+            crowdfunding, GoFundMe, "matching challenge"]
+  # Jewish and Israel signal. Worth 2: it cannot admit a story alone, because 57% of the
+  # real section is general philanthropy with no Jewish angle at all.
+  - name: jewish
+    points: 2
+    terms: [Jewish, Jew, Jews, Israel, Israeli, Hebrew, Judaism, rabbi, rabbinic,
+            synagogue, yeshiva, Hillel, Chabad, Torah, kosher, Holocaust, Shoah,
+            Zionist, aliyah, haredi, Hasidic, Satmar, Orthodox, JCC, Hadassah,
+            Jerusalem, "Tel Aviv", Negev, Soroka, Beersheva, Beersheba, Knesset,
+            "Magen David", Birthright, Maccabi, Yad Vashem, mohel, kollel, mikvah]
+
+# ---------------------------------------------------------------------------
+# STREAM 2 — WHAT WE'RE WATCHING
+# ---------------------------------------------------------------------------
+# Threshold 5, higher than gifts, because the failure mode here is admitting ordinary
+# news. THE TEST: somebody CONVENED or SCHEDULED it, and it is happening now.
+#
+# convening 3 + today 2 = 5 exactly. So "Federation hosts summit today" clears and
+# "Israel and Lebanon hold talks" (convening 3, no today anchor) does not. That is
+# deliberate: the section is a same-day brief, and 59% of real items say "today".
+watching_threshold: 5
+watching_require_anchor: [convening]
+watching_axes:
+  # Measured: hosting (217), conference (213), will host (57), summit (57),
+  # kicks off (56), gala (50), memorial (39), ceremony (37), dinner (36).
+  - name: convening
+    points: 3
+    terms: [conference, summit, convention, "general assembly", assembly, retreat,
+            convening, forum, symposium, gala, benefit, dinner, luncheon, reception,
+            ceremony, ceremonies, festival, premiere, screening, exhibition,
+            commemoration, commemorating, memorial, yahrzeit, vigil, tribute,
+            mission, delegation, "state visit", hearing, "oral argument", vote,
+            primary, primaries, hosts, hosting, "will host", "will present",
+            dedication, groundbreaking, installation, inauguration, "town hall",
+            march, rally, procession, awards, "award ceremony",
+            launch, launches, launched, launching, unveil, unveiled, unveils,
+            "opening night", reopening, reopens, "first time", anniversary,
+            observance, service, services, prayers, selichot, minyan, siyum,
+            "ribbon cutting", "book launch", parade, exhibit, tour,
+            # Verbs that ARE the convening. From the archive's own misses: "will meet",
+            # "will hold a memorial service", "opens its exhibition", "will be awarded".
+            meet, meets, meeting, gather, gathers, gathering,
+            "will hold", "is holding", "are holding", "to hold",
+            convene, convenes, convened, gala, gathering, gatherings,
+            prize, prizes, honoree, honorees, "will be awarded", gets, receives,
+            # Scheduled civic set-pieces the archive carries: "It's primary day in
+            # Michigan", a sentencing, a trial, a Knesset session.
+            "primary day", "election day", "voting", "polls open", session, sitting,
+            sentencing, arraignment, trial, testimony, "victim impact",
+            # Sporting and cultural convenings: the JCC Maccabi Games run every year.
+            games, tournament, championship, exhibition, showcase]
+  # The time anchor. 59% of real items say today or tonight; 18% use span framing.
+  - name: today
+    points: 2
+    terms: [today, tonight, "this evening", "this morning", "this afternoon",
+            "kicks off", "kicked off", "opens today", "begins today", "concludes",
+            "concluding", underway, "runs through", "wraps up", "gets underway",
+            "is set to", "will begin", "will open", "will close", tomorrow,
+            "this week", "later today", "earlier today", "beginning today",
+            "opened today", "began today", "starts today", "through Sunday",
+            "through Friday", continuing, continues, resumes, "now underway"]
+  - name: jewish
+    points: 2
+    terms: [Jewish, Jew, Jews, Israel, Israeli, Hebrew, Judaism, rabbi, rabbinic,
+            synagogue, yeshiva, Hillel, Chabad, Torah, Holocaust, Shoah, Zionist,
+            aliyah, haredi, Hasidic, Orthodox, JCC, federation, Hadassah, Jerusalem,
+            "Tel Aviv", Knesset, Birthright, Maccabi, "Yad Vashem", kosher, shul]
+  # Scale. A national or international convening outranks a local one, but local is
+  # explicitly allowed — a city film festival's opening night runs in the real section.
+  - name: scale
+    points: 1
+    terms: [national, international, global, annual, biennial, inaugural, first,
+            largest, thousands, hundreds, delegates, leaders, executives]
+
+# ---------------------------------------------------------------------------
+# VETOES — measured at 0% or near-0% of 1,102 real items
+# ---------------------------------------------------------------------------
+# The headline alone is read for these, never the teaser: a gala honouring victims of an
+# attack is a gala, and the attack will appear in its description.
+noise:
+  # Antisemitism incidents: literally ZERO of 1,102 archive items. The old collector
+  # sent a Nazi-salute story and an Edinburgh discrimination case to the events channel.
+  - swastika
+  - "nazi salute"
+  - vandalized
+  - vandalised
+  - defaced
+  - "hate crime"
+  # Combat and casualty reporting
+  - airstrike
+  - "air strike"
+  - "rocket fire"
+  - casualties
+  - wounded
+  - "killed in"
+  - "death toll"
+  - manhunt
+  # Crime
+  - arrested
+  - indicted
+  - sentenced
+  - convicted
+  - shooting
+  - stabbing
+  - murder
+  - robbery
+  # Commentary about the news rather than the news
+  - opinion
+  - op-ed
+  - editorial
+  - commentary
+  - slams
+  - blasts
+  - accuses
+  - condemns
+  - "hits back"
+  # Business, not philanthropy
+  - "quarterly results"
+  - earnings
+  - IPO
+  - acquisition
+  - "stake in"
+  - valuation
+  - "series a"
+  - "series b"
+  - "funding round"
+  - "raises seed"
+  # Sport and weather
+  - playoff
+  - touchdown
+  - "final score"
+  - forecast
+
+byline_bypass: []

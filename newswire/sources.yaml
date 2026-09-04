@@ -1,0 +1,348 @@
+# Sources the eJP newswire polls each run. Data, not logic — poll.py re-reads this
+# file every run, so an edit takes effect on the next tick.
+#
+# The list is not a guess. It is what eJewishPhilanthropy's own coverage points at,
+# plus the gaps found by measuring what the previous collector missed:
+#
+#   * Local and regional Jewish papers. 8 of 11 items missed in one audited week were a
+#     local institution hosting something — a JCC speaker, a federation program, a film
+#     festival opening. National feeds never carry those; Cleveland Jewish News, J. Bay
+#     Area and Washington Jewish Week do.
+#   * Haredi outlets. The Satmar philanthropist who pledged $1M for yeshiva legal aid
+#     appeared in no mainstream feed. Matzav, Yeshiva World, Yated and Collive carry
+#     that world and nothing else did.
+#   * Diaspora. 6.2% of real Major Gifts items and 3.3% of What We're Watching are
+#     outside Israel and the US — a Vancouver bequest, a London gala, a Buenos Aires
+#     commemoration. Australian, European, South African and Spanish-language sources
+#     are here for those.
+#
+# Per-source fields:
+#   key             short unique id; the dedup + status label
+#   outlet          how it appears in Slack
+#   method          rss | gnews
+#   url             rss: the feed. gnews: the query.
+#   threshold       score needed from this source. Omit for the stream default.
+#   window_minutes  freshness window; must exceed the 15-minute dispatch interval.
+#
+# Feed status verified live 2026-09-02. Re-run `poll.py --audit` monthly: a dead feed
+# answers HTTP 200 and serves a web page, so nothing else will ever notice.
+
+max_items: 12
+
+# Publish-age cap: an item posts only if we have not seen it AND it was published within
+# this many minutes. Dedup does the novelty work, so this only stops old news being
+# dredged up on a first run or after an outage.
+#
+# 240, not the Circuit newswire's 30. Half this source list is Google News searches, and
+# a search surfaces things published hours earlier — at 45 minutes every single query
+# returned "0 in window / 100 in feed" and the Major Gifts channel got nothing at all.
+max_age_minutes: 240
+default_window_minutes: 180
+
+sources:
+  # ══ Jewish wires and national outlets ═══════════════════════════
+  - key: jerusalem_post
+    outlet: Jerusalem Post
+    method: rss
+    url: https://www.jpost.com/rss/rssfeedsheadlines.aspx
+  - key: jns
+    outlet: JNS
+    method: rss
+    url: https://www.jns.org/feed/
+  - key: jta
+    outlet: JTA
+    method: rss
+    url: https://www.jta.org/feed
+  - key: forward
+    outlet: Forward
+    method: rss
+    url: https://forward.com/feed/
+  - key: algemeiner
+    outlet: Algemeiner
+    method: rss
+    url: https://www.algemeiner.com/feed/
+  - key: ynet
+    outlet: Ynet
+    method: rss
+    url: https://www.ynetnews.com/Integration/StoryRss3082.xml
+  - key: times_of_israel
+    outlet: Times of Israel
+    method: rss
+    url: https://www.timesofisrael.com/feed/
+  - key: haaretz
+    outlet: Haaretz
+    method: rss
+    url: https://www.haaretz.com/cmlink/1.4605102
+  - key: jewish_chronicle_uk
+    outlet: Jewish Chronicle UK
+    method: rss
+    url: https://www.thejc.com/rss
+  - key: jewish_insider
+    outlet: Jewish Insider
+    method: rss
+    url: https://jewishinsider.com/feed/
+
+  # ══ Haredi and Orthodox — the world no other feed covers ════════
+  - key: matzav
+    outlet: Matzav
+    method: rss
+    url: https://matzav.com/feed/
+  - key: yeshiva_world_news
+    outlet: Yeshiva World News
+    method: rss
+    url: https://www.theyeshivaworld.com/feed
+  - key: jewish_press
+    outlet: Jewish Press
+    method: rss
+    url: https://www.jewishpress.com/feed/
+  - key: yated
+    outlet: Yated
+    method: rss
+    url: https://yated.com/feed/
+  - key: collive
+    outlet: Collive
+    method: rss
+    url: https://collive.com/feed/
+
+  # ══ Philanthropy trade press — carries the 57% of Major Gifts that is general philanthropy 
+  - key: chronicle_of_philanthrop
+    outlet: Chronicle of Philanthropy
+    method: rss
+    url: https://www.philanthropy.com/feed
+  - key: philanthropy_news_digest
+    outlet: Philanthropy News Digest
+    method: rss
+    url: https://philanthropynewsdigest.org/feeds/rss/news
+  - key: nonprofit_quarterly
+    outlet: Nonprofit Quarterly
+    method: rss
+    url: https://nonprofitquarterly.org/feed/
+  - key: devex
+    outlet: Devex
+    method: rss
+    url: https://www.devex.com/news.rss
+
+  # ══ Local and regional Jewish papers — where a JCC hosting a speaker actually gets covered 
+  - key: washington_jewish_week
+    outlet: Washington Jewish Week
+    method: rss
+    url: https://www.washingtonjewishweek.com/feed/
+  - key: jewish_journal_la
+    outlet: Jewish Journal LA
+    method: rss
+    url: https://jewishjournal.com/feed/
+  - key: cleveland_jewish_news
+    outlet: Cleveland Jewish News
+    method: rss
+    url: https://www.clevelandjewishnews.com/search/?f=rss&t=article&l=50&s=start_time&sd=desc
+  - key: baltimore_jewish_times
+    outlet: Baltimore Jewish Times
+    method: rss
+    url: https://www.jewishtimes.com/feed/
+  - key: canadian_jewish_news
+    outlet: Canadian Jewish News
+    method: rss
+    url: https://thecjn.ca/feed/
+  - key: jewish_exponent
+    outlet: Jewish Exponent
+    method: rss
+    url: https://www.jewishexponent.com/feed/
+  - key: atlanta_jewish_times
+    outlet: Atlanta Jewish Times
+    method: rss
+    url: https://www.atlantajewishtimes.com/feed/
+  - key: j_bay_area
+    outlet: J. Bay Area
+    method: rss
+    url: https://jweekly.com/feed/
+  - key: new_york_jewish_week
+    outlet: New York Jewish Week
+    method: rss
+    url: https://www.jta.org/category/ny/feed
+  - key: boulder_jewish_news
+    outlet: Boulder Jewish News
+    method: rss
+    url: https://boulderjewishnews.org/feed/
+  - key: jewish_link
+    outlet: Jewish Link
+    method: rss
+    url: https://jewishlink.news/feed/
+
+  # ══ Diaspora — Europe, Australia, South Africa, Latin America ═══
+  - key: australian_jewish_news
+    outlet: Australian Jewish News
+    method: rss
+    url: https://ajn.timesofisrael.com/feed/
+  - key: j_wire_australia
+    outlet: J-Wire Australia
+    method: rss
+    url: https://www.jwire.com.au/feed/
+  - key: european_jewish_congress
+    outlet: European Jewish Congress
+    method: rss
+    url: https://eurojewcong.org/feed/
+  - key: jewish_news_uk
+    outlet: Jewish News UK
+    method: rss
+    url: https://www.jewishnews.co.uk/feed/
+  - key: sa_jewish_report
+    outlet: SA Jewish Report
+    method: rss
+    url: https://www.sajr.co.za/feed/
+  - key: enlace_judio_mx
+    outlet: Enlace Judio (MX)
+    method: rss
+    url: https://www.enlacejudio.com/feed/
+  - key: agencia_ajn_ar
+    outlet: Agencia AJN (AR)
+    method: rss
+    url: https://agenciaajn.com/feed/
+
+  # ══ Standing searches. Google News, scoped by query rather than site, because
+  #    a gift to a secular university is covered by that university's own newsroom
+  #    and by local business press, not by any feed worth subscribing to.
+  #    These include Rachel's own daily searches verbatim.
+  - key: q00
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'philanthropy gift donation'
+    threshold: 5
+  - key: q01
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '"major gift" OR "largest gift" OR "record gift"'
+    threshold: 5
+  - key: q02
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(donates OR donated OR gifts OR gifted) to (university OR hospital OR museum OR college)'
+    threshold: 5
+  - key: q03
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'foundation (grant OR grants OR awards OR commits) nonprofit'
+    threshold: 5
+  - key: q04
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(pledged OR pledges OR commits) (to build OR to launch OR to fund)'
+    threshold: 5
+  - key: q05
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'philanthropist (gives OR donates OR pledges)'
+    threshold: 5
+  - key: q06
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '"relief fund" OR "emergency fund" launched donations'
+    threshold: 5
+  - key: q07
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'donor (gives OR gave OR donates) center OR institute OR program'
+    threshold: 5
+  - key: q08
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'bequest OR estate gift OR "planned giving" million'
+    threshold: 5
+  - key: q09
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'Jewish (donation OR gift OR grant OR philanthropy OR endowment)'
+    threshold: 5
+  - key: q10
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'Israel (donation OR gift OR grant OR pledge) nonprofit OR hospital OR university'
+    threshold: 5
+  - key: q11
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(NIS OR shekel OR shekels) (donation OR gift OR grant OR pledge)'
+    threshold: 5
+  - key: q12
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'haredi OR Hasidic OR Orthodox (philanthropist OR donor OR fund)'
+    threshold: 5
+  - key: q13
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'embassy OR bank OR corporation donates (supplies OR equipment OR services)'
+    threshold: 5
+  - key: q14
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'federation OR JCC OR Hillel OR yeshiva (gift OR grant OR donation)'
+    threshold: 5
+  - key: q15
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'Jewish (conference OR summit OR "general assembly" OR gala OR retreat) opens OR begins OR concludes'
+    threshold: 5
+  - key: q16
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'Israel (conference OR summit OR delegation OR mission OR ceremony) begins OR opens OR concludes'
+    threshold: 5
+  - key: q17
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(Jewish OR Israeli) organization (announces OR launches OR unveils) program OR initiative'
+    threshold: 5
+  - key: q18
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(JCC OR "Jewish Community Center" OR federation OR synagogue) (hosts OR hosting OR presents OR welcomes)'
+    threshold: 5
+  - key: q19
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '"Jewish film festival" OR "Jewish book festival" OR "Jewish music festival"'
+    threshold: 5
+  - key: q20
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(Jewish OR Israeli) author OR speaker OR survivor (speaks OR speaking OR appears) event'
+    threshold: 5
+  - key: q21
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'former hostage OR lone soldier (speaks OR event OR community)'
+    threshold: 5
+  - key: q22
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '"Jewish community" (event OR program OR series OR launch) this week'
+    threshold: 5
+  - key: q23
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'rabbi OR rabbinic (conference OR convention OR gathering OR mission)'
+    threshold: 5

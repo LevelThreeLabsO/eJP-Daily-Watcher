@@ -1,0 +1,47 @@
+name: eJP newswire
+
+# Lives in this repo rather than its own because SLACK_GIFTS and SLACK_WWW are already
+# here, and GitHub secrets are write-only — there is no way to copy them to a new repo
+# without the plaintext values, which nobody has.
+
+on:
+  # Fired every 15 minutes by an Apps Script trigger on Google's servers (see
+  # newswire/pinger.gs). GitHub's own cron has been measured on this repo dropping whole
+  # days and once firing 11.6 hours late; the schedule below is an hourly fallback only.
+  workflow_dispatch:
+  schedule:
+    - cron: "17 * * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ejp-newswire
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: newswire
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install feedparser requests pyyaml python-dotenv
+      - run: python poll.py
+        env:
+          SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
+          SLACK_WWW: ${{ secrets.SLACK_WWW }}
+      - name: Persist dedup state
+        if: always()
+        working-directory: .
+        run: |
+          git config user.name "ejp-newswire-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add newswire/ || true
+          git diff --staged --quiet || git commit -m "newswire state: $(date -u +%FT%TZ)"
+          git pull --rebase --autostash -q || true
+          git push || true
