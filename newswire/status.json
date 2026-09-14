@@ -1,19 +1,19 @@
 {
-  "started_at": "2026-09-14T01:01:50+00:00",
-  "finished_at": "2026-09-14T01:01:58+00:00",
-  "duration_seconds": 7.1,
+  "started_at": "2026-09-14T06:15:12+00:00",
+  "finished_at": "2026-09-14T06:15:20+00:00",
+  "duration_seconds": 7.9,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 33,
-    "fresh": 33,
-    "relevant": 16,
-    "unseen": 15,
-    "unique": 15,
-    "posted": 0
+    "fetched": 23,
+    "fresh": 23,
+    "relevant": 13,
+    "unseen": 12,
+    "unique": 12,
+    "posted": 3
   },
-  "posted": 0,
-  "delivered": null,
-  "last_posted_at": "2026-09-13T18:10:44+00:00",
+  "posted": 3,
+  "delivered": true,
+  "last_posted_at": "2026-09-14T06:15:20+00:00",
   "sources": {
     "jerusalem_post": {
       "status": "ok",
@@ -22,7 +22,7 @@
     },
     "jns": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 3,
       "in_window": 30
     },
     "jta": {
@@ -51,7 +51,7 @@
     },
     "haaretz": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 100
     },
     "jewish_chronicle_uk": {
@@ -66,7 +66,7 @@
     },
     "matzav": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 1,
       "in_window": 30
     },
     "yeshiva_world_news": {
@@ -86,7 +86,7 @@
     },
     "collive": {
       "status": "ok",
-      "fetched": 5,
+      "fetched": 1,
       "in_window": 20
     },
     "chronicle_of_philanthrop": {
@@ -114,7 +114,7 @@
     },
     "jewish_journal_la": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 10
     },
     "cleveland_jewish_news": {
@@ -128,7 +128,7 @@
     },
     "canadian_jewish_news": {
       "status": "ok",
-      "fetched": 0,
+      "fetched": 2,
       "in_window": 10
     },
     "jewish_exponent": {
@@ -150,8 +150,8 @@
       "in_window": 20
     },
     "boulder_jewish_news": {
-      "status": "parse_fail",
-      "detail": "served an HTML page, not a feed (<unknown>:2:119: not well-formed (invalid token))"
+      "status": "error",
+      "detail": "HTTPError: 403 Client Error: Forbidden for url: https://boulderjewishnews.org/feed/"
     },
     "jewish_link": {
       "status": "ok",
@@ -183,7 +183,7 @@
     },
     "enlace_judio_mx": {
       "status": "ok",
-      "fetched": 3,
+      "fetched": 0,
       "in_window": 10
     },
     "agencia_ajn_ar": {
@@ -202,7 +202,7 @@
     },
     "q02": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 0,
       "in_window": 100
     },
     "q03": {
@@ -227,12 +227,12 @@
     },
     "q07": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 0,
       "in_window": 100
     },
     "q08": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 100
     },
     "q09": {
@@ -262,17 +262,17 @@
     },
     "q14": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 100
     },
     "q15": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 100
     },
     "q16": {
       "status": "ok",
-      "fetched": 5,
+      "fetched": 4,
       "in_window": 100
     },
     "q17": {
@@ -282,7 +282,7 @@
     },
     "q18": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 100
     },
     "q19": {
@@ -292,7 +292,7 @@
     },
     "q20": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 4,
       "in_window": 100
     },
     "q21": {
@@ -312,66 +312,66 @@
     }
   },
   "consecutive_empty": {
-    "jerusalem_post": 64,
-    "jns": 3,
-    "jta": 16,
-    "forward": 5,
-    "algemeiner": 14,
-    "ynet": 64,
-    "times_of_israel": 64,
+    "jerusalem_post": 65,
+    "jns": 0,
+    "jta": 17,
+    "forward": 6,
+    "algemeiner": 15,
+    "ynet": 65,
+    "times_of_israel": 65,
     "haaretz": 0,
-    "jewish_chronicle_uk": 16,
-    "jewish_insider": 16,
-    "matzav": 14,
-    "yeshiva_world_news": 18,
-    "jewish_press": 15,
-    "yated": 26,
+    "jewish_chronicle_uk": 17,
+    "jewish_insider": 17,
+    "matzav": 0,
+    "yeshiva_world_news": 19,
+    "jewish_press": 16,
+    "yated": 27,
     "collive": 0,
-    "chronicle_of_philanthrop": 17,
-    "nonprofit_quarterly": 17,
-    "devex": 64,
-    "washington_jewish_week": 13,
-    "jewish_journal_la": 0,
-    "cleveland_jewish_news": 9,
-    "baltimore_jewish_times": 20,
-    "canadian_jewish_news": 16,
-    "jewish_exponent": 20,
-    "atlanta_jewish_times": 64,
-    "j_bay_area": 16,
-    "new_york_jewish_week": 16,
-    "boulder_jewish_news": 46,
-    "jewish_link": 20,
-    "australian_jewish_news": 64,
-    "j_wire_australia": 18,
-    "european_jewish_congress": 16,
-    "jewish_news_uk": 64,
-    "sa_jewish_report": 18,
-    "enlace_judio_mx": 0,
-    "agencia_ajn_ar": 64,
-    "q00": 3,
-    "q01": 22,
-    "q02": 0,
-    "q03": 2,
-    "q04": 2,
-    "q05": 4,
-    "q06": 58,
-    "q07": 0,
+    "chronicle_of_philanthrop": 18,
+    "nonprofit_quarterly": 18,
+    "devex": 65,
+    "washington_jewish_week": 14,
+    "jewish_journal_la": 1,
+    "cleveland_jewish_news": 10,
+    "baltimore_jewish_times": 21,
+    "canadian_jewish_news": 0,
+    "jewish_exponent": 21,
+    "atlanta_jewish_times": 65,
+    "j_bay_area": 17,
+    "new_york_jewish_week": 17,
+    "boulder_jewish_news": 47,
+    "jewish_link": 21,
+    "australian_jewish_news": 65,
+    "j_wire_australia": 19,
+    "european_jewish_congress": 17,
+    "jewish_news_uk": 65,
+    "sa_jewish_report": 19,
+    "enlace_judio_mx": 1,
+    "agencia_ajn_ar": 65,
+    "q00": 4,
+    "q01": 23,
+    "q02": 1,
+    "q03": 3,
+    "q04": 3,
+    "q05": 5,
+    "q06": 59,
+    "q07": 1,
     "q08": 0,
     "q09": 0,
-    "q10": 1,
-    "q11": 14,
-    "q12": 3,
-    "q13": 6,
+    "q10": 2,
+    "q11": 15,
+    "q12": 4,
+    "q13": 7,
     "q14": 0,
     "q15": 0,
     "q16": 0,
-    "q17": 14,
-    "q18": 0,
-    "q19": 24,
+    "q17": 15,
+    "q18": 1,
+    "q19": 25,
     "q20": 0,
     "q21": 0,
     "q22": 0,
-    "q23": 3
+    "q23": 4
   },
   "consecutive_parse_fail": {
     "jerusalem_post": 0,
@@ -389,7 +389,7 @@
     "yated": 0,
     "collive": 0,
     "chronicle_of_philanthrop": 0,
-    "philanthropy_news_digest": 64,
+    "philanthropy_news_digest": 65,
     "nonprofit_quarterly": 0,
     "washington_jewish_week": 0,
     "jewish_journal_la": 0,
