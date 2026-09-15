@@ -1,0 +1,11 @@
+# The venv self-excludes (python -m venv writes its own .gitignore), but say so here
+# too so a venv made another way cannot land in the repo.
+.venv/
+__pycache__/
+*.pyc
+.env
+.DS_Store
+
+# NOT ignored, deliberately: watcher_state.json, status.json and posted_log.json.
+# State lives in the repo — that is how dedup survives between runs on a stateless
+# runner, and how status.json is readable without a server.
