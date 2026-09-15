@@ -266,10 +266,23 @@ def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.
         _git(*GIT_ID, "commit", "-q", "-m", "Update newswire state [skip ci]")
         if _git("push", "-q", "origin", "HEAD:main").returncode == 0:
             return
-        # Lost the race. Undo our commit but keep the files, then point the branch at the
-        # new origin without disturbing the tree, and re-merge on the next pass.
-        _git("reset", "-q", "--soft", "HEAD~1")
-        _git("update-ref", "refs/heads/main", "origin/main")
+        # Lost the race. Move HEAD *and the index* to the new origin, keeping the tree.
+        #
+        # This used to be `reset --soft HEAD~1` + `update-ref ... origin/main`, which moves
+        # the branch pointer but leaves the index holding the tree this run was checked out
+        # from. The next `git commit` then snapshots that stale index, silently reverting
+        # every file that landed upstream between checkout and push — under a commit
+        # labelled "Update newswire state", which is the last place anyone looks.
+        #
+        # It did exactly that here on 15 September: commit 54758f3 rolled scoring.yaml back
+        # from the widened What We're Watching config (threshold 4, no anchor, 82.5% recall)
+        # to the old one (threshold 5, convening anchor, 70.1%) about a minute after it was
+        # pushed, while the widening commit stayed in history looking intact. The live
+        # newswire ran at the old recall until it was noticed.
+        #
+        # A mixed reset to origin/main refreshes the index to the new upstream tree. The
+        # working tree is untouched, and only the files named in `files` are ever staged.
+        _git("reset", "-q", "--mixed", "origin/main")
 
 
 def _merge_posted_log() -> None:

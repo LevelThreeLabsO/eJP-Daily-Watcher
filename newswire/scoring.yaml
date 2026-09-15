@@ -98,14 +98,32 @@ gift_axes:
 # ---------------------------------------------------------------------------
 # STREAM 2 — WHAT WE'RE WATCHING
 # ---------------------------------------------------------------------------
-# Threshold 5, higher than gifts, because the failure mode here is admitting ordinary
-# news. THE TEST: somebody CONVENED or SCHEDULED it, and it is happening now.
+# Threshold 4, no required anchor. This reverses an earlier design, and the reason is
+# worth keeping because the earlier design was wrong about what the section IS.
 #
-# convening 3 + today 2 = 5 exactly. So "Federation hosts summit today" clears and
-# "Israel and Lebanon hold talks" (convening 3, no today anchor) does not. That is
-# deliberate: the section is a same-day brief, and 59% of real items say "today".
-watching_threshold: 5
-watching_require_anchor: [convening]
+# It used to require a convening word, on the theory that What We're Watching means
+# "somebody CONVENED or SCHEDULED it". Measured against the archive, that theory caps
+# recall at about 78% no matter how the vocabulary is tuned: of 324 missed items, 251
+# (77.5%) contain no convening word at all, because the section is not a calendar. It is
+# what the philanthropy world should have its eye on today, and that includes things
+# nobody convened —
+#
+#   "After an 18-year run dedicated to Israel education, the iCenter closes its doors"
+#   "Ben Gurion Airport officially became the world's most disrupted airport today"
+#   "The Knesset yesterday passed a Basic Law designating Torah study a foundational value"
+#   "A Trump administration proposal to give agencies power to cut off grants to nonprofits"
+#   "We'll be keeping a close eye over the weekend on the situation in the Middle East"
+#
+# Dropping the anchor and lowering the threshold to 4 measured at 82.5% recall against
+# 70.1%, for 20.2% noise against 18.3% — 134 real items gained for 11 negatives, and 9
+# of those 11 are simply foreign (a Taiwan warning, an SCO summit in Bishkek, Pakistani
+# taekwondo, Nigerian politics) rather than plausible-but-wrong.
+#
+# Requiring the `jewish` axis instead was tried and is worse, not better: 68.5%. Real
+# headlines frequently carry no Jewish word even when the item plainly belongs, exactly
+# as with Major Gifts, where 60% of published items have none.
+watching_threshold: 4
+watching_require_anchor: []
 watching_axes:
   # Measured: hosting (217), conference (213), will host (57), summit (57),
   # kicks off (56), gala (50), memorial (39), ceremony (37), dinner (36).
@@ -273,6 +291,12 @@ noise:
   - "after school"
   - "after-school"
   - afterschool
+  # Weapons. "US Launches Mysterious Weapons Into Space" scored on `launches`, which is
+  # a real convening word ("launches its exhibition"). Zero archive hits for these three,
+  # so they are free. NOT `missile` or `air force` — those appear in 4 and 1 real items.
+  - weapons
+  - warhead
+  - "into space"
   - "to grant"
   - urges
   - urged
@@ -316,5 +340,32 @@ noise:
   - "win gold"
   - "take gold"
   - forecast
+
+# ---------------------------------------------------------------------------
+# URL-PATH VETOES — genre signals the headline does not carry
+# ---------------------------------------------------------------------------
+# Checked against the item's link in poll.py gate 3, before scoring. A commentary
+# piece can be worded exactly like news; its URL cannot. Commentary and opinion are
+# 0% of both archive sections.
+noise_url_paths:
+  - /opinion/
+  - /opinion-
+  - /opinions/
+  - /commentary/
+  - /op-ed/
+  - /oped/
+  - /editorial/
+  - /editorials/
+  - /blogs/
+  - /blog/
+  - blogs.timesofisrael.com
+  - /columnists/
+  - /letters/
+  - /obituaries/
+  - /sports/
+  - /horoscope
+  - /recipes/
+  - /shopping/
+  - /deals/
 
 byline_bypass: []
