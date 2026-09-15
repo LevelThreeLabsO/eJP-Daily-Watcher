@@ -42,6 +42,12 @@ jobs:
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
+          # Health findings only, never stories — see _housekeeping in poll.py. Optional:
+          # with this unset, findings stay in status.json and a critical one still fails
+          # the run, which is what sends GitHub's own email to the repo owner.
+          SLACK_HEALTH: ${{ secrets.SLACK_HEALTH }}
+          # Used only to put the status.json URL in a health message.
+          GITHUB_REPOSITORY: ${{ github.repository }}
 
       # There is deliberately no git step here. poll.py commits and pushes its own state
       # through state.record(), which unions against origin first and, on a lost push

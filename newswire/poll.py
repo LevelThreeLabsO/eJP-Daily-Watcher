@@ -56,7 +56,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from src import dedup, digest, postlog, state, status
+from src import dedup, digest, health, postlog, state, status
 from src.fetch import Item, ParseFailure, fetch_all, now_utc
 from src.score import Scorer
 from src.slack_client import DeliveryError, SlackClient
@@ -290,8 +290,7 @@ def run(args) -> int:
         if not args.dry_run:
             postlog.save(log)
         print("Nothing to post.")
-        _housekeeping(run_status, slack, live_state, args)
-        return 0
+        return _exit_code(_housekeeping(run_status, slack, live_state, args))
 
     # Two channels. Circuit posts one digest; eJP has two sections with different
     # tests and different readers, so each stream gets its own bundle and its own
@@ -320,8 +319,7 @@ def run(args) -> int:
 
     if not bundles:
         print("Nothing to post.")
-        _housekeeping(run_status, slack, live_state, args)
-        return 0
+        return _exit_code(_housekeeping(run_status, slack, live_state, args))
 
     # Claim before sending, per bundle, so a failure in one channel does not suppress
     # the other's items on the next tick.
@@ -350,29 +348,75 @@ def run(args) -> int:
         postlog.record(log, included, dedup.title_words)
     postlog.save(log)
     print(f"Posted {total} item(s) across {len(bundles)} channel(s).")
-    _housekeeping(run_status, slack, live_state, args)
+    return _exit_code(_housekeeping(run_status, slack, live_state, args))
+
+
+def _exit_code(findings: list) -> int:
+    """0 normally; 1 when something is actually broken.
+
+    A non-zero exit turns the workflow run red, and GitHub emails the repo owner about a
+    failed run. That is the one alerting channel that needs no setup at all, so it is
+    worth using — but only for `critical` findings. Failing the run because the channel
+    was quiet overnight would make a red run meaningless within a week, which is why
+    health.py grades silence as a warning and never as critical.
+    """
+    if any(f.severity == "critical" for f in findings):
+        print("Exiting non-zero: a critical health finding. See status.json.", file=sys.stderr)
+        return 1
     return 0
 
 
-def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, args) -> None:
+def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, args) -> list:
     """Persist state and status. Posts NOTHING.
 
-    This function used to send health alerts — a silence alarm and a dead-feed warning.
-    Both are gone. They were never asked for, and on 30 August the dead-feed alert fired
-    every five minutes into the live channel for an hour. An automation posts the content
-    it was built to post and nothing else; its own health belongs in status.json, which
-    `poll.py --status` reads and which is committed to the repo on every run.
+    Posts nothing to the STORY channels, which carry stories and nothing else. That is
+    the rule this function exists to enforce: it used to send a silence alarm and a
+    dead-feed warning into the live channel, and on 30 August the dead-feed alert fired
+    every five minutes for an hour because it had no cooldown.
 
-    If health alerting is ever wanted, it goes to a separate channel, with a persisted
-    cooldown, and only after being asked for.
+    Health alerting came back on 15 September, asked for, and under three constraints
+    that the old version broke — a separate webhook (SLACK_HEALTH), a cooldown persisted
+    in status.json so it survives between runs, and silence treated as a warning rather
+    than a failure. With no SLACK_HEALTH set, findings stay in status.json, which is a
+    public URL on this repo.
     """
+    findings = []
     if not args.dry_run:
+        # Before write(), so run_status.alerts_sent can record what went out and be
+        # persisted in the same document the cooldown is read from next run.
+        findings = health.check(run_status.snapshot())
+        findings = health.due(findings, run_status.alerts_sent)
+        if findings:
+            _send_health(findings, run_status, args)
         run_status.write()
         state.record(live_state, files=("watcher_state.json", "status.json", "posted_log.json"))
     else:
         run_status.write()
     doc = status.load()
     print(f"Run took {doc.get('duration_seconds')}s.")
+    return findings
+
+
+def _send_health(findings, run_status, args) -> None:
+    """Deliver health findings to SLACK_HEALTH, or say why they went nowhere."""
+    for f in findings:
+        print(f"  health [{f.severity}] {f.kind}: {f.text[:90]}", file=sys.stderr)
+    if not os.environ.get("SLACK_HEALTH", "").strip():
+        # Not an error. status.json still records everything, and a critical finding
+        # still fails the run, which is what sends GitHub's own email.
+        print("  (SLACK_HEALTH not set — findings recorded in status.json only)")
+        return
+    repo = os.environ.get("GITHUB_REPOSITORY")
+    try:
+        SlackClient("SLACK_HEALTH").post(health.format(findings, repo))
+    except DeliveryError as e:
+        # A health alert that cannot be delivered must not take down the run that was
+        # otherwise fine. It is already in status.json and on stderr.
+        print(f"  ! health alert undeliverable: {e}", file=sys.stderr)
+        return
+    stamp = status._now()
+    for f in findings:
+        run_status.alerts_sent[f.kind] = stamp
 
 
 # --------------------------------------------------------------------- subcommands

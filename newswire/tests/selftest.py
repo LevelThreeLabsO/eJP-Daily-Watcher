@@ -19,7 +19,7 @@ counts is the tool doing its job.
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.score import Scorer
-from src import state
+from src import state, health
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -62,6 +62,42 @@ def load(name):
     return [l.strip() for l in open(p) if l.strip() and not l.startswith("#")]
 
 
+def health_test():
+    """Health findings, cooldowns, and the disabled-source filter.
+
+    The cooldown is the part worth testing. A dead-feed alert with no cooldown once
+    posted twelve identical messages into a live channel in an hour, and a cooldown that
+    lives in process memory is no cooldown at all, because every run is a new process —
+    it has to survive in status.json.
+    """
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone.utc)
+    doc = {"sources": {"a": {}, "b": {}},
+           "consecutive_empty": {"a": 999, "turned_off": 999},
+           "consecutive_parse_fail": {"b": 99},
+           "last_posted_at": (now - timedelta(hours=40)).isoformat(),
+           "delivered": False, "error": None}
+    problems = []
+    found = health.check(doc, now)
+    kinds = {f.kind for f in found}
+    if kinds != {"delivery", "silence", "dead_sources"}:
+        problems.append(f"      expected delivery/silence/dead_sources, got {sorted(kinds)}")
+    if not any(f.severity == "critical" for f in found):
+        problems.append("      a refused delivery must be critical (it fails the run)")
+    if any(f.severity == "critical" and f.kind == "silence" for f in found):
+        problems.append("      silence must NOT be critical — a quiet night is not a failure")
+    if "turned_off" in health.format(found):
+        problems.append("      a disabled source must not raise a finding")
+    sent = {f.kind: now.isoformat() for f in found}
+    if health.due(found, sent, now):
+        problems.append("      cooldown did not suppress an immediate repeat")
+    if not health.due(found, sent, now + timedelta(hours=25)):
+        problems.append("      cooldown never expires")
+    if problems:
+        return [f"{'Health checks':<22} FAILED"] + problems, True
+    return [f"{'Health checks':<22} ok       findings + cooldown + disabled filter"], False
+
+
 def main():
     s = Scorer()
     report, failed = [], False
@@ -97,10 +133,15 @@ def main():
     report += lines
     failed = failed or broke
 
+    hlines, hbroke = health_test()
+    report += hlines
+    broke = broke or hbroke
+    failed = failed or hbroke
+
     print("\n".join(report))
     print()
     if broke:
-        print("FAIL: state merge is broken — dedup keys will be lost on every push race")
+        print("FAIL: state merge or health checking is broken")
         return 1
     if failed:
         print("FAIL: noise rate above 25% — tighten scoring.yaml")

@@ -66,6 +66,11 @@ class Run:
         # Cross-run counters, keyed by source.
         self._streak_empty: dict[str, int] = dict(prev.get("consecutive_empty", {}))
         self._streak_parse: dict[str, int] = dict(prev.get("consecutive_parse_fail", {}))
+        # {finding kind: iso timestamp} of the last health alert sent for it. Carried
+        # forward across runs so a cooldown actually survives — an alert with a
+        # per-process cooldown is an alert with no cooldown, since every run is a new
+        # process. See src/health.py.
+        self.alerts_sent: dict[str, str] = dict(prev.get("alerts_sent", {}))
 
     # ---- per-source outcomes -------------------------------------------------
 
@@ -119,12 +124,17 @@ class Run:
 
     # ---- persist ------------------------------------------------------------
 
-    def write(self) -> dict:
+    def snapshot(self) -> dict:
+        """The document this run WOULD write, without writing it.
+
+        Health checks read this before write() so that whatever they send can be
+        recorded in the same document the next run reads its cooldown from.
+        """
         finished = datetime.now(timezone.utc)
         last_posted = self.prev.get("last_posted_at")
         if self.posted and self.delivered:
             last_posted = _now()
-        doc = {
+        return {
             "started_at": self.started,
             "finished_at": finished.isoformat(timespec="seconds"),
             "duration_seconds": round((finished - self.t0).total_seconds(), 1),
@@ -140,8 +150,12 @@ class Run:
             "consecutive_parse_fail": self._streak_parse,
             "stale_sources": self.stale_sources(),
             "error": self.error,
+            "alerts_sent": self.alerts_sent,
             "error_traceback": getattr(self, "error_traceback", None),
         }
+
+    def write(self) -> dict:
+        doc = self.snapshot()
         STATUS_FILE.write_text(json.dumps(doc, indent=2) + "\n")
         return doc
 
