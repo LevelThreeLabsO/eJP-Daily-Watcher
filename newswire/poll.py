@@ -173,8 +173,18 @@ def run(args) -> int:
     run_status.gate("fresh", len(fresh))
 
     # ---- gate 3: relevance --------------------------------------------------
+    # The URL says things the headline does not. "The cancellation of Macklemore: A Yom
+    # Kippur reflection" is indistinguishable from news by its words alone, and is filed
+    # at forward.com/OPINION/ — commentary is 0% of both archive sections, and the path
+    # is a more reliable signal than trying to guess the genre from a title.
+    url_veto = [p.lower() for p in (scorer.config.get("noise_url_paths") or [])]
     scored: list[Item] = []
     for item in fresh:
+        path_hit = next((p for p in url_veto if p in (item.url or "").lower()), None)
+        if path_hit:
+            if args.dry_run and args.verbose:
+                print(f"  · drop [url:{path_hit}] {item.outlet}: {item.title[:66]}")
+            continue
         verdict = scorer.score(item.title, item.body, item.author)
         item.score, item.axes = verdict.score, verdict.axes
         if scorer.admits(verdict, item.threshold):
