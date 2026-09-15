@@ -56,7 +56,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from src import dedup, digest, health, postlog, state, status
+from src import dedup, digest, health, judge, postlog, state, status
 from src.fetch import Item, ParseFailure, fetch_all, now_utc
 from src.score import Scorer
 from src.slack_client import DeliveryError, SlackClient
@@ -219,6 +219,20 @@ def run(args) -> int:
         elif args.dry_run and args.verbose:
             why = f"veto:{verdict.vetoed}" if verdict.vetoed else f"score {verdict.score}"
             print(f"  · drop [{why}] {item.outlet}: {item.title[:70]}")
+    # ---- gate 3b: the judge rescues near-misses -----------------------------
+    # Rescue only — it can promote what the scorer rejected, never suppress what the
+    # scorer accepted. A model outage therefore costs the rescues and nothing else, and
+    # the run degrades to exactly its keyword behaviour. See src/judge.py.
+    if judge.available() and not args.no_judge:
+        near = judge.candidates(fresh, scorer)
+        if near:
+            rescued = judge.screen(near, run_status, run_status.prev)
+            for item in near:
+                if item.url in rescued:
+                    item.category = scorer.categorize(item.title, item.body) or "major_gift"
+                    item.axes = list(item.axes) + ["judge"]
+                    scored.append(item)
+
     run_status.gate("relevant", len(scored))
 
     # ---- gate 4: not already posted ---------------------------------------
@@ -493,6 +507,8 @@ def main() -> int:
     p.add_argument("--baseline-source", action="append", metavar="KEY",
                    help="claim a source's current items without posting; run this "
                         "before an html source goes live")
+    p.add_argument("--no-judge", action="store_true",
+                   help="skip the Gemini rescue pass (keyword scoring only)")
     p.add_argument("--allow-local", action="store_true",
                    help="permit a live posting run outside GitHub Actions (see the guard below)")
     args = p.parse_args()

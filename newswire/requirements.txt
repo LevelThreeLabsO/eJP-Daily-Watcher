@@ -2,3 +2,6 @@ requests>=2.31
 PyYAML>=6.0
 feedparser>=6.0
 python-dotenv>=1.0
+# The judge's rescue pass (src/judge.py). Absent, the newswire runs keyword-only —
+# which is the intended degraded mode, not a failure.
+google-genai>=1.0

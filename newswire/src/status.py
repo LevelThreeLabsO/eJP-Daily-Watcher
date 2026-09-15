@@ -71,6 +71,10 @@ class Run:
         # per-process cooldown is an alert with no cooldown, since every run is a new
         # process. See src/health.py.
         self.alerts_sent: dict[str, str] = dict(prev.get("alerts_sent", {}))
+        # {date: calls} for the Gemini judge. Lives here because status.json is already
+        # committed every run, so it survives the fresh checkout each CI run starts from.
+        # A quota file of its own was tried in this repo and caused rebase conflicts.
+        self.judge_calls: dict[str, int] = dict(prev.get("judge_calls", {}))
 
     # ---- per-source outcomes -------------------------------------------------
 
@@ -151,6 +155,7 @@ class Run:
             "stale_sources": self.stale_sources(),
             "error": self.error,
             "alerts_sent": self.alerts_sent,
+            "judge_calls": self.judge_calls,
             "error_traceback": getattr(self, "error_traceback", None),
         }
 
