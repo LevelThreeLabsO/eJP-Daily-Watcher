@@ -59,13 +59,21 @@ def _fmt_age(delta) -> str:
 def audit_one(source: dict, now):
     """Fetch one source over a wide horizon. Never raises — the verdict is the return.
 
-    The horizon is ten years, not fourteen days, and the reason is worth keeping. With a
-    14-day window a feed frozen in June 2025 returns thirty entries and zero items, which
-    is indistinguishable from a publisher label that drifted — and the first version of
-    this file reported the Jerusalem Post, dead for fifteen months, as a label problem.
-    Taking everything the feed has and measuring the newest item separates the two.
+    For an RSS feed the horizon is ten years, not fourteen days, and the reason is worth
+    keeping. With a 14-day window a feed frozen in June 2025 returns thirty entries and
+    zero items, which is indistinguishable from a publisher label that drifted — and the
+    first version of this file reported the Jerusalem Post, dead for fifteen months, as a
+    label problem. Taking everything the feed has and measuring the newest item separates
+    the two.
+
+    For Google News the horizon cannot be widened, because there it is part of the query:
+    `when:3650d` asks a different question than `when:14d` and Google ranks a different
+    hundred results back. Auditing the Australian Jewish News at ten years reported it
+    stale at twelve days while a three-day search returned thirteen fresh items. So these
+    are audited at the horizon they actually run against.
     """
-    since = now - timedelta(days=3650)
+    wide = source.get("method") == "rss"
+    since = now - timedelta(days=3650 if wide else HORIZON_DAYS)
     try:
         items, entries = fetch_source(source, since)
     except ParseFailure as e:

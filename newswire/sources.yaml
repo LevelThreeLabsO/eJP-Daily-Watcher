@@ -68,10 +68,16 @@ sources:
     outlet: Ynet
     method: rss
     url: https://www.ynetnews.com/Integration/StoryRss3082.xml
+  # The native feed answers 200 from a laptop and 403 from a GitHub runner: the host
+  # blocks datacenter IPs, so this was silently absent from every cloud run — on a beat
+  # that is largely Israel, the most expensive of the five to lose. Site-scoped Google
+  # News is not blocked. blogs.timesofisrael.com is deliberately not accepted: it is the
+  # opinion platform, and commentary is out of both sections.
   - key: times_of_israel
     outlet: Times of Israel
-    method: rss
-    url: https://www.timesofisrael.com/feed/
+    method: gnews
+    url: timesofisrael.com
+    publisher: [The Times of Israel, Times of Israel, timesofisrael.com]
   - key: haaretz
     outlet: Haaretz
     method: rss
@@ -167,10 +173,15 @@ sources:
     outlet: Jewish Exponent
     method: rss
     url: https://www.jewishexponent.com/feed/
+  # 403 from a runner only, and Google barely indexes it — a site: search returns about
+  # one item a week. Kept on that thin route rather than disabled, because one item a
+  # week from Atlanta is still one more than the native feed delivers to a runner, and
+  # it costs one query. If --audit ever shows this at zero for a month, drop it.
   - key: atlanta_jewish_times
     outlet: Atlanta Jewish Times
-    method: rss
-    url: https://www.atlantajewishtimes.com/feed/
+    method: gnews
+    url: atlantajewishtimes.com
+    publisher: [Atlanta Jewish Times, atlantajewishtimes.com]
   # 403 to this fetcher from a laptop as well as from a runner, so it is the WAF, not
   # datacenter-IP blocking. Google indexes it fine.
   - key: j_bay_area
@@ -193,10 +204,12 @@ sources:
     url: https://jewishlink.news/feed/
 
   # ══ Diaspora — Europe, Australia, South Africa, Latin America ═══
+  # Also 403 from a runner only.
   - key: australian_jewish_news
     outlet: Australian Jewish News
-    method: rss
-    url: https://ajn.timesofisrael.com/feed/
+    method: gnews
+    url: australianjewishnews.com
+    publisher: [The Australian Jewish News, Australian Jewish News, australianjewishnews.com]
   - key: j_wire_australia
     outlet: J-Wire Australia
     method: rss
@@ -205,10 +218,12 @@ sources:
     outlet: European Jewish Congress
     method: rss
     url: https://eurojewcong.org/feed/
+  # 403 from a runner only. Google labels it "Jewish News", not "Jewish News UK".
   - key: jewish_news_uk
     outlet: Jewish News UK
-    method: rss
-    url: https://www.jewishnews.co.uk/feed/
+    method: gnews
+    url: jewishnews.co.uk
+    publisher: [Jewish News, Jewish News UK, jewishnews.co.uk]
   - key: sa_jewish_report
     outlet: SA Jewish Report
     method: rss
@@ -217,10 +232,12 @@ sources:
     outlet: Enlace Judio (MX)
     method: rss
     url: https://www.enlacejudio.com/feed/
+  # 403 from a runner only. Google carries it with a leading dash in the label.
   - key: agencia_ajn_ar
     outlet: Agencia AJN (AR)
-    method: rss
-    url: https://agenciaajn.com/feed/
+    method: gnews
+    url: agenciaajn.com
+    publisher: ["- AJN Agencia de Noticias", AJN Agencia de Noticias, agenciaajn.com]
 
   # ══ Standing searches. Google News, scoped by query rather than site, because
   #    a gift to a secular university is covered by that university's own newsroom
