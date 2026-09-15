@@ -6,11 +6,18 @@ name: eJP newswire
 
 on:
   # Fired every 15 minutes by an Apps Script trigger on Google's servers (see
-  # newswire/pinger.gs). GitHub's own cron has been measured on this repo dropping whole
-  # days and once firing 11.6 hours late; the schedule below is an hourly fallback only.
+  # newswire/pinger.gs). The schedule below is a fallback only, and a weak one.
+  #
+  # Measured over 27 consecutive scheduled runs while this asked for hourly: median gap
+  # 4.2 hours, worst 6.6. GitHub queues cron on a private repo and drops what it cannot
+  # place, so the request is a hint, not a promise, and asking hourly bought a four-hour
+  # digest. Asking every 15 minutes is not expected to be honoured either — it is set
+  # here because more attempts can only land more often, never fewer, and it costs
+  # nothing extra: a run with nothing fresh reads its state, finds no new items and
+  # exits. Real cadence comes from the pinger.
   workflow_dispatch:
   schedule:
-    - cron: "17 * * * *"
+    - cron: "*/15 * * * *"
 
 permissions:
   contents: write
