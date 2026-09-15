@@ -347,21 +347,36 @@ def cmd_status() -> int:
 
 
 def cmd_score(text: str) -> int:
+    """Score one headline against BOTH streams and show where it would land.
+
+    This used to call scorer.score()/admits(), the single-stream methods inherited from
+    the Gulf newswire, and so reported a verdict no live run would ever reach: it printed
+    ADMIT for a headline scoring 2 against a threshold of 4, because the real decision is
+    per stream and this was reading neither of them. Tuning is done by reading this
+    output, so it has to be the same decision poll.py makes.
+    """
     scorer = Scorer()
-    v = scorer.score(text)
-    print(f"score {v.score} (threshold {scorer.default_threshold}) "
-          f"-> {'ADMIT' if scorer.admits(v) else 'DROP'}")
-    print(f"axes    {', '.join(v.axes) or '(none)'}")
-    print(f"matched {', '.join(v.matched) or '(none)'}")
-    if v.vetoed:
-        print(f"vetoed  {v.vetoed}")
+    for stream, label in (("major_gift", "Major Gifts"), ("watching", "What We're Watching")):
+        v = scorer.score_stream(stream, text)
+        admits = scorer.admits_stream(stream, v)
+        print(f"{label:<22} score {v.score} / threshold {scorer.thresholds[stream]}"
+              f"  -> {'ADMIT' if admits else 'drop'}")
+        print(f"  axes     {', '.join(v.axes) or '(none)'}")
+        print(f"  matched  {', '.join(v.matched) or '(none)'}")
+        anchor = scorer.anchors[stream]
+        if anchor and not (anchor & set(v.title_axes)):
+            print(f"  no anchor: the headline needs one of {sorted(anchor)}")
+        if v.vetoed:
+            print(f"  vetoed   {v.vetoed}")
+    stream, _ = scorer.route(text)
+    print(f"\nroutes to: {stream or 'nothing — this headline would not post'}")
     return 0
 
 
 def cmd_test_webhook() -> int:
     slack = SlackClient()
     try:
-        slack.post(":wrench: Circuit newswire webhook test — delivery confirmed.")
+        slack.post(":wrench: eJP newswire webhook test — delivery confirmed.")
     except DeliveryError as e:
         print(f"FAILED: {e}", file=sys.stderr)
         return 1
@@ -380,7 +395,7 @@ def cmd_audit(args) -> int:
 
 
 def main() -> int:
-    p = argparse.ArgumentParser(description="The Circuit newswire")
+    p = argparse.ArgumentParser(description="The eJP newswire — Major Gifts and What We're Watching")
     p.add_argument("--dry-run", action="store_true", help="print, don't post; don't touch state")
     p.add_argument("--verbose", "-v", action="store_true", help="show what was dropped and why")
     p.add_argument("--window-hours", type=float, default=None, help="override every source's window")
@@ -395,6 +410,8 @@ def main() -> int:
     p.add_argument("--test-webhook", action="store_true", help="post a test message and exit")
     p.add_argument("--selftest", action="store_true", help="scoring recall/noise fixtures")
     p.add_argument("--audit", action="store_true", help="audit every source's feed health")
+    p.add_argument("--allow-local", action="store_true",
+                   help="permit a live posting run outside GitHub Actions (see the guard below)")
     args = p.parse_args()
 
     if args.status:
@@ -407,6 +424,17 @@ def main() -> int:
         return cmd_selftest()
     if args.audit:
         return cmd_audit(args)
+
+    # One poller, ever. Claim-before-send protects two overlapping runs of the same
+    # poller; it cannot protect two schedulers that exchange state through git pushes
+    # landing seconds apart, which is how a laptop run and a cloud run posted the same
+    # digest twice ninety seconds apart. Verification from a laptop uses --dry-run; this
+    # refuses anything that would post or write state.
+    if not (args.dry_run or args.allow_local) and not os.environ.get("GITHUB_ACTIONS"):
+        print("Refusing a live run outside GitHub Actions: the cloud poller owns the\n"
+              "channels and the state file. Use --dry-run to see what would post, or\n"
+              "--allow-local if you genuinely mean to post from here.", file=sys.stderr)
+        return 2
 
     # Any unhandled failure must still leave a status record, or the file keeps showing
     # the last good run and the watcher looks healthy while it is broken — the precise

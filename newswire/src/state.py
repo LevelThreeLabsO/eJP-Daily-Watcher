@@ -25,6 +25,7 @@ from __future__ import annotations
 import hashlib
 import json
 import subprocess
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -136,7 +137,12 @@ def merge(a: dict, b: dict) -> dict:
         for k, v in b.get(store, {}).items():
             if k not in out[store] or v < out[store][k]:
                 out[store][k] = v
-    combined = {(t.get("at"), t.get("words")): t for t in a.get("titles", []) + b.get("titles", [])}
+    # tuple(), not the list itself: `words` is a list, and a list cannot be a dict key.
+    # This line raised TypeError on every call for a week, and both callers wrapped it in
+    # a bare `except: pass`, so no merge ever happened and each push race quietly dropped
+    # the other run's dedup keys. tests/selftest.py now exercises merge on every change.
+    combined = {(t.get("at"), tuple(t.get("words") or ())): t
+                for t in a.get("titles", []) + b.get("titles", [])}
     out["titles"] = sorted(combined.values(), key=lambda t: t.get("at", ""))[-TITLE_MAX:]
     return out
 
@@ -204,7 +210,11 @@ def latest() -> dict:
         return local
     try:
         return merge(local, _coerce(json.loads(r.stdout)))
-    except Exception:
+    except Exception as e:
+        # Loud, never silent. A merge that fails silently loses dedup keys and the only
+        # symptom is a duplicate post days later.
+        print(f"  WARNING: state merge with origin failed: {type(e).__name__}: {e}",
+              file=sys.stderr)
         return local
 
 
@@ -246,8 +256,9 @@ def record(state: dict, files: tuple[str, ...] = ("watcher_state.json", "status.
             if remote.returncode == 0:
                 try:
                     merged = merge(state, _coerce(json.loads(remote.stdout)))
-                except Exception:
-                    pass
+                except Exception as e:
+                    print(f"  WARNING: state merge before commit failed: "
+                          f"{type(e).__name__}: {e}", file=sys.stderr)
         save(merged)
         _git("add", *files)
         if _git("diff", "--cached", "--quiet").returncode == 0:

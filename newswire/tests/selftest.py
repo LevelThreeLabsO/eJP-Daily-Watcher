@@ -7,12 +7,52 @@ Negatives are real headlines from the same feeds that eJP did not run.
 Recall is the number that matters: a word removed from scoring.yaml shows up here as
 items the desk would no longer see. Noise is the cost side — some negatives are
 genuinely borderline, so this reports the rate rather than demanding zero.
+
+Read the noise rate as a ceiling, not a defect count. The negative set is "headlines eJP
+did not publish", and the section runs about two gifts a day out of dozens that qualify,
+so it is full of items that are squarely on-beat and simply did not make the edition —
+"Boston Ballet receives $10M donation, largest endowment gift in its history" sits in
+there. A newswire surfacing that for an editor is working, not failing. Chase a rise in
+this number only after reading which headlines caused it; roughly a fifth of what it
+counts is the tool doing its job.
 """
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.score import Scorer
+from src import state
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+
+def merge_test():
+    """State merge must actually run.
+
+    It did not for a week: `words` is a list, the title key tupled it with `at` into a
+    dict key, and every call raised TypeError into a bare `except: pass` at both call
+    sites. Nothing looked broken — pushes succeeded, state saved, and each push race
+    quietly dropped the other run's dedup keys. This is the only thing that would have
+    caught it, so it runs on every change.
+    """
+    a = {"seen": {"aaa": "2026-09-01T00:00:00Z"}, "first_seen": {"aaa": "2026-09-01T00:00:00Z"},
+         "titles": [{"words": ["gift", "hillel"], "at": "2026-09-01T00:00:00Z", "outlet": "JTA"}]}
+    b = {"seen": {"aaa": "2026-09-02T00:00:00Z", "bbb": "2026-09-02T00:00:00Z"},
+         "first_seen": {}, "titles": [{"words": ["gala"], "at": "2026-09-02T00:00:00Z",
+                                       "outlet": "Forward"}]}
+    try:
+        m = state.merge(a, b)
+    except Exception as e:
+        return [f"{'State merge':<22} FAILED  {type(e).__name__}: {e}"], True
+
+    problems = []
+    if set(m["seen"]) != {"aaa", "bbb"}:
+        problems.append(f"      merge lost keys: {sorted(m['seen'])}")
+    if m["seen"].get("aaa") != "2026-09-01T00:00:00Z":
+        problems.append("      merge kept the later stamp; it must keep the earliest")
+    if len(m["titles"]) != 2:
+        problems.append(f"      merge lost remembered titles: {len(m['titles'])} of 2")
+    if problems:
+        return [f"{'State merge':<22} FAILED"] + problems, True
+    return [f"{'State merge':<22} ok       union + earliest-stamp + titles"], False
 
 
 def load(name):
@@ -53,8 +93,15 @@ def main():
         if rate > 25:
             failed = True
 
+    lines, broke = merge_test()
+    report += lines
+    failed = failed or broke
+
     print("\n".join(report))
     print()
+    if broke:
+        print("FAIL: state merge is broken — dedup keys will be lost on every push race")
+        return 1
     if failed:
         print("FAIL: noise rate above 25% — tighten scoring.yaml")
         return 1

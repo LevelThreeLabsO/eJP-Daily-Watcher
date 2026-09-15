@@ -30,18 +30,23 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: { python-version: "3.11" }
-      - run: pip install feedparser requests pyyaml python-dotenv
+      - run: pip install -r requirements.txt
       - run: python poll.py
         env:
           SLACK_GIFTS: ${{ secrets.SLACK_GIFTS }}
           SLACK_WWW: ${{ secrets.SLACK_WWW }}
-      - name: Persist dedup state
-        if: always()
-        working-directory: .
-        run: |
-          git config user.name "ejp-newswire-bot"
-          git config user.email "bot@users.noreply.github.com"
-          git add newswire/ || true
-          git diff --staged --quiet || git commit -m "newswire state: $(date -u +%FT%TZ)"
-          git pull --rebase --autostash -q || true
-          git push || true
+
+      # There is deliberately no git step here. poll.py commits and pushes its own state
+      # through state.record(), which unions against origin first and, on a lost push
+      # race, points the branch at origin without disturbing the tree.
+      #
+      # The step that used to live here did the same job a second time with
+      # `git pull --rebase --autostash`. Two committers writing the same files in one job
+      # is how a stale index snapshots an old tree and silently deletes work that is
+      # already on origin, and --autostash is the specific mechanism that has lost
+      # uncommitted work in this org before. One writer, and it is the one that merges.
+
+      # Runs on failure too: status.json explains the break, and it is the only thing
+      # that will after the fact.
+      - if: always()
+        run: python poll.py --status

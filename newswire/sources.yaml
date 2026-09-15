@@ -44,7 +44,10 @@ sources:
   - key: jerusalem_post
     outlet: Jerusalem Post
     method: rss
-    url: https://www.jpost.com/rss/rssfeedsheadlines.aspx
+    # Not rssfeedsheadlines.aspx. That path answers 200 with thirty well-formed entries
+    # whose newest is 16 June 2025 — fifteen months dead, and invisible to everything
+    # except `--audit`. rssfeedsjerusalem.aspx is worse still, frozen in 2021.
+    url: https://www.jpost.com/rss/rssfeedsfrontpage.aspx
   - key: jns
     outlet: JNS
     method: rss
@@ -109,18 +112,35 @@ sources:
     outlet: Chronicle of Philanthropy
     method: rss
     url: https://www.philanthropy.com/feed
+  # Disabled, not deleted, so nobody re-adds it in six months without the finding.
+  # Every documented feed path (/feeds/rss/news, /rss/news.xml, /feed, /rss, /news/rss)
+  # answers 200 with an HTML page, and Google News indexes the domain zero times — a
+  # site: search returns nothing at all, as does the masthead as a phrase. There is no
+  # route to this outlet from here. Its grant announcements are reachable through Candid
+  # below, which is the same organisation.
   - key: philanthropy_news_digest
     outlet: Philanthropy News Digest
     method: rss
     url: https://philanthropynewsdigest.org/feeds/rss/news
+    enabled: false
+
+  - key: candid
+    outlet: Candid
+    method: gnews
+    url: candid.org
+    query: "(grant OR grants OR gift OR foundation OR philanthropy OR nonprofit)"
+    publisher: [Candid, candid.org, learning.candid.org, Philanthropy News Digest]
   - key: nonprofit_quarterly
     outlet: Nonprofit Quarterly
     method: rss
     url: https://nonprofitquarterly.org/feed/
+  # news.rss is a 404 and /news/feed a 403 — Devex put its feeds behind the paywall.
   - key: devex
     outlet: Devex
-    method: rss
-    url: https://www.devex.com/news.rss
+    method: gnews
+    url: devex.com
+    query: "(philanthropy OR foundation OR donor OR grant OR gift)"
+    publisher: [Devex, devex.com]
 
   # ══ Local and regional Jewish papers — where a JCC hosting a speaker actually gets covered 
   - key: washington_jewish_week
@@ -151,18 +171,22 @@ sources:
     outlet: Atlanta Jewish Times
     method: rss
     url: https://www.atlantajewishtimes.com/feed/
+  # 403 to this fetcher from a laptop as well as from a runner, so it is the WAF, not
+  # datacenter-IP blocking. Google indexes it fine.
   - key: j_bay_area
     outlet: J. Bay Area
-    method: rss
-    url: https://jweekly.com/feed/
+    method: gnews
+    url: jweekly.com
+    publisher: [J. The Jewish News of Northern California, jweekly.com, J. Weekly]
   - key: new_york_jewish_week
     outlet: New York Jewish Week
     method: rss
     url: https://www.jta.org/category/ny/feed
   - key: boulder_jewish_news
     outlet: Boulder Jewish News
-    method: rss
-    url: https://boulderjewishnews.org/feed/
+    method: gnews
+    url: boulderjewishnews.org
+    publisher: [Boulder Jewish News, boulderjewishnews.org]
   - key: jewish_link
     outlet: Jewish Link
     method: rss

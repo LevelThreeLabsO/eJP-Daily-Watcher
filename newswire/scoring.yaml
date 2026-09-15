@@ -42,13 +42,31 @@ gift_axes:
     terms: [donate, donated, donates, donating, donation, donor, donors,
             gift, gifted, gifts, gifting, grant, granted, grants, grantee,
             pledge, pledged, pledges, bequest, bequeath, bequeathed,
-            endow, endowed, endowment, philanthropist, philanthropy, philanthropic,
-            benefactor, gave, gives, giving, contributed, contribution,
+            endow, endowed, endowment, philanthropist, benefactor,
+            gave, gives, contributed, contribution,
+            # The verb, which is a transaction ("are giving $1.48 million to Wilcox
+            # Medical Center", "is giving away 250 tickets"). Only the NOUN moved to
+            # giving_topic below. Collapsing the two cost five real archive gifts.
+            giving,
+            # The receiving side. A gift reported from the recipient's end is still a
+            # gift: "has received $1.1 million in philanthropic support".
+            receive, received, receives, receiving, recipient of, "awarded to",
             award, awarded, awards, commit, committed, committing, commitment, allocate, allocated,
             earmark, earmarked, designate, designated, underwrite, underwritten,
             "matching gift", "in memory of",
             raise, raised, raising, fundraise, fundraising, funder, funders,
             "stepped up", "came forward", subsidize, subsidise, sponsor, sponsored]
+  # The subject, not the act — and therefore not an anchor.
+  #
+  # These sat in `giving` and, because `giving` is the required anchor, any essay about
+  # the field admitted on its own vocabulary: "AI in corporate philanthropy: An
+  # opportunity for nonprofits to lean in" scored philanthropy + nonprofits and posted
+  # to Major Gifts. Nothing was given. Worth 2 alongside a real transaction, worth
+  # nothing without one — the same reason geography cannot carry a story by itself.
+  - name: giving_topic
+    points: 2
+    terms: [philanthropy, philanthropic, "giving circle", "Giving Tuesday",
+            charitable, generosity, grantmaking, grantmaker, "donor-advised"]
   # Who or what receives it. A giving verb plus a recipient is a gift story.
   - name: recipient
     points: 2
@@ -104,10 +122,18 @@ watching_axes:
             launch, launches, launched, launching, unveil, unveiled, unveils,
             "opening night", reopening, reopens, "first time", anniversary,
             observance, service, services, prayers, selichot, minyan, siyum,
-            "ribbon cutting", "book launch", parade, exhibit, tour,
+            "ribbon cutting", "book launch", parade, exhibit,
+            # Not bare `tour`: it admitted "Macklemore blames Jewish billionaire Robert
+            # Kraft for his removal from Ed Sheeran's tour". A concert tour is not a
+            # convening, and a museum tour is the routine programming the archive
+            # excludes. Real eJP usage is "mission" or "delegation", both above.
             # Verbs that ARE the convening. From the archive's own misses: "will meet",
             # "will hold a memorial service", "opens its exhibition", "will be awarded".
-            meet, meets, meeting, gather, gathers, gathering,
+            # Not bare `meet` — as an infinitive it fires inside negations and
+            # intentions ("says won't try to meet Mamdani"), the same failure as bare
+            # `holds` matching "Hamas still holds Gaza captive".
+            meets, meeting, "will meet", "to meet with", "met with",
+            gather, gathers, gathering,
             "will hold", "is holding", "are holding", "to hold",
             convene, convenes, convened, gala, gathering, gatherings,
             prize, prizes, honoree, honorees, "will be awarded", gets, receives,
@@ -154,6 +180,9 @@ noise:
   - vandalised
   - defaced
   - "hate crime"
+  # "son received death threats" scored as a gift on `received`.
+  - "death threat"
+  - "death threats"
   # Combat and casualty reporting
   - airstrike
   - "air strike"
@@ -180,8 +209,22 @@ noise:
   - slams
   - blasts
   - accuses
+  - blames
   - condemns
   - "hits back"
+  # Retail, not philanthropy. "gift" is the single strongest word in the gift axis, and
+  # commerce listicles are built out of it: "15 practical gifts for college students they
+  # will actually use" scored gift + college and posted to Major Gifts.
+  - "gift guide"
+  - "gift ideas"
+  - "gifts for"
+  - "best gifts"
+  - "practical gifts"
+  - "holiday gifts"
+  - "gifts under"
+  - "gift-giving season"
+  - deals
+  - discount
   # Business, not philanthropy
   - "quarterly results"
   - earnings
@@ -193,10 +236,24 @@ noise:
   - "series b"
   - "funding round"
   - "raises seed"
-  # Sport and weather
+  # Sport and weather.
+  #
+  # Results only, never the fixture: the JCC Maccabi Games and the Maccabiah are real
+  # archive items, so `games`, `tournament` and `championship` stay scoring words in the
+  # convening axis and the veto catches what happened at them instead. "Israeli judo
+  # pair strike gold at top tournament in Hungary" posted on tournament + Israeli.
   - playoff
   - touchdown
   - "final score"
+  - "strike gold"
+  - "gold medal"
+  - "silver medal"
+  - "bronze medal"
+  - medalist
+  - medallist
+  - "wins gold"
+  - "win gold"
+  - "take gold"
   - forecast
 
 byline_bypass: []
