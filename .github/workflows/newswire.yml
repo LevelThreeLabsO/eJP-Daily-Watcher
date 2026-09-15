@@ -46,6 +46,9 @@ jobs:
           # with this unset, findings stay in status.json and a critical one still fails
           # the run, which is what sends GitHub's own email to the repo owner.
           SLACK_HEALTH: ${{ secrets.SLACK_HEALTH }}
+          # The judge's rescue pass. Absent, the newswire runs keyword-only, which is
+          # the intended degraded mode rather than a failure.
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           # Used only to put the status.json URL in a health message.
           GITHUB_REPOSITORY: ${{ github.repository }}
 
