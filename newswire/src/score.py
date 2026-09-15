@@ -120,6 +120,13 @@ class Scorer:
         if noise_hit:
             return Verdict(0, [], [], vetoed=noise_hit.group(0))
 
+        # A question is an essay, not news of something happening. Measured across the
+        # whole archive: ZERO of 1,085 What We're Watching items and zero of 429 Major
+        # Gifts end in a question mark. It admitted "How can Yiddish fans in Israel
+        # benefit from the growing Yiddish scene abroad?" to What We're Watching.
+        if title.rstrip().endswith("?"):
+            return Verdict(0, [], [], vetoed="question headline")
+
         title_text = f" {title} ".replace("\u2019", "'")
         total, axes_hit, title_axes, matched = 0, [], [], []
         for name, points, pattern in self.axes[stream]:

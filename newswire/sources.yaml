@@ -387,3 +387,102 @@ sources:
     window_minutes: 360
     query: 'rabbi OR rabbinic (conference OR convention OR gathering OR mission)'
     threshold: 5
+
+  # ══ Jewish and Israel giving vocabulary, not restricted to any outlet ═══════
+  #
+  # Why these exist and why they look the way they do.
+  #
+  # The outlet list cannot be the answer: 87% of the organizations eJP names in
+  # What We're Watching appear exactly once across 1,082 items, and watching even
+  # the top 400 would reach under half of them. So discovery has to be vocabulary
+  # driven and outlet blind, which is what every query below is.
+  #
+  # Each one was run live against a 2-7 day window before being added, and kept
+  # only if it returned items the scorer routes to Major Gifts AND those items
+  # carried a real Jewish or Israel angle. Queries that read plausibly and
+  # returned nothing were dropped rather than carried: the exact phrases
+  # "Jewish donor" and "Jewish philanthropist" return ZERO over seven days of
+  # Google News, so the desk's own hand-search vocabulary does not survive being
+  # automated verbatim — it needs the unquoted, verb-driven forms below.
+  #
+  # These reach the 40% of Major Gifts whose headline says Jewish or Israel. The
+  # other 60% carry no such word and are general philanthropy where the DONOR is
+  # the Jewish connection. No keyword finds those; see the note at the end of
+  # this file.
+  - key: g01
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'Jewish (gift OR donation OR grant OR endowment OR bequest)'
+    threshold: 4
+  - key: g02
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'Jewish (donates OR donated OR pledges OR pledged OR gives OR gave)'
+    threshold: 4
+  - key: g03
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(Israel OR Israeli) (donation OR gift OR grant OR pledge OR donated)'
+    threshold: 4
+  - key: g04
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: 'Israeli (nonprofit OR hospital OR university) (donation OR gift OR grant OR funding)'
+    threshold: 4
+  # 7-day window: these are low-volume and high-precision. Two days of Hillel and
+  # Chabad giving news is often literally nothing; a week caught Robert Kraft's
+  # $10M Brandeis Hillel center under three separate headlines.
+  - key: g05
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(Hillel OR Chabad OR Birthright OR "Jewish Federation") (gift OR grant OR donation OR million)'
+    threshold: 4
+  # Shekels. 84% of eJP's coverage is Israel and NIS figures are normal there, but
+  # this returns ~8 items a week, so it needs the wider window to be worth a slot.
+  # It is what surfaced "Turpaz CEO donates NIS 70 million to Israel's hospitals".
+  - key: g06
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(NIS OR shekel OR shekels) (donation OR gift OR grant OR pledge OR donated)'
+    threshold: 4
+  - key: g07
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(synagogue OR yeshiva OR "Jewish day school" OR "Jewish school") (gift OR grant OR donation OR bequest)'
+    threshold: 4
+  # Campus and communal-security money, which the archive carries steadily and no
+  # other query here reaches. Found the $100M Harvard megadonor gift.
+  - key: g08
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 360
+    query: '(antisemitism OR "Jewish life" OR "Jewish education") (grant OR gift OR million OR funding)'
+    threshold: 4
+
+# ─────────────────────────────────────────────────────────────────────────────
+# THE 60% THIS FILE CANNOT REACH
+#
+# Measured on eJP's own 429 published Major Gifts: only 173 (40.3%) contain any
+# Jewish or Israel word in the headline. The other 256 are general philanthropy —
+# a gift to a secular university, hospital, museum or theater — and they belong
+# in the section because the DONOR is Jewish or connected to the Jewish communal
+# world. That is the screening step eJP's team does by hand.
+#
+# No keyword finds those. It was tried: broad giving queries with no Jewish term
+# return volume without relevance — "foundation awards (scholarships OR grants)
+# students" returned 38 scorer-admitted items in two days, every one of them a
+# generic local scholarship story that eJP would never run. Widening that way
+# floods the channel rather than covering the gap, so it is deliberately absent.
+#
+# Closing it properly needs donor identification, which is judgment, not
+# vocabulary — the `judge:` seam in scoring.yaml is where that would attach. The
+# rule that has to survive into any such pass: NEVER infer someone's background
+# from a surname. Flag an uncertain one for the editor; never guess it.
+# ─────────────────────────────────────────────────────────────────────────────

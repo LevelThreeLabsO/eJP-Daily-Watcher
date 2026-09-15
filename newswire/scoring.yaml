@@ -236,6 +236,67 @@ noise:
   - "series b"
   - "funding round"
   - "raises seed"
+  - "raises $"
+  - startup
+  - "venture capital"
+  - investors
+  # ---------------------------------------------------------------------------
+  # Polysemy. Every word below is a real giving word in one sense and something
+  # else entirely in another, and the other sense is common on this beat. These
+  # were all admitted as Major Gifts from live feeds.
+  # ---------------------------------------------------------------------------
+  # "grant" as permission, not money: "UN urges Israel to grant investigators
+  # access", "Brandeis Center urges Supreme Court to grant relief".
+  - "grant access"
+  - "grant relief"
+  - "grant asylum"
+  - "grant immunity"
+  - "grant amnesty"
+  - "grant permission"
+  - "grant citizenship"
+  - "grant certiorari"
+  - "grant bail"
+  - "grant a visa"
+  - "granted access"
+  - "granted asylum"
+  - "granted immunity"
+  - "granted bail"
+  - "granted citizenship"
+  # "to grant" as an infinitive is always permission, never money — a gift is
+  # "granted a $5M gift" or "awarded a grant", never "to grant". And advocacy
+  # verbs are someone demanding an action, which is neither a gift nor a convened
+  # event. Measured across all 1,514 archive items in both sections: zero hits for
+  # any of these five, so the veto costs nothing.
+  # Routine local programming, which the archive excludes explicitly. "The Arts
+  # Federation hosts free after school program for students K-12" scored on
+  # `federation` + `hosts` and is neither Jewish nor newsworthy. Zero archive hits.
+  - "after school"
+  - "after-school"
+  - afterschool
+  - "to grant"
+  - urges
+  - urged
+  - "calls on"
+  - demands
+  # "pledge" without money: "German minister pledges solidarity with Jewish
+  # community". A pledge of support is a speech; a pledge of dollars is a gift.
+  - "pledges solidarity"
+  - "pledged solidarity"
+  - "pledge allegiance"
+  - "pledges allegiance"
+  - "pledges to continue"
+  - "pledges cooperation"
+  # "award" as a prize: "Jewish talent shines at the Emmy Awards". Note that
+  # "research award" and "endowed chair" stay scoring terms — those are 15% of
+  # the archive — so this vetoes the ceremony vocabulary, not the noun.
+  - "emmy"
+  - "oscar"
+  - "grammy"
+  - "academy awards"
+  - "award-winning"
+  - "awards season"
+  - "red carpet"
+  - "nominees"
   # Sport and weather.
   #
   # Results only, never the fixture: the JCC Maccabi Games and the Maccabiah are real
