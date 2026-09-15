@@ -84,6 +84,11 @@ def audit_one(source: dict, now):
                 "note": f"{type(e).__name__}: {e}"[:70],
                 "entries": 0, "kept": 0, "freshest": None}
 
+    # A source's own expectation, where it has one. STALE_DAYS is tuned for news
+    # outlets; a foundation that announces a grant every six weeks is not broken, and an
+    # audit that cries wolf about it every month is an audit nobody reads.
+    stale_days = int(source.get("stale_days", STALE_DAYS))
+
     ages = [a for a in (_age(i, now) for i in items) if a is not None]
     freshest = min(ages) if ages else None
     # KEPT is what a normal run would actually have to work with.
@@ -98,7 +103,7 @@ def audit_one(source: dict, now):
         verdict, note = "ALL DROPPED", "publisher/language check rejected every entry"
     elif freshest is None:
         verdict, note = "ok", "undated (ages from first sighting)"
-    elif freshest > timedelta(days=STALE_DAYS):
+    elif freshest > timedelta(days=stale_days):
         verdict, note = "STALE", f"newest item is {freshest.days} days old"
     else:
         verdict, note = "ok", ""
@@ -122,7 +127,7 @@ def main(only: list[str] | None = None) -> int:
 
     now = now_utc()
     print(f"Auditing {len(sources)} sources over a {HORIZON_DAYS}-day horizon "
-          f"(stale = newest item older than {STALE_DAYS} days)\n")
+          f"(stale = older than each source's own limit, default {STALE_DAYS} days)\n")
     print(f"  {'SOURCE':22} {'METHOD':13} {'ENTRIES':>7} {'KEPT':>5} {'FRESHEST':>9}  VERDICT")
 
     with ThreadPoolExecutor(max_workers=MAX_WORKERS) as pool:

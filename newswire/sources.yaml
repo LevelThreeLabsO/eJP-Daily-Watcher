@@ -466,6 +466,64 @@ sources:
     query: '(antisemitism OR "Jewish life" OR "Jewish education") (grant OR gift OR million OR funding)'
     threshold: 4
 
+  # ══ The funders themselves ═════════════════════════════════════════════════
+  #
+  # A foundation announcing its own grant is the earliest that grant is knowable —
+  # before any outlet writes it up, and often instead of one ever doing so.
+  #
+  # Twenty Jewish foundations and federations were probed for this. Most have no
+  # usable feed: JFNA, Hadassah, JNF, CJP and Genesis Prize 404, and Schusterman,
+  # JFN and JDC return 403. Two are feeds that answer 200 while being long dead —
+  # Azrieli's newest item is from January 2022 and Avi Chai's from December 2019
+  # (that foundation sunset). `--audit` will keep flagging those if anyone re-adds
+  # them. Shalom Hartman and HIAS are live but publish essays, which both sections
+  # veto, so they are deliberately absent.
+  #
+  # These three are live, on-beat, and publish grants.
+  - key: jim_joseph
+    outlet: Jim Joseph Foundation
+    method: rss
+    url: https://jimjosephfoundation.org/news-blogs/feed/
+    window_minutes: 1440
+    stale_days: 30
+  - key: maimonides_fund
+    outlet: Maimonides Fund
+    method: rss
+    url: https://maimonidesfund.org/feed/
+    window_minutes: 1440
+    stale_days: 45
+  # Slow — roughly monthly — but it is a real funder and an idle feed costs one
+  # conditional GET.
+  - key: wexner
+    outlet: Wexner Foundation
+    method: rss
+    url: https://www.wexnerfoundation.org/feed/
+    window_minutes: 1440
+    stale_days: 120
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ON THE `html` METHOD
+#
+# poll.py supports a fourth discovery method that reads an institution's
+# announcement listing page and each announcement's own page. No source here uses
+# it, and that is a finding rather than an oversight.
+#
+# It was tested against JFNA, UJA-Federation NY, CJP Boston, Jim Joseph,
+# Schusterman, JNF, Birthright, Hadassah, Maimonides, Brandeis and Azrieli. Most
+# either block this fetcher or render their listings with JavaScript, so the raw
+# HTML carries no links. The ones that do render server-side were not worth it:
+# CJP's listing links to more listings, and Brandeis's /stories/ is student
+# internship features, not gift news. Where an institution IS reachable, it runs
+# WordPress and has a real feed — which is strictly better, because feed items
+# carry dates and need no baselining.
+#
+# Keep the method for the case it was built for: a source with announcements worth
+# having, no feed, and server-side HTML. Such a source needs `link_pattern` (and
+# optionally `base`, `title_strip`, `max_pages`), and MUST be introduced with
+# `poll.py --baseline-source KEY` before its first live run, because html items are
+# undated and age from first sighting — without that, the whole listing reads as
+# new at once.
+# ─────────────────────────────────────────────────────────────────────────────
 # ─────────────────────────────────────────────────────────────────────────────
 # THE 60% THIS FILE CANNOT REACH
 #
