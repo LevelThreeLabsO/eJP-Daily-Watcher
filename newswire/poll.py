@@ -1,27 +1,36 @@
 #!/usr/bin/env python3
-"""The Circuit newswire: one run.
+"""The eJP newswire: one run.
 
-Reads every source in sources.yaml, keeps what scores as Gulf-business relevant, drops
-what has already been posted or is the same story someone else just filed, and posts one
-bundled digest to Slack. Single-shot — one invocation per GitHub Actions tick.
+Reads every source in sources.yaml, routes what scores into one of two Daily Phil
+sections, drops what has already been posted or is the same story someone else just
+filed, and posts a bundled digest to each section's Slack channel. Single-shot — one
+invocation per GitHub Actions tick, fired every 15 minutes by newswire/pinger.gs.
 
-    python3 poll.py                      real run (needs SLACK_WEBHOOK_URL)
-    python3 poll.py --dry-run            print the digest, post nothing, touch no state
-    python3 poll.py --dry-run --window-hours 24 --source agbi
+Two streams, unlike the Gulf newswire this is ported from:
+
+    major_gift  did somebody GIVE something? A transaction.
+    watching    what should the philanthropy world have its eye on today?
+
+An item lands in exactly one; gifts win ties.
+
+    python3 poll.py                      real run (needs SLACK_GIFTS and SLACK_WWW)
+    python3 poll.py --dry-run            print the digests, post nothing, touch no state
+    python3 poll.py --dry-run -v --window-hours 3
     python3 poll.py --audit              every source: alive, fresh, parseable
-    python3 poll.py --selftest           scoring recall + noise rate against fixtures
-    python3 poll.py --score "headline"   score one headline and show which axes hit
+    python3 poll.py --selftest           recall + noise against the real archive
+    python3 poll.py --score "headline"   score against both streams, show the routing
+    python3 poll.py --baseline-source K  claim a source's items without posting
     python3 poll.py --test-webhook       assert Slack answers `ok`
     python3 poll.py --status             print status.json
 
 Gate order matters — an item rejected at gate 3 is never seen by gate 4:
 
-    1 fetch      every source, threaded
+    1 fetch      every source, threaded (rss, gnews, gnews_entity, html)
     2 fresh      within that source's own window
-    3 relevant   four-axis score >= the source's threshold
+    3 relevant   url-path genre veto, then score >= the source's threshold
     4 unseen     not already posted, by URL hash and by headline hash
     5 unique     not the story another outlet just filed
-    6 post       one bundled message, newest first, capped
+    6 post       one bundled message per stream, newest first, capped
 
 Claim-before-send is the load-bearing rule: keys are written to state *before* the post
 goes out, and rolled back if Slack refuses. Marking after sending means two overlapping
@@ -32,6 +41,10 @@ There is deliberately no concurrency lock. The workflow serializes runs, and in 
 original two separate outages came from the guard rather than from concurrency — a real
 lock wedged permanently when a run was killed while holding it, and its self-expiring
 replacement then turned away two scheduled runs.
+
+A live run refuses to start outside GitHub Actions unless --allow-local is passed: the
+cloud poller owns the channels and the state file, and two schedulers exchanging state
+through git pushes cannot be protected by claim-before-send.
 """
 from __future__ import annotations
 
@@ -138,6 +151,19 @@ def run(args) -> int:
         state.record(fresh_state, merge_remote=False)
         run_status.write()
         print(f"Reset — baselined {len(candidates)} items from a clean slate.")
+        return 0
+
+    # Introduce one source without dumping its backlog. Required before an `html`
+    # source's first live run: those items are undated, so the whole listing reads as
+    # new on first sight and would land in the channel at once.
+    if args.baseline_source and not args.dry_run:
+        wanted = set(args.baseline_source)
+        live_state = state.latest()
+        keys = [k for item in candidates if item.source_key in wanted
+                for k in dedup.keys_for(item)]
+        state.claim(live_state, keys)
+        state.record(live_state)
+        print(f"Baselined {len(keys) // 2} item(s) from {', '.join(sorted(wanted))}; nothing posted.")
         return 0
 
     # ---- first run: baseline silently rather than dumping the backlog -------
@@ -410,6 +436,9 @@ def main() -> int:
     p.add_argument("--test-webhook", action="store_true", help="post a test message and exit")
     p.add_argument("--selftest", action="store_true", help="scoring recall/noise fixtures")
     p.add_argument("--audit", action="store_true", help="audit every source's feed health")
+    p.add_argument("--baseline-source", action="append", metavar="KEY",
+                   help="claim a source's current items without posting; run this "
+                        "before an html source goes live")
     p.add_argument("--allow-local", action="store_true",
                    help="permit a live posting run outside GitHub Actions (see the guard below)")
     args = p.parse_args()

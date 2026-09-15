@@ -96,6 +96,7 @@ class Scorer:
         self.axes: dict[str, list[tuple[str, int, re.Pattern]]] = {}
         self.thresholds: dict[str, int] = {}
         self.anchors: dict[str, set[str]] = {}
+        self.min_title_axes: dict[str, int] = {}
         for stream, prefix in (("major_gift", "gift"), ("watching", "watching")):
             self.axes[stream] = [
                 (a["name"], int(a["points"]), _compile(a.get("terms", [])))
@@ -104,6 +105,10 @@ class Scorer:
             self.thresholds[stream] = int(
                 self.config.get(f"{prefix}_threshold", self.config.get("default_threshold", 4)))
             self.anchors[stream] = set(self.config.get(f"{prefix}_require_anchor", []) or [])
+            # Per-stream, because the two sections need different amounts of it.
+            self.min_title_axes[stream] = int(
+                self.config.get(f"{prefix}_min_title_axes",
+                                self.config.get("min_title_axes", 0)))
 
     @property
     def default_threshold(self) -> int:
@@ -157,6 +162,15 @@ class Scorer:
         # No anchor axis, no story. For gifts that means a giving verb; for events a
         # convening word. Checked on the HEADLINE, so a teaser cannot carry an item in.
         if anchor and not (anchor & set(verdict.title_axes)):
+            return False
+        # The HEADLINE must carry this many distinct signals on its own. The Gulf
+        # newswire's rule, and it is the principled version of what a pile of hand-added
+        # noise words does badly: body text alone was carrying stories in there, and here
+        # a single Jewish word plus a teaser was doing the same. "Duke University
+        # Continues Its Anti-Israel Activity" carries one signal and a verb; a real item
+        # carries a convening AND a time, or a gift AND a recipient.
+        need = self.min_title_axes.get(stream, 0)
+        if need and len(set(verdict.title_axes)) < need:
             return False
         threshold = int(source_threshold) if source_threshold is not None \
             else self.thresholds[stream]

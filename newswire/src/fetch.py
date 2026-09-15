@@ -438,7 +438,102 @@ def _fetch_gnews(source: dict, since: datetime) -> tuple[list[Item], int]:
     return items, len(parsed.entries)
 
 
-_METHODS = {"rss": _fetch_rss, "gnews": _fetch_gnews, "gnews_entity": _fetch_gnews}
+# ---------------------------------------------------------------------------
+# METHOD 4 — direct reads of institutional announcement pages
+#
+# Ported verbatim from the Gulf newswire, where it serves regulators and exchanges.
+# For eJP the equivalent is a foundation, federation or university posting a gift
+# announcement on its own newsroom before any outlet writes it up. That is the
+# earliest a gift is knowable, and it is invisible to both RSS and Google News until
+# somebody else files on it.
+#
+# Items are deliberately UNDATED — an announcement page rarely carries a
+# machine-readable date, so they age from first sighting. That makes baselining
+# mandatory: introduce a new source with `poll.py --baseline-source KEY`, or its
+# entire listing reads as new and dumps into the channel at once.
+#
+# Test before adding one: the listing must render server-side (links present in the
+# raw HTML, not injected by JavaScript) and announcement pages should expose
+# og:title. Check the first cloud run's log for 403/429 — some hosts block runners.
+# ---------------------------------------------------------------------------
+HTML_MAX_PAGES = 12          # newest links fetched per run; a listing is rarely deeper
+HTML_MAX_AGE_DAYS = 3        # page-dated older than this is a resurfaced link, not news
+
+_OG_TITLE = re.compile(r'property="og:title"\s+content="([^"]+)"', re.IGNORECASE)
+_TITLE_TAG = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
+_META_DATE = re.compile(r'(?:article:published_time|datePublished)"?\s*(?:content=|:)\s*"([^"]+)"')
+_TEXT_DATE = re.compile(
+    r"\b(\d{1,2})\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(20\d\d)\b")
+_MONTHS = {m: i for i, m in enumerate(
+    ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], 1)}
+
+
+def _page_title(page: str, strip: list[str]) -> str:
+    m = _OG_TITLE.search(page) or _TITLE_TAG.search(page)
+    title = clean(m.group(1)) if m else ""
+    # Remove a masthead ONLY together with its separator: "DFSA | HKMA and DFSA…" loses
+    # "DFSA | ", and "Some headline - ADGM" loses " - ADGM". A bare masthead word at the
+    # edge is left alone, because it is usually the subject of the sentence — the first
+    # version stripped the bare word and turned "ADGM Reinforces Abu Dhabi's Standing…"
+    # into "Reinforces Abu Dhabi's Standing…", "ADGM's FSRA Signs…" into "'s FSRA
+    # Signs…", and dropped the entity from "…Accepted Spot Commodity in ADGM", which then
+    # scored zero.
+    for name in strip:
+        n = re.escape(name.strip(" |-–:"))
+        if not n:
+            continue
+        title = re.sub(rf"^\s*{n}\s*[|:\-–]\s*", "", title, flags=re.IGNORECASE)
+        title = re.sub(rf"\s*[|:\-–]\s*{n}\s*$", "", title, flags=re.IGNORECASE)
+    return title.strip()
+
+
+def _page_date(page: str) -> datetime | None:
+    m = _META_DATE.search(page)
+    if m:
+        try:
+            return _aware(datetime.fromisoformat(m.group(1).replace("Z", "+00:00")))
+        except ValueError:
+            pass
+    m = _TEXT_DATE.search(page)
+    if m:
+        day, mon, year = int(m.group(1)), _MONTHS[m.group(2)], int(m.group(3))
+        try:
+            return datetime(year, mon, day, 12, tzinfo=timezone.utc)
+        except ValueError:
+            return None
+    return None
+
+
+def _fetch_html(source: dict, since: datetime) -> tuple[list[Item], int]:
+    listing = _get(source["url"]).text
+    links = list(dict.fromkeys(re.findall(source["link_pattern"], listing)))
+    if not links:
+        # Same failure shape as a feed serving HTML: the page answered and gave nothing
+        # usable. Say so, rather than reporting a source that has merely gone quiet.
+        raise ParseFailure("listing page yielded no announcement links")
+
+    base = source.get("base") or re.match(r"https?://[^/]+", source["url"]).group(0)
+    strip = source.get("title_strip") or [source.get("outlet", "")]
+    cutoff = now_utc() - timedelta(days=HTML_MAX_AGE_DAYS)
+    items: list[Item] = []
+    for link in links[: source.get("max_pages", HTML_MAX_PAGES)]:
+        url = link if link.startswith("http") else base + link
+        try:
+            page = _get(url).text
+        except Exception:  # noqa: BLE001 — one dead page must not sink the listing
+            continue
+        title = _page_title(page, strip)
+        if not title or looks_like_spam(title):
+            continue
+        dated = _page_date(page)
+        if dated and dated < cutoff:
+            continue
+        items.append(_mk(source, title, url, None, "", ""))
+    return items, len(links)
+
+
+_METHODS = {"rss": _fetch_rss, "gnews": _fetch_gnews, "gnews_entity": _fetch_gnews,
+            "html": _fetch_html}
 
 
 def window_start(source: dict, now: datetime, override_hours: float | None = None,
