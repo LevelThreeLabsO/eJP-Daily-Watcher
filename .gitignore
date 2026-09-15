@@ -2,3 +2,13 @@ __pycache__/
 *.pyc
 .DS_Store
 data/quota.json
+
+# Transient caches from the (now disabled) daily collector. Outputs, not source, and
+# feed_pool.json holds scraped article bodies — including third-party contact details
+# that appeared in the text. Nothing reads these; they are regenerated on demand.
+data/feed_pool.json
+data/event_cache.json
+data/events_latest.json
+data/picks.json
+data/lastweek.json
+data/gifts_latest.json
