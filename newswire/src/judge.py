@@ -41,8 +41,20 @@ from datetime import datetime, timezone
 # day's quota to discover.
 MODELS = ("gemini-3.5-flash", "gemini-3.6-flash")
 
-MAX_CALLS_PER_DAY = 16       # under the 20/day free cap, with headroom for retries
+MAX_CALLS_PER_DAY = 40
 MAX_ITEMS_PER_CALL = 25
+
+# Quota allocation, and the reason it has to exist.
+#
+# On 16 September the rescue pass spent the entire day's budget by mid-afternoon — it
+# fired on nearly every run, because most runs have at least one near-miss, and 96 runs a
+# day will exhaust any per-day budget. The screening pass, which is the one that fixes
+# 81% of the channel being off-beat, never got a single call.
+#
+# So screening has first claim. Rescue may only spend while there is more than the
+# reserve left, and only when it has a batch worth spending on rather than one headline.
+RESERVE_FOR_KEEP = 20
+MIN_RESCUE_BATCH = 6
 MAX_OUTPUT_TOKENS = 4000     # thinking models spend the budget thinking; 1200 truncated
 
 SYSTEM_PROMPT = """You screen news for "Major Gifts" in Your Daily Phil, the daily \
@@ -213,7 +225,12 @@ def _ask(items, run_status, status_doc, system_prompt, key) -> set[str] | None:
                 ),
             )
         except Exception as e:  # noqa: BLE001 — every failure degrades to keyword-only
-            print(f"  judge: {model} failed ({type(e).__name__}: {str(e)[:90]})")
+            # Printed in full for quota errors specifically: MAX_CALLS_PER_DAY is a guess
+            # at the free tier's real ceiling, and a RESOURCE_EXHAUSTED message is the
+            # only thing that will ever tell us the true number.
+            detail = str(e)
+            width = 400 if "RESOURCE_EXHAUSTED" in detail or "429" in detail else 90
+            print(f"  judge: {model} failed ({type(e).__name__}: {detail[:width]})")
             continue
 
         raw = (getattr(resp, "text", "") or "").strip()
@@ -241,7 +258,17 @@ def _ask(items, run_status, status_doc, system_prompt, key) -> set[str] | None:
 
 
 def rescue(items, run_status, status_doc) -> set[str]:
-    """URLs the judge promotes out of the near-miss pile. Never suppresses anything."""
+    """URLs the judge promotes out of the near-miss pile. Never suppresses anything.
+
+    Yields to the screening pass: it will not spend when the remaining budget is down to
+    the reserve, and it will not spend a call on a handful of headlines.
+    """
+    if len(items) < MIN_RESCUE_BATCH:
+        return set()
+    if calls_left(status_doc) <= RESERVE_FOR_KEEP:
+        print(f"  judge: holding the last {RESERVE_FOR_KEEP} calls for screening; "
+              f"skipping rescue")
+        return set()
     got = _ask(items, run_status, status_doc, SYSTEM_PROMPT, "rescue")
     if got is None:
         return set()
