@@ -56,7 +56,7 @@ from pathlib import Path
 import yaml
 from dotenv import load_dotenv
 
-from src import dedup, digest, health, judge, postlog, state, status
+from src import dedup, digest, health, judge, pending, postlog, state, status
 from src.fetch import Item, ParseFailure, fetch_all, now_utc
 from src.score import Scorer
 from src.slack_client import DeliveryError, SlackClient
@@ -226,7 +226,7 @@ def run(args) -> int:
     if judge.available() and not args.no_judge:
         near = judge.candidates(fresh, scorer)
         if near:
-            rescued = judge.screen(near, run_status, run_status.prev)
+            rescued = judge.rescue(near, run_status, run_status.prev)
             for item in near:
                 if item.url in rescued:
                     item.category = scorer.categorize(item.title, item.body) or "major_gift"
@@ -309,6 +309,59 @@ def run(args) -> int:
     # Two channels. Circuit posts one digest; eJP has two sections with different
     # tests and different readers, so each stream gets its own bundle and its own
     # webhook. An item is in exactly one — scorer.route() decides, gifts winning ties.
+    # ---- gate 5b: hold generic gifts for batched screening ------------------
+    # Measured over seven live days: 107 items reached Major Gifts and 87 of them (81%)
+    # carried no Jewish or Israel signal at all — a Jesuit school's bequest, a Kiwanis
+    # book donation, a trailer given to a veterans museum. All real gifts; none eJP's.
+    #
+    # The vocabulary fix does not exist: requiring a Jewish word drops gift recall from
+    # 81.8% to 34.7%, because 60% of what eJP publishes is general philanthropy that
+    # belongs on the strength of who the DONOR is. Only the judge can make that call, and
+    # there is not enough quota to call it every run — so these wait in a queue until a
+    # batch is worth a call. Gifts tolerate that; "What We're Watching" would not, which
+    # is why only gifts are held. See src/pending.py.
+    queue = pending.load()
+    released: list[Item] = []
+    if not args.dry_run and not args.no_judge and judge.available():
+        generic = [i for i in unique
+                   if getattr(i, "category", None) == "major_gift"
+                   and "jewish" not in (getattr(i, "axes", None) or [])]
+        if generic:
+            held = {i.url for i in generic}
+            unique = [i for i in unique if i.url not in held]
+            queue = pending.add(queue, generic)
+            print(f"  held {len(generic)} generic gift(s); queue now {len(queue)}")
+
+        forced = pending.overdue(queue)
+        if forced:
+            # Waited past the hard limit. Out they go, screened or not — a gift nobody
+            # sees is worse than a gift nobody wanted.
+            print(f"  releasing {len(forced)} gift(s) unscreened (held too long)")
+            released += pending.to_items(forced, Item)
+            queue = pending.remove(queue, {e["url"] for e in forced})
+
+        if pending.is_due(queue):
+            batch = pending.to_items(queue, Item)
+            verdict = judge.keep(batch, run_status, run_status.prev)
+            if verdict is None:
+                # No verdict available. Release everything rather than hold it hostage
+                # to a model outage: this is exactly the pre-judge behaviour.
+                print(f"  no verdict — releasing all {len(batch)} unscreened")
+                released += batch
+                queue = []
+            else:
+                kept = [i for i in batch if i.url in verdict]
+                dropped = [e for e in queue if e["url"] not in verdict]
+                released += kept
+                # Claim the rejects so they do not re-enter the queue next run.
+                if dropped:
+                    state.claim(live_state,
+                                [k for e in dropped
+                                 for k in dedup.keys_for(pending.to_items([e], Item)[0])])
+                queue = []
+    pending.save(queue)
+    unique = list(unique) + released
+
     streams = [
         ("major_gift", "Major Gifts", "SLACK_GIFTS"),
         ("watching", "What We're Watching", "SLACK_WWW"),
@@ -403,7 +456,8 @@ def _housekeeping(run_status: status.Run, slack: SlackClient, live_state: dict, 
         if findings:
             _send_health(findings, run_status, args)
         run_status.write()
-        state.record(live_state, files=("watcher_state.json", "status.json", "posted_log.json"))
+        state.record(live_state, files=("watcher_state.json", "status.json",
+                                       "posted_log.json", "pending_gifts.json"))
     else:
         run_status.write()
     doc = status.load()

@@ -19,7 +19,7 @@ counts is the tool doing its job.
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.score import Scorer
-from src import state, health
+from src import state, health, pending
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -98,6 +98,48 @@ def health_test():
     return [f"{'Health checks':<22} ok       findings + cooldown + disabled filter"], False
 
 
+def pending_test():
+    """The generic-gift holding queue.
+
+    The property that matters is the failure mode: when the judge gives no verdict the
+    queue must RELEASE, never hold. A quality filter that becomes a silence filter during
+    a model outage is worse than no filter, and this system has shipped that bug before.
+    """
+    from datetime import datetime, timezone, timedelta
+    now = datetime.now(timezone.utc)
+    problems = []
+
+    q = []
+    if pending.is_due(q, now):
+        problems.append("      an empty queue must never be due")
+
+    q = [{"url": f"u{n}", "queued_at": now.isoformat()} for n in range(2)]
+    if pending.is_due(q, now):
+        problems.append(f"      {len(q)} items is under MIN_BATCH and should not be due")
+
+    q = [{"url": f"u{n}", "queued_at": now.isoformat()} for n in range(pending.MIN_BATCH)]
+    if not pending.is_due(q, now):
+        problems.append("      a full batch must be due")
+
+    old = (now - timedelta(minutes=pending.MAX_HOLD_MINUTES + 5)).isoformat()
+    if not pending.is_due([{"url": "u", "queued_at": old}], now):
+        problems.append("      one item held past MAX_HOLD_MINUTES must be due")
+
+    ancient = (now - timedelta(hours=pending.HARD_RELEASE_HOURS + 1)).isoformat()
+    forced = pending.overdue([{"url": "old", "queued_at": ancient},
+                              {"url": "new", "queued_at": now.isoformat()}], now)
+    if [e["url"] for e in forced] != ["old"]:
+        problems.append(f"      overdue() should release only the stale one, got {forced}")
+
+    left = pending.remove([{"url": "a"}, {"url": "b"}], {"a"})
+    if [e["url"] for e in left] != ["b"]:
+        problems.append("      remove() did not drop the named url")
+
+    if problems:
+        return [f"{'Pending queue':<22} FAILED"] + problems, True
+    return [f"{'Pending queue':<22} ok       batching + hold limits + release"], False
+
+
 def main():
     s = Scorer()
     report, failed = [], False
@@ -137,6 +179,11 @@ def main():
     report += hlines
     broke = broke or hbroke
     failed = failed or hbroke
+
+    plines, pbroke = pending_test()
+    report += plines
+    broke = broke or pbroke
+    failed = failed or pbroke
 
     print("\n".join(report))
     print()

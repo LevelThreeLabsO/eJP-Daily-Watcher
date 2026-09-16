@@ -243,6 +243,34 @@ noise:
   - "gift-giving season"
   - deals
   - discount
+  # ---------------------------------------------------------------------------
+  # FUNDRAISING JOB LISTINGS
+  #
+  # The worst class of false positive here, because a job in fundraising is written
+  # in perfect gift vocabulary: "Associate Director, Major Gifts, University of
+  # Chicago" scores giving + recipient and is not a gift at all, and "Senior
+  # Principal Gifts Manager - The British Museum - Salary £54,000" does the same.
+  # Both posted. Every term below appears in ZERO of all 1,514 archive items, except
+  # `salary` and `hiring` which appear once each and are therefore NOT vetoed.
+  # ---------------------------------------------------------------------------
+  - "associate director"
+  - "assistant director"
+  - "director of development"
+  - "development officer"
+  - "gift officer"
+  - "gifts officer"
+  - "gifts manager"
+  - "principal gifts"
+  - "advancement officer"
+  - "stewardship officer"
+  - "annual fund manager"
+  - "full-time"
+  - "part-time"
+  - "apply now"
+  - "job description"
+  - recruitment
+  - vacancy
+  - "position available"
   # Business, not philanthropy
   - "quarterly results"
   - earnings
@@ -367,5 +395,15 @@ noise_url_paths:
   - /recipes/
   - /shopping/
   - /deals/
+  # Recruitment sites. Their listings are written in fundraising vocabulary and are
+  # never news — hercjobs, HigherEdJobs, Idealist and the like.
+  - /jobs/
+  - /job/
+  - /careers/
+  - /vacancies/
+  - hercjobs.org
+  - higheredjobs.com
+  - jobs.theguardian
+  - charityjob
 
 byline_bypass: []

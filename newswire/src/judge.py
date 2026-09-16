@@ -7,11 +7,18 @@ the section because the DONOR is Jewish or connected to the Jewish communal worl
 is knowledge about people, not vocabulary, and no word list will ever reach it. This is
 the step eJP's team does by hand.
 
-RESCUE ONLY. The judge can promote an item the scorer rejected. It can never suppress
-one the scorer accepted. That asymmetry is deliberate: a model outage then costs nothing
-but the rescues, and the newswire degrades to exactly its keyword behaviour rather than
-going quiet. The failure this is written against is real — an earlier version of this
-system posted "Nothing found today" when the model had in fact returned 503.
+TWO DIRECTIONS, both of which fail safe.
+
+  rescue()  promotes near-misses the scorer rejected. Failure costs the rescues.
+  keep()    screens gifts that carry no Jewish signal at all, which measured at 81% of
+            everything reaching the Major Gifts channel over seven live days. Failure
+            returns None, and the caller then RELEASES the whole batch unscreened —
+            exactly today's behaviour.
+
+Neither direction can produce silence, and that is the design constraint rather than an
+accident. An earlier version of this system posted "Nothing found today" when the model
+had in fact returned 503, and a quality filter that turns into a silence filter during an
+outage is worse than no filter at all.
 
 QUOTA. Gemini's free tier is 20 requests per DAY, not per minute; that was learned the
 expensive way. At a 15-minute cadence there are 96 runs a day, so a per-item call, or
@@ -74,6 +81,37 @@ guess about who someone is.
 Return one entry per item id you were given a verdict for. Omit ids you would reject."""
 
 
+KEEP_PROMPT = """You screen news for "Major Gifts" in Your Daily Phil, the daily \
+newsletter of eJewishPhilanthropy, read by Jewish foundation staff, federation \
+executives and major donors.
+
+Every item below IS a real philanthropic gift — that part is already established, do not \
+re-litigate it. Not one of them mentions anything Jewish or Israeli in its headline. Your \
+only question is whether this particular gift would interest that readership anyway.
+
+KEEP it if:
+- The DONOR is Jewish or active in Jewish communal life. This is the main case. eJP runs \
+gifts to secular universities, hospitals, museums and theaters all the time when a known \
+Jewish philanthropist is behind them — 57% of the section is general philanthropy for \
+exactly this reason.
+- The recipient does work the Jewish communal world follows closely: Holocaust education \
+or memory, antisemitism research or security, Israel studies, refugee resettlement.
+- The gift is so large or unusual that it is news across the whole philanthropic sector \
+regardless of who gave it — a nine-figure gift, a record for its field, a landmark bequest.
+
+DROP it if it is simply a gift somewhere in the world with no connection to any of that: \
+a local service club's donation, a regional hospital's fundraiser, a community \
+foundation's routine grant round, a parochial school's bequest with no Jewish tie.
+
+DONOR IDENTIFICATION. Judge only on what you actually know about the person — their \
+known philanthropy, their communal roles, their own public statements. NEVER infer \
+someone's religion or ethnicity from their surname; it is unreliable and offensive when \
+wrong. If you do not know who the donor is, DROP it. This section runs a handful of items \
+a day and the editor would rather see five right ones than twenty maybes.
+
+Return the ids to KEEP, with one short clause saying why. Omit everything else."""
+
+
 def _today() -> str:
     return datetime.now(timezone.utc).date().isoformat()
 
@@ -118,13 +156,18 @@ def candidates(items, scorer, limit: int = MAX_ITEMS_PER_CALL) -> list:
     return [i for i, _ in out[:limit]]
 
 
-def screen(items, run_status, status_doc) -> set[str]:
-    """Return the URLs of items the judge rescues. Never raises."""
+def _ask(items, run_status, status_doc, system_prompt, key) -> set[str] | None:
+    """One batched call. Returns the chosen URLs, or None if the call could not be made.
+
+    None and an empty set mean different things, and the callers depend on it: None is
+    "no verdict" (degrade to whatever the scorer decided), empty set is "the judge
+    looked and chose nothing".
+    """
     if not items or not available():
-        return set()
+        return None
     if calls_left(status_doc) <= 0:
-        print(f"  judge: daily quota spent ({MAX_CALLS_PER_DAY} calls); keyword-only this run")
-        return set()
+        print(f"  judge: daily quota spent ({MAX_CALLS_PER_DAY} calls); no verdict this run")
+        return None
 
     listing = "\n".join(
         f"{n}. {i.title}" + (f"\n   [{i.outlet}] {(i.body or '')[:140]}" if i.body
@@ -135,13 +178,13 @@ def screen(items, run_status, status_doc) -> set[str]:
         from google import genai
         from google.genai import types
     except ImportError:
-        print("  judge: google-genai not installed; keyword-only", file=os.sys.stderr)
-        return set()
+        print("  judge: google-genai not installed", file=os.sys.stderr)
+        return None
 
     schema = {
         "type": "object",
         "properties": {
-            "rescue": {
+            key: {
                 "type": "array",
                 "items": {
                     "type": "object",
@@ -153,7 +196,7 @@ def screen(items, run_status, status_doc) -> set[str]:
                 },
             }
         },
-        "required": ["rescue"],
+        "required": [key],
     }
 
     client = genai.Client(api_key=os.environ["GEMINI_API_KEY"].strip())
@@ -163,7 +206,7 @@ def screen(items, run_status, status_doc) -> set[str]:
                 model=model,
                 contents=listing,
                 config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
+                    system_instruction=system_prompt,
                     response_mime_type="application/json",
                     response_schema=schema,
                     max_output_tokens=MAX_OUTPUT_TOKENS,
@@ -184,16 +227,37 @@ def screen(items, run_status, status_doc) -> set[str]:
             continue
 
         _spend(run_status)
-        rescued = set()
-        for entry in data.get("rescue", []):
+        chosen = set()
+        for entry in data.get(key, []):
             idx = entry.get("id")
             if isinstance(idx, int) and 0 <= idx < len(items):
-                rescued.add(items[idx].url)
-                print(f"  judge RESCUE: {items[idx].title[:70]}")
-                print(f"                {str(entry.get('why', ''))[:88]}")
-        if not rescued:
-            print(f"  judge: reviewed {len(items)} near-miss(es), rescued none")
-        return rescued
+                chosen.add(items[idx].url)
+                print(f"  judge {key.upper()}: {items[idx].title[:66]}")
+                print(f"      {str(entry.get('why', ''))[:88]}")
+        return chosen
 
-    print("  judge: every model failed; keyword-only this run")
-    return set()
+    print("  judge: every model failed; no verdict this run")
+    return None
+
+
+def rescue(items, run_status, status_doc) -> set[str]:
+    """URLs the judge promotes out of the near-miss pile. Never suppresses anything."""
+    got = _ask(items, run_status, status_doc, SYSTEM_PROMPT, "rescue")
+    if got is None:
+        return set()
+    if not got:
+        print(f"  judge: reviewed {len(items)} near-miss(es), rescued none")
+    return got
+
+
+def keep(items, run_status, status_doc) -> set[str] | None:
+    """URLs to keep out of a batch of gifts that carry no Jewish signal.
+
+    Returns None when no verdict could be obtained, and the caller must then release the
+    whole batch unscreened rather than hold or drop it. A model outage must never become
+    a silence.
+    """
+    got = _ask(items, run_status, status_doc, KEEP_PROMPT, "keep")
+    if got is not None:
+        print(f"  judge: screened {len(items)} generic gift(s), kept {len(got)}")
+    return got
