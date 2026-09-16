@@ -243,6 +243,29 @@ noise:
   - "gift-giving season"
   - deals
   - discount
+  # Political money. Explicitly 0% of the archive, and site-scoped searches on the
+  # mainstream wires surface it constantly: "U.K.'s Reform Party Rakes In Record $97
+  # Million Donation" and "Farage's Reform UK lands second record £36 million donation"
+  # both scored as Major Gifts. Note what is NOT here: `super pac` and ` pac ` each
+  # appear in two real archive gifts, so they are left alone.
+  - "political party"
+  - "political donation"
+  - "political donations"
+  - "campaign donation"
+  - "campaign contribution"
+  - "party donation"
+  - "campaign finance"
+  - "election campaign"
+  - "reform uk"
+  - "reform party"
+  - "labour party"
+  - "conservative party"
+  - "republican party"
+  - "democratic party"
+  - "party funding"
+  - "party donor"
+  - "donor to the party"
+  - farage
   # ---------------------------------------------------------------------------
   # FUNDRAISING JOB LISTINGS
   #

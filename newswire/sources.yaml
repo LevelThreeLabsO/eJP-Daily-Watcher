@@ -466,6 +466,101 @@ sources:
     query: '(antisemitism OR "Jewish life" OR "Jewish education") (grant OR gift OR million OR funding)'
     threshold: 4
 
+  # ══ Mainstream and national outlets ════════════════════════════════════════
+  #
+  # Added 16 September after a gap check: of 410 items posted in the first week,
+  # only 8 (2%) came from a mainstream outlet — the New York Times once, the
+  # Washington Post and Bloomberg twice each, Reuters, Axios and NPR once. The open
+  # searches do technically reach these outlets, but Google returns a ranked 100 per
+  # query and Jewish-outlet results crowd them out.
+  #
+  # That matters because 57% of eJP's Major Gifts are general philanthropy, and the
+  # big general gifts — a Gates Foundation billion, a nine-figure university gift —
+  # break here first. Site-scoped, the same fallback used for outlets with no feed.
+  #
+  # Probed before adding. The Atlantic and Politico returned zero gifts over seven
+  # days (essays and politics respectively) and are deliberately absent. The Free
+  # Press returned 14 items and zero gifts; it is included anyway at a higher
+  # threshold because it is explicitly wanted, but do not expect volume from it.
+  - key: nyt
+    outlet: New York Times
+    method: gnews
+    url: nytimes.com
+    query: '(philanthropy OR donation OR gift OR grant OR endowment OR bequest OR foundation)'
+    publisher: [The New York Times, New York Times, nytimes.com]
+    threshold: 5
+  - key: wsj
+    outlet: Wall Street Journal
+    method: gnews
+    url: wsj.com
+    query: '(philanthropy OR donation OR gift OR grant OR endowment OR bequest OR foundation)'
+    publisher: [The Wall Street Journal, Wall Street Journal, wsj.com, WSJ]
+    threshold: 5
+    paywall: true
+  - key: wapo
+    outlet: Washington Post
+    method: gnews
+    url: washingtonpost.com
+    query: '(philanthropy OR donation OR gift OR grant OR endowment OR bequest OR foundation)'
+    publisher: [The Washington Post, Washington Post, washingtonpost.com]
+    threshold: 5
+  - key: bloomberg
+    outlet: Bloomberg
+    method: gnews
+    url: bloomberg.com
+    query: '(philanthropy OR donation OR gift OR endowment OR bequest OR foundation)'
+    publisher: [Bloomberg, Bloomberg.com]
+    threshold: 5
+  - key: reuters
+    outlet: Reuters
+    method: gnews
+    url: reuters.com
+    query: '(philanthropy OR donation OR gift OR endowment OR bequest OR foundation)'
+    publisher: [Reuters]
+    threshold: 5
+  - key: ap
+    outlet: Associated Press
+    method: gnews
+    url: apnews.com
+    query: '(philanthropy OR donation OR gift OR endowment OR bequest OR foundation)'
+    publisher: [Associated Press, AP News, apnews.com, The Associated Press]
+    threshold: 5
+  - key: axios
+    outlet: Axios
+    method: gnews
+    url: axios.com
+    query: '(philanthropy OR donation OR gift OR grant OR endowment OR foundation)'
+    publisher: [Axios, axios.com]
+    threshold: 5
+  - key: forbes
+    outlet: Forbes
+    method: gnews
+    url: forbes.com
+    query: '(philanthropy OR philanthropist OR donation OR gift OR endowment OR bequest)'
+    publisher: [Forbes, forbes.com]
+    threshold: 5
+  - key: npr
+    outlet: NPR
+    method: gnews
+    url: npr.org
+    query: '(philanthropy OR donation OR gift OR endowment OR bequest OR foundation)'
+    publisher: [NPR, npr.org]
+    threshold: 5
+  - key: free_press
+    outlet: The Free Press
+    method: gnews
+    url: thefp.com
+    publisher: [The Free Press, thefp.com]
+    threshold: 5
+  # The trade press for this beat. Inside Philanthropy had the highest gift yield of
+  # anything probed (6 in seven days) but also serves job listings, which the
+  # recruitment vetoes in scoring.yaml handle.
+  - key: inside_philanthropy
+    outlet: Inside Philanthropy
+    method: gnews
+    url: insidephilanthropy.com
+    threshold: 4
+
   # ══ The funders themselves ═════════════════════════════════════════════════
   #
   # A foundation announcing its own grant is the earliest that grant is knowable —
