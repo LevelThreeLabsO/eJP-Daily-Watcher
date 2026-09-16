@@ -561,6 +561,120 @@ sources:
     url: insidephilanthropy.com
     threshold: 4
 
+  # ══ The 990 watchlist: institutions, and their announcements ═══════════════
+  #
+  # Generated from the 1,292 Jewish nonprofits with $1M+ revenue that the lead
+  # engine built out of the IRS Business Master File. One query per organization
+  # would be 1,292 sources polled every fifteen minutes; Google honours a long
+  # disjunction, so each of these carries ten organizations crossed with giving
+  # vocabulary. Regenerate with tools/build_org_queries.py, which also documents
+  # why the names need cleaning before they are searchable.
+  #
+  # Measured over seven days before adding: 458 items, 30 scoring as gifts —
+  # "Birthright Israel Foundation celebrates 25 years with $220M", "La Jolla gala
+  # raises $2 million for Jewish Family Service", "Jewish Federation of Southern
+  # New Jersey announces the establishment of...". Two of the twelve returned
+  # nothing; their batches hold names too institutional to appear in news.
+  # 120 organizations from the 990 watchlist, in 12 queries.
+  # Regenerate: python3 tools/build_org_queries.py --top 120
+  - key: org00
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Claims Conference\" OR \"Hebrew University of Jerusalem\" OR \"Jewish Community Federation of S F\" OR \"Jewish Agency for Israel\" OR \"Yeshiva University\" OR \"Jewish Federations of North America\" OR \"JDC\" OR \"National Jewish Health\" OR \"Combined Jewish Philanthropies of Greater Boston\" OR \"UJA-Federation of New York\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org01
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Federation of Metropolitan Chicago\" OR \"Jewish Board of Family & Childrens\" OR \"Jewish National Fund\" OR \"Jewish Community Foundation of San Diego\" OR \"United States Holocaust Memorial Council\" OR \"Jewish Community Fdn of the Jewish\" OR \"Jewish United Fund of Metropolitan Chicago\" OR \"Hadassah\" OR \"Jewish Federation of Cleveland\" OR \"Greater Miami Jewish Federation\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org02
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Anti-Defamation League\" OR \"Jewish Community Foundation of Greater Metrowest\" OR \"American Jewish Committee\" OR \"Parker Jewish Institute for Health Care\" OR \"Hebrew Home for the Aged\" OR \"Jewish Federation of Greater Atlanta\" OR \"Rosalind and Joseph Gurwin Jewish Geriatric\" OR \"Ohel Childrens Home and Family Services\" OR \"American Friends of the Hebrew University\" OR \"92nd Street Y\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org03
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Family Service of San Diego\" OR \"Jewish Child Care Association of New\" OR \"Miami Jewish Health Systems\" OR \"Jewish Community Council of Greater Coney\" OR \"Jewish Home Lifecare Manhattan\" OR \"Jewish Federation of Greater Washington\" OR \"Hebrew Home of Greater Washington\" OR \"Jewish Family & Childrens Services\" OR \"Jewish Federation of Greater Pittsburgh\" OR \"Jewish Federation of Greater Philadelphia\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org04
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Home for the Elderly\" OR \"Birthright Israel Foundation\" OR \"Hillel the Foundation for Jewish Campus\" OR \"National Society for Hebrew Day Schools\" OR \"Jewish Family Service of Los Angeles\" OR \"Grancell Village of the Los Angeles\" OR \"Dallas Jewish Community Foundation\" OR \"Jewish Home of Rochester\" OR \"Council for Jewish Elderly\" OR \"Jewish Federation of Metropolitan Detroit\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org05
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Federation Council of Greater Los\" OR \"Gulf Coast Jewish Family and Community\" OR \"Jewish Federation of Palm Beach County\" OR \"Jewish Social Service Agency\" OR \"Hadassah Medical Relief Association\" OR \"Jewish Federation of Omaha\" OR \"Bellefaire Jewish Childrens Bureau\" OR \"Associated Jewish Community Federation of Baltimore\" OR \"Scheck Hillel Community School\" OR \"Yeshivat Darche Eres\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org06
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Community Centers of Chicago\" OR \"Jewish Home Lifecare Sarah Neuman Center\" OR \"Jewish Federation of Southern New Jersey\" OR \"Minneapolis Jewish Federation\" OR \"American Jewish World Service\" OR \"Metropolitan Jewish Home Care\" OR \"Metropolitan New York Coordinating Council on\" OR \"Jewish Child and Family Services\" OR \"American Friends of Yeshiva Dmir\" OR \"Jewish Family and Childrens Service\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org07
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Federation of Northern New Jersey\" OR \"Jewish Community Foundation of Orange County\" OR \"Bnai Brith Youth Organization\" OR \"Westchester Jewish Community Services\" OR \"Jewish Community Center of the East\" OR \"Charles E Smith Jewish Day School\" OR \"Jewish Home at Rockleigh\" OR \"Marcus Jewish Community Center of Atlanta\" OR \"Hebrew Academy of Cleveland\" OR \"Associated Jewish Charities of Baltimore\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org08
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Federation of Greater Metrowest NJ\" OR \"Jewish Agency for Israel-North American Council\" OR \"Jewish Community Services of South Florida\" OR \"Jewish Community Center of Staten Island\" OR \"Board of Jewish Education\" OR \"Jewish Community Center in Manhattan\" OR \"Jewish Foundation for Group Homes\" OR \"Jewish Community Center of San Francisco\" OR \"Jewish Community Service\" OR \"Jewish Community Foundation of Greater Kansas\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org09
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Hebrew Academy for Special Children\" OR \"Jewish Community Center on the Palisades\" OR \"Jewish Federation of Cincinnati\" OR \"Jewish Museum\" OR \"Milwaukee Jewish Federation\" OR \"Houston Jewish Community Foundation\" OR \"Foundation for Jewish Philanthropies\" OR \"Jewish Family Service Association of Cleveland\" OR \"Jewish Healthcare Center\" OR \"Donna Klein Jewish Academy\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org10
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Tzur Foundation\" OR \"Beth Sholom Home of Virginia\" OR \"San Diego Hebrew Homes\" OR \"Emery-Weiner Center for Jewish Education\" OR \"Hebrew Day School of Broward County\" OR \"Oshman Family Jewish Community Center\" OR \"Holocaust Legacy Foundation\" OR \"Jewish Family & Career Services\" OR \"Hebrew Seniorlife\" OR \"Young Men & Womens Hebrew Assn\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+  - key: org11
+    outlet: Google News
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(\"Jewish Federation of Greater Houston\" OR \"Eisenberg Village of the Los Angeles\" OR \"Bnos Bais Yaakov of Far Rockaway\" OR \"Melvin J Berman Hebrew Academy\" OR \"Jewish Community Centers of Greater Boston\" OR \"Jewish Community Foundation of Southern Arizona\" OR \"Jewish Vocational Service\" OR \"Jewish Nursing Home of Western Mass\" OR \"Chelsea Jewish Green House\" OR \"Indianapolis Jewish Home Inc Hooverwood\") (gift OR donation OR grant OR endowment OR bequest OR pledge OR donates OR donated OR gave OR campaign)"
+
+  # ══ PR wires — the announcement before anyone reports it ═══════════════════
+  #
+  # A gift is usually announced on a wire hours before an outlet writes it up, and
+  # frequently instead of one ever doing so. Measured over seven days: PR Newswire
+  # alone returned 16 items scoring as gifts, including "Anonymous Donor Gives $125
+  # Million to Hackensack Meridian Health" and "Children's Minnesota Receives
+  # Historic $35 Million Gift".
+  #
+  # Split deliberately into a Jewish-scoped query and a large-gift query. The wires
+  # carry an enormous volume of small local philanthropy that is real but not this
+  # beat, and an unscoped wire source would flood the generic-gift queue and burn
+  # the judge's daily quota screening church raffles.
+  - key: wires_jewish
+    outlet: PR wire
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(site:prnewswire.com OR site:businesswire.com OR site:globenewswire.com OR site:einpresswire.com) (Jewish OR Israel OR Israeli OR Holocaust OR synagogue OR Hillel OR yeshiva OR federation) (gift OR donation OR grant OR endowment OR bequest OR pledge)"
+  - key: wires_major
+    outlet: PR wire
+    method: gnews_entity
+    window_minutes: 720
+    threshold: 4
+    query: "(site:prnewswire.com OR site:businesswire.com OR site:globenewswire.com) (\"largest gift\" OR \"major gift\" OR \"record gift\" OR \"transformational gift\" OR \"landmark gift\" OR endowment OR bequest OR \"names the\")"
+
   # ══ The funders themselves ═════════════════════════════════════════════════
   #
   # A foundation announcing its own grant is the earliest that grant is knowable —

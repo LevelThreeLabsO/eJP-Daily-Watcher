@@ -96,11 +96,18 @@ def audit_one(source: dict, now):
 
     if entries == 0:
         verdict, note = "EMPTY", "feed answered but served no entries"
-    elif not items:
-        # The feed is alive and every single entry was thrown away. Almost always the
-        # publisher label, not the source: Google relabels outlets from masthead to
-        # domain without warning, and that reads as total silence.
+    elif not items and wide:
+        # An RSS feed is audited over ten years, so nothing here can be "too old". Every
+        # entry was thrown away, which is almost always the publisher label rather than
+        # the source: Google relabels outlets from masthead to domain without warning,
+        # and that reads as total silence.
         verdict, note = "ALL DROPPED", "publisher/language check rejected every entry"
+    elif not items:
+        # A search source is audited at its real horizon, so an empty result usually
+        # means the query returned only old material — which for an organization-name
+        # query is ordinary, not broken. Saying "publisher rejected" here sent me looking
+        # for a filter bug when the truth was that the org had no recent news.
+        verdict, note = "NOTHING RECENT", f"{entries} result(s), none within {HORIZON_DAYS} days"
     elif freshest is None:
         verdict, note = "ok", "undated (ages from first sighting)"
     elif freshest > timedelta(days=stale_days):
