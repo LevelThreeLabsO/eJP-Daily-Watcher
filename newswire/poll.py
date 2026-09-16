@@ -494,6 +494,47 @@ def cmd_status() -> int:
     return 0
 
 
+def cmd_judge_test() -> int:
+    """Exercise both judge directions against known headlines.
+
+    The screening path is hard to observe in the wild — it only fires when a batch of
+    generic gifts has accumulated — so this drives it directly with four gifts whose
+    right answers are known: two that eJP would run (a known Jewish philanthropist, and
+    Holocaust-related work) and two it would not (a local service club, a parochial
+    school). Needs GEMINI_API_KEY, so in practice it runs in CI.
+    """
+    from src.fetch import Item
+
+    def mk(title, outlet):
+        return Item(source_key="test", outlet=outlet, title=title, url=f"https://x/{hash(title)}",
+                    published=now_utc(), category="major_gift")
+
+    should_keep = [
+        mk("Michael Bloomberg gives $600 million to four historically Black medical schools", "AP"),
+        mk("Anonymous donor gives $12 million to Holocaust museum for education wing", "Reuters"),
+    ]
+    should_drop = [
+        mk("Lawrenceburg Kiwanis Donates 1,000 Books to Help Young Hospital Patients", "Main Street"),
+        mk("Jesuit High School Receives Record $10 Million Bequest From Alumnus", "tbbwmag"),
+    ]
+    batch = should_keep + should_drop
+    run_status = status.Run()
+    print(f"calls left today: {judge.calls_left(run_status.prev)}")
+    verdict = judge.keep(batch, run_status, run_status.prev)
+    if verdict is None:
+        print("NO VERDICT — the caller would release all four unscreened (correct failure mode).")
+        return 0
+    print()
+    for i in batch:
+        want = "keep" if i in should_keep else "drop"
+        got = "keep" if i.url in verdict else "drop"
+        mark = "ok  " if want == got else "MISS"
+        print(f"  {mark} want={want} got={got}  {i.title[:66]}")
+    hits = sum((i.url in verdict) == (i in should_keep) for i in batch)
+    print(f"\n{hits}/4 as expected.")
+    return 0
+
+
 def cmd_score(text: str) -> int:
     """Score one headline against BOTH streams and show where it would land.
 
@@ -561,6 +602,8 @@ def main() -> int:
     p.add_argument("--baseline-source", action="append", metavar="KEY",
                    help="claim a source's current items without posting; run this "
                         "before an html source goes live")
+    p.add_argument("--judge-test", action="store_true",
+                   help="run both judge directions against known headlines")
     p.add_argument("--no-judge", action="store_true",
                    help="skip the Gemini rescue pass (keyword scoring only)")
     p.add_argument("--allow-local", action="store_true",
@@ -575,6 +618,8 @@ def main() -> int:
         return cmd_test_webhook()
     if args.selftest:
         return cmd_selftest()
+    if args.judge_test:
+        return cmd_judge_test()
     if args.audit:
         return cmd_audit(args)
 

@@ -1,0 +1,24 @@
+name: judge test
+
+# Manual only. Drives the judge's screening path directly against four headlines whose
+# right answers are known, because that path only fires in the wild once a batch of
+# generic gifts has accumulated — which makes it easy to ship broken and not notice.
+#
+# Posts nothing, writes no state, and spends one Gemini call.
+on:
+  workflow_dispatch:
+
+jobs:
+  judge-test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: newswire
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install -r requirements.txt
+      - run: python poll.py --judge-test
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
