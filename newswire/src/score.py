@@ -37,6 +37,9 @@ import yaml
 
 CONFIG_FILE = Path(__file__).resolve().parent.parent / "scoring.yaml"
 
+# Below this, it is a label rather than a headline. See the veto in score_stream.
+MIN_TITLE_CHARS = 18
+
 # Term boundaries that tolerate the punctuation in real names: "e&", "AI", "Ma'aden",
 # "2PointZero". A plain \b breaks on the ampersand and would match "ai" inside "Dubai".
 _LEFT = r"(?<![A-Za-z0-9])"
@@ -124,6 +127,15 @@ class Scorer:
         noise_hit = self.noise.search(title)
         if noise_hit:
             return Verdict(0, [], [], vetoed=noise_hit.group(0))
+
+        # A headline has to be a headline. The Jewish Link publishes school-column
+        # entries whose titles are just an acronym — "JEC", "BPY", "Naaleh", "Ha'azinu" —
+        # with the actual content in the body, and they posted on body text alone. The
+        # shortest of 419 real headlines that have posted here is 19 characters
+        # ("Hosting Hillel Fuld") and only one is under 30, so an 18-character floor
+        # costs nothing measurable and removes the whole class.
+        if len(title.strip()) < MIN_TITLE_CHARS:
+            return Verdict(0, [], [], vetoed="headline too short to be a headline")
 
         # A question is an essay, not news of something happening. Measured across the
         # whole archive: ZERO of 1,085 What We're Watching items and zero of 429 Major

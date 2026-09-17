@@ -34,6 +34,7 @@ judge: false
 # worth 1 point, never a requirement.
 gift_threshold: 4
 gift_require_anchor: [giving]
+gift_min_title_axes: 1
 gift_axes:
   # The act itself. Measured: donated (116), gift (48), grant (48+41), awarded (41),
   # raised (29), donation (24), pledged (21), committed (18), endowment (14).
@@ -124,6 +125,12 @@ gift_axes:
 # as with Major Gifts, where 60% of published items have none.
 watching_threshold: 4
 watching_require_anchor: []
+# The headline must carry at least one signal of its own. Body text alone was dragging
+# items in: the Jewish Link's school columns are titled "JEC" or "BPY" with the content
+# in the body, and they scored on "assembly" and "gathered" from the teaser. Measured
+# against 419 real headlines that have posted here, requiring one title axis costs
+# nothing. Two costs 8.8 points of gift recall, which is why it is 1 and not 2.
+watching_min_title_axes: 1
 watching_axes:
   # Measured: hosting (217), conference (213), will host (57), summit (57),
   # kicks off (56), gala (50), memorial (39), ceremony (37), dinner (36).
