@@ -157,10 +157,13 @@ sources:
     outlet: Jewish Journal LA
     method: rss
     url: https://jewishjournal.com/feed/
+  # 429 from a GitHub runner — rate-limited by datacenter IP, same as the five others
+  # routed this way. Fine from a laptop, which is why it looked healthy in local audits.
   - key: cleveland_jewish_news
     outlet: Cleveland Jewish News
-    method: rss
-    url: https://www.clevelandjewishnews.com/search/?f=rss&t=article&l=50&s=start_time&sd=desc
+    method: gnews
+    url: clevelandjewishnews.com
+    publisher: [Cleveland Jewish News, clevelandjewishnews.com]
   - key: baltimore_jewish_times
     outlet: Baltimore Jewish Times
     method: rss

@@ -31,6 +31,9 @@ STATUS_FILE = Path(__file__).resolve().parent.parent / "status.json"
 # channel. At a 15-minute cadence, 192 runs is 48 hours — long enough that a quiet
 # overnight source isn't flagged, short enough to catch a feed that died yesterday.
 DEAD_SOURCE_RUNS = 192
+# Dispatch is every 15 minutes, so a day is 96 runs. Used to turn a source's declared
+# stale_days into a run count.
+RUNS_PER_DAY = 96
 
 
 def _now() -> str:
@@ -75,6 +78,8 @@ class Run:
         # committed every run, so it survives the fresh checkout each CI run starts from.
         # A quota file of its own was tried in this repo and caused rebase conflicts.
         self.judge_calls: dict[str, int] = dict(prev.get("judge_calls", {}))
+        # {source key: stale_days}, set by poll.py from sources.yaml.
+        self.slow_sources: dict[str, int] = {}
 
     # ---- per-source outcomes -------------------------------------------------
 
@@ -111,8 +116,21 @@ class Run:
 
     def stale_sources(self, threshold: int = DEAD_SOURCE_RUNS) -> list[str]:
         """Sources that have gone quiet or unparseable long enough to be worth saying
-        out loud. This is the check that would have caught JPost's eighteen dead days."""
-        bad = [k for k, n in self._streak_empty.items() if n >= threshold]
+        out loud. This is the check that would have caught JPost's eighteen dead days.
+
+        Respects each source's own expected cadence. The streak counts empty RUNS, and at
+        96 runs a day a foundation that announces a grant every six weeks is empty for
+        four thousand of them — so a flat threshold reported Jim Joseph, the Maimonides
+        Fund and Wexner as dead when all three were working exactly as expected. Sources
+        declare `stale_days` in sources.yaml; poll.py passes it through.
+        """
+        slow = getattr(self, "slow_sources", {}) or {}
+
+        def limit(key: str) -> int:
+            days = slow.get(key)
+            return int(days * RUNS_PER_DAY) if days else threshold
+
+        bad = [k for k, n in self._streak_empty.items() if n >= limit(k)]
         bad += [k for k, n in self._streak_parse.items() if n >= threshold]
         return sorted(set(bad))
 

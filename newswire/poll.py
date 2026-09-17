@@ -112,6 +112,10 @@ def run(args) -> int:
             sys.exit(f"{' and '.join(missing)} not set. Use --dry-run to inspect "
                      f"without posting.")
 
+    # Each source's own expected cadence, so a monthly funder is not reported dead.
+    run_status.slow_sources = {x["key"]: int(x["stale_days"])
+                               for x in sources if x.get("stale_days")}
+
     tight = check_windows(sources)
     if tight:
         print(f"  ! window_minutes <= dispatch interval for: {', '.join(tight)}")
