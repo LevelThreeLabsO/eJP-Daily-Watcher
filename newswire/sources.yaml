@@ -198,10 +198,25 @@ sources:
     method: gnews
     url: boulderjewishnews.org
     publisher: [Boulder Jewish News, boulderjewishnews.org]
+  # Threshold 7, far above anything else here, and it is still on probation.
+  #
+  # Of 27 items it contributed in the first week, roughly 24 were school-newsletter
+  # copy — "SAR Academy Welcomes 2026-27 School Year", "Parents Experience a Day At
+  # RPRY", "SINAI@TABC Starts the Year With BBQ and Bowling" — plus a real estate
+  # listing and a high school sportstar of the week. It is a Bergen County community
+  # paper, and its school columns are written in exactly the convening vocabulary this
+  # scorer looks for ("Welcomes", "Launches", "Commemorates"), which no word list can
+  # separate from a real convening. Routine local programming is explicitly excluded by
+  # the archive.
+  #
+  # Kept rather than deleted because the two or three real items it did produce (an
+  # anti-extremism rally, a Chabad Torah dedication) are the kind of local item no other
+  # source here carries. If the next review still shows school columns, drop it.
   - key: jewish_link
     outlet: Jewish Link
     method: rss
     url: https://jewishlink.news/feed/
+    threshold: 7
 
   # ══ Diaspora — Europe, Australia, South Africa, Latin America ═══
   # Also 403 from a runner only.

@@ -142,7 +142,11 @@ watching_axes:
             commemoration, commemorating, memorial, yahrzeit, vigil, tribute,
             mission, delegation, "state visit", hearing, "oral argument", vote,
             primary, primaries, hosts, hosting, "will host", "will present",
-            dedication, groundbreaking, installation, inauguration, "town hall",
+            # dedicates/dedicate, not just the noun: the stemmer cannot get from
+            # "dedication" to "dedicates", so "Chabad of the Meadowlands Dedicates
+            # Two New Torahs" carried no convening signal in its headline at all.
+            dedication, dedicate, dedicates, dedicated, dedicating,
+            groundbreaking, installation, inauguration, "town hall",
             march, rally, procession, awards, "award ceremony",
             launch, launches, launched, launching, unveil, unveiled, unveils,
             "opening night", reopening, reopens, "first time", anniversary,
@@ -217,6 +221,23 @@ noise:
   - "killed in"
   - "death toll"
   - manhunt
+  # Combat operations reported as events. "IDF launches new strikes in Lebanon" scored
+  # on `launches` — a genuine convening word ("launches its exhibition") — plus Israel,
+  # and Haaretz was filing several a day into What We're Watching. Military operations
+  # are explicitly 0% of the archive. Each term below appears in zero archive items;
+  # `strikes in`, `strikes on`, `hezbollah`, `drone attack` and `missile attack` were
+  # measured and REJECTED because each appears in real ones.
+  - "launches strikes"
+  - "launched strikes"
+  - "new strikes"
+  - "idf launches"
+  - "idf strikes"
+  - airstrikes
+  - shelling
+  - "ground offensive"
+  - "troops enter"
+  - "strikes target"
+  - "drone launch"
   # Crime
   - arrested
   - indicted
