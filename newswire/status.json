@@ -1,18 +1,18 @@
 {
-  "started_at": "2026-09-19T22:47:26+00:00",
-  "finished_at": "2026-09-19T22:47:33+00:00",
-  "duration_seconds": 6.8,
+  "started_at": "2026-09-19T23:02:29+00:00",
+  "finished_at": "2026-09-19T23:02:49+00:00",
+  "duration_seconds": 19.1,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 117,
-    "fresh": 117,
-    "relevant": 35,
-    "unseen": 25,
-    "unique": 25,
-    "posted": 1
+    "fetched": 112,
+    "fresh": 112,
+    "relevant": 30,
+    "unseen": 22,
+    "unique": 22,
+    "posted": 0
   },
-  "posted": 1,
-  "delivered": true,
+  "posted": 0,
+  "delivered": null,
   "last_posted_at": "2026-09-19T22:47:33+00:00",
   "sources": {
     "jerusalem_post": {
@@ -98,7 +98,7 @@
     "candid": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 8
+      "in_window": 14
     },
     "nonprofit_quarterly": {
       "status": "ok",
@@ -123,7 +123,7 @@
     "cleveland_jewish_news": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 22
+      "in_window": 21
     },
     "baltimore_jewish_times": {
       "status": "ok",
@@ -148,7 +148,7 @@
     "j_bay_area": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 4
+      "in_window": 5
     },
     "new_york_jewish_week": {
       "status": "ok",
@@ -183,7 +183,7 @@
     "jewish_news_uk": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 4
+      "in_window": 5
     },
     "sa_jewish_report": {
       "status": "ok",
@@ -217,7 +217,7 @@
     },
     "q03": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 100
     },
     "q04": {
@@ -242,12 +242,12 @@
     },
     "q08": {
       "status": "ok",
-      "fetched": 3,
+      "fetched": 4,
       "in_window": 100
     },
     "q09": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 3,
       "in_window": 100
     },
     "q10": {
@@ -322,17 +322,17 @@
     },
     "g01": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 3,
       "in_window": 100
     },
     "g02": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 100
     },
     "g03": {
       "status": "ok",
-      "fetched": 6,
+      "fetched": 5,
       "in_window": 100
     },
     "g04": {
@@ -352,23 +352,23 @@
     },
     "g07": {
       "status": "ok",
-      "fetched": 2,
+      "fetched": 1,
       "in_window": 100
     },
     "g08": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 3,
       "in_window": 100
     },
     "nyt": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 3,
       "in_window": 100
     },
     "wsj": {
       "status": "ok",
-      "fetched": 11,
-      "in_window": 75
+      "fetched": 12,
+      "in_window": 74
     },
     "wapo": {
       "status": "ok",
@@ -383,12 +383,12 @@
     "reuters": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 18
+      "in_window": 15
     },
     "ap": {
       "status": "ok",
       "fetched": 2,
-      "in_window": 28
+      "in_window": 23
     },
     "axios": {
       "status": "ok",
@@ -403,11 +403,11 @@
     "npr": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 7
+      "in_window": 6
     },
     "free_press": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 2,
       "in_window": 25
     },
     "inside_philanthropy": {
@@ -433,7 +433,7 @@
     "org03": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 21
+      "in_window": 20
     },
     "org04": {
       "status": "ok",
@@ -448,7 +448,7 @@
     "org06": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 34
+      "in_window": 32
     },
     "org07": {
       "status": "ok",
@@ -463,7 +463,7 @@
     "org09": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 35
+      "in_window": 34
     },
     "org10": {
       "status": "ok",
@@ -473,7 +473,7 @@
     "org11": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 38
+      "in_window": 39
     },
     "wires_jewish": {
       "status": "ok",
@@ -503,102 +503,102 @@
   },
   "consecutive_empty": {
     "jerusalem_post": 0,
-    "jns": 7,
-    "jta": 99,
-    "forward": 27,
-    "algemeiner": 97,
-    "ynet": 185,
+    "jns": 8,
+    "jta": 100,
+    "forward": 28,
+    "algemeiner": 98,
+    "ynet": 186,
     "times_of_israel": 0,
     "haaretz": 0,
-    "jewish_chronicle_uk": 115,
-    "jewish_insider": 98,
-    "matzav": 95,
-    "yeshiva_world_news": 156,
-    "jewish_press": 103,
-    "yated": 452,
-    "collive": 97,
-    "chronicle_of_philanthrop": 115,
-    "nonprofit_quarterly": 136,
-    "devex": 80,
-    "washington_jewish_week": 100,
-    "jewish_journal_la": 89,
-    "cleveland_jewish_news": 7,
-    "baltimore_jewish_times": 112,
-    "canadian_jewish_news": 99,
-    "jewish_exponent": 112,
-    "atlanta_jewish_times": 503,
-    "j_bay_area": 97,
-    "new_york_jewish_week": 107,
-    "boulder_jewish_news": 162,
-    "jewish_link": 146,
-    "australian_jewish_news": 154,
-    "j_wire_australia": 158,
-    "european_jewish_congress": 442,
-    "jewish_news_uk": 4,
-    "sa_jewish_report": 150,
+    "jewish_chronicle_uk": 116,
+    "jewish_insider": 99,
+    "matzav": 96,
+    "yeshiva_world_news": 157,
+    "jewish_press": 104,
+    "yated": 453,
+    "collive": 98,
+    "chronicle_of_philanthrop": 116,
+    "nonprofit_quarterly": 137,
+    "devex": 81,
+    "washington_jewish_week": 101,
+    "jewish_journal_la": 90,
+    "cleveland_jewish_news": 8,
+    "baltimore_jewish_times": 113,
+    "canadian_jewish_news": 100,
+    "jewish_exponent": 113,
+    "atlanta_jewish_times": 504,
+    "j_bay_area": 98,
+    "new_york_jewish_week": 108,
+    "boulder_jewish_news": 163,
+    "jewish_link": 147,
+    "australian_jewish_news": 155,
+    "j_wire_australia": 159,
+    "european_jewish_congress": 443,
+    "jewish_news_uk": 5,
+    "sa_jewish_report": 151,
     "enlace_judio_mx": 0,
-    "agencia_ajn_ar": 503,
+    "agencia_ajn_ar": 504,
     "q00": 0,
-    "q01": 186,
-    "q02": 4,
+    "q01": 187,
+    "q02": 5,
     "q03": 0,
     "q04": 0,
-    "q05": 14,
-    "q06": 235,
+    "q05": 15,
+    "q06": 236,
     "q07": 0,
     "q08": 0,
     "q09": 0,
     "q10": 0,
-    "q11": 8,
+    "q11": 9,
     "q12": 0,
-    "q13": 29,
+    "q13": 30,
     "q14": 0,
     "q15": 0,
     "q16": 0,
-    "q17": 33,
-    "q18": 2,
-    "q19": 395,
+    "q17": 34,
+    "q18": 3,
+    "q19": 396,
     "q20": 0,
     "q21": 0,
     "q22": 0,
     "q23": 0,
-    "candid": 94,
+    "candid": 95,
     "g01": 0,
-    "g02": 0,
+    "g02": 1,
     "g03": 0,
     "g04": 0,
     "g05": 0,
-    "g06": 8,
+    "g06": 9,
     "g07": 0,
     "g08": 0,
-    "jim_joseph": 423,
-    "maimonides_fund": 423,
-    "wexner": 423,
+    "jim_joseph": 424,
+    "maimonides_fund": 424,
+    "wexner": 424,
     "nyt": 0,
     "wsj": 0,
     "wapo": 0,
     "bloomberg": 0,
     "reuters": 0,
     "ap": 0,
-    "axios": 23,
-    "forbes": 7,
-    "npr": 7,
+    "axios": 24,
+    "forbes": 8,
+    "npr": 8,
     "free_press": 0,
-    "inside_philanthropy": 98,
-    "org00": 28,
-    "org01": 339,
-    "org02": 339,
-    "org03": 339,
-    "org04": 339,
-    "org05": 339,
-    "org06": 339,
-    "org07": 339,
-    "org08": 339,
-    "org09": 339,
-    "org10": 339,
-    "org11": 123,
-    "wires_jewish": 86,
-    "wires_major": 105
+    "inside_philanthropy": 99,
+    "org00": 29,
+    "org01": 340,
+    "org02": 340,
+    "org03": 340,
+    "org04": 340,
+    "org05": 340,
+    "org06": 340,
+    "org07": 340,
+    "org08": 340,
+    "org09": 340,
+    "org10": 340,
+    "org11": 124,
+    "wires_jewish": 87,
+    "wires_major": 106
   },
   "consecutive_parse_fail": {
     "jerusalem_post": 0,
@@ -723,7 +723,7 @@
   "judge_calls": {
     "2026-09-17": 26,
     "2026-09-18": 25,
-    "2026-09-19": 21
+    "2026-09-19": 22
   },
   "error_traceback": null
 }
