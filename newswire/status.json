@@ -1,14 +1,14 @@
 {
-  "started_at": "2026-09-21T17:47:31+00:00",
-  "finished_at": "2026-09-21T17:48:16+00:00",
-  "duration_seconds": 45.0,
+  "started_at": "2026-09-21T18:02:34+00:00",
+  "finished_at": "2026-09-21T18:05:54+00:00",
+  "duration_seconds": 199.9,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 243,
-    "fresh": 243,
-    "relevant": 51,
-    "unseen": 31,
-    "unique": 31,
+    "fetched": 12,
+    "fresh": 12,
+    "relevant": 3,
+    "unseen": 3,
+    "unique": 3,
     "posted": 0
   },
   "posted": 0,
@@ -17,7 +17,7 @@
   "sources": {
     "jerusalem_post": {
       "status": "ok",
-      "fetched": 5,
+      "fetched": 8,
       "in_window": 27
     },
     "jns": {
@@ -46,9 +46,8 @@
       "in_window": 30
     },
     "times_of_israel": {
-      "status": "ok",
-      "fetched": 32,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:timesofisrael.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "haaretz": {
       "status": "ok",
@@ -92,13 +91,12 @@
     },
     "chronicle_of_philanthrop": {
       "status": "ok",
-      "fetched": 1,
+      "fetched": 0,
       "in_window": 10
     },
     "candid": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 2
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:candid.org%20(grant%20OR%20grants%20OR%20gift%20OR%20foundation%20OR%20philanthropy%20OR%20nonprofit)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "nonprofit_quarterly": {
       "status": "ok",
@@ -106,9 +104,8 @@
       "in_window": 12
     },
     "devex": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 3
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:devex.com%20(philanthropy%20OR%20foundation%20OR%20donor%20OR%20grant%20OR%20gift)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "washington_jewish_week": {
       "status": "ok",
@@ -121,9 +118,8 @@
       "in_window": 10
     },
     "cleveland_jewish_news": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 7
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:clevelandjewishnews.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "baltimore_jewish_times": {
       "status": "ok",
@@ -141,14 +137,12 @@
       "in_window": 10
     },
     "atlanta_jewish_times": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 0
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:atlantajewishtimes.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "j_bay_area": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 0
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:jweekly.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "new_york_jewish_week": {
       "status": "ok",
@@ -156,9 +150,8 @@
       "in_window": 20
     },
     "boulder_jewish_news": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 3
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:boulderjewishnews.org%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "jewish_link": {
       "status": "ok",
@@ -166,9 +159,8 @@
       "in_window": 10
     },
     "australian_jewish_news": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 1
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:australianjewishnews.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "j_wire_australia": {
       "status": "ok",
@@ -181,9 +173,8 @@
       "in_window": 10
     },
     "jewish_news_uk": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 1
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:jewishnews.co.uk%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "sa_jewish_report": {
       "status": "ok",
@@ -196,294 +187,236 @@
       "in_window": 10
     },
     "agencia_ajn_ar": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 1
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:agenciaajn.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "q00": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=philanthropy%20gift%20donation%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20match\"%20-highlights%20-\"tv%20channel\"%20-site:x.c"
     },
     "q01": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=\"major%20gift\"%20OR%20\"largest%20gift\"%20OR%20\"record%20gift\"%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20match\"%20-highlight"
     },
     "q02": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(donates%20OR%20donated%20OR%20gifts%20OR%20gifted)%20to%20(university%20OR%20hospital%20OR%20museum%20OR%20college)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soc"
     },
     "q03": {
-      "status": "ok",
-      "fetched": 7,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=foundation%20(grant%20OR%20grants%20OR%20awards%20OR%20commits)%20nonprofit%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20match"
     },
     "q04": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(pledged%20OR%20pledges%20OR%20commits)%20(to%20build%20OR%20to%20launch%20OR%20to%20fund)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%2"
     },
     "q05": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=philanthropist%20(gives%20OR%20donates%20OR%20pledges)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20match\"%20-highlights%20-\"t"
     },
     "q06": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=\"relief%20fund\"%20OR%20\"emergency%20fund\"%20launched%20donations%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20match\"%20-highli"
     },
     "q07": {
-      "status": "ok",
-      "fetched": 4,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=donor%20(gives%20OR%20gave%20OR%20donates)%20center%20OR%20institute%20OR%20program%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full"
     },
     "q08": {
-      "status": "ok",
-      "fetched": 5,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=bequest%20OR%20estate%20gift%20OR%20\"planned%20giving\"%20million%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20match\"%20-highli"
     },
     "q09": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=Jewish%20(donation%20OR%20gift%20OR%20grant%20OR%20philanthropy%20OR%20endowment)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%2"
     },
     "q10": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=Israel%20(donation%20OR%20gift%20OR%20grant%20OR%20pledge)%20nonprofit%20OR%20hospital%20OR%20university%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"matc"
     },
     "q11": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(NIS%20OR%20shekel%20OR%20shekels)%20(donation%20OR%20gift%20OR%20grant%20OR%20pledge)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"f"
     },
     "q12": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=haredi%20OR%20Hasidic%20OR%20Orthodox%20(philanthropist%20OR%20donor%20OR%20fund)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%2"
     },
     "q13": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=embassy%20OR%20bank%20OR%20corporation%20donates%20(supplies%20OR%20equipment%20OR%20services)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20previe"
     },
     "q14": {
-      "status": "ok",
-      "fetched": 3,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=federation%20OR%20JCC%20OR%20Hillel%20OR%20yeshiva%20(gift%20OR%20grant%20OR%20donation)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-"
     },
     "q15": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=Jewish%20(conference%20OR%20summit%20OR%20\"general%20assembly\"%20OR%20gala%20OR%20retreat)%20opens%20OR%20begins%20OR%20concludes%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20s"
     },
     "q16": {
-      "status": "ok",
-      "fetched": 4,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=Israel%20(conference%20OR%20summit%20OR%20delegation%20OR%20mission%20OR%20ceremony)%20begins%20OR%20opens%20OR%20concludes%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\""
     },
     "q17": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(Jewish%20OR%20Israeli)%20organization%20(announces%20OR%20launches%20OR%20unveils)%20program%20OR%20initiative%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%2"
     },
     "q18": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(JCC%20OR%20\"Jewish%20Community%20Center\"%20OR%20federation%20OR%20synagogue)%20(hosts%20OR%20hosting%20OR%20presents%20OR%20welcomes)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"fre"
     },
     "q19": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=\"Jewish%20film%20festival\"%20OR%20\"Jewish%20book%20festival\"%20OR%20\"Jewish%20music%20festival\"%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20previ"
     },
     "q20": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(Jewish%20OR%20Israeli)%20author%20OR%20speaker%20OR%20survivor%20(speaks%20OR%20speaking%20OR%20appears)%20event%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer"
     },
     "q21": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=former%20hostage%20OR%20lone%20soldier%20(speaks%20OR%20event%20OR%20community)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20m"
     },
     "q22": {
-      "status": "ok",
-      "fetched": 3,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=\"Jewish%20community\"%20(event%20OR%20program%20OR%20series%20OR%20launch)%20this%20week%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\""
     },
     "q23": {
-      "status": "ok",
-      "fetched": 4,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=rabbi%20OR%20rabbinic%20(conference%20OR%20convention%20OR%20gathering%20OR%20mission)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"f"
     },
     "g01": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=Jewish%20(gift%20OR%20donation%20OR%20grant%20OR%20endowment%20OR%20bequest)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-\"full%20matc"
     },
     "g02": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=Jewish%20(donates%20OR%20donated%20OR%20pledges%20OR%20pledged%20OR%20gives%20OR%20gave)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%20-"
     },
     "g03": {
-      "status": "ok",
-      "fetched": 4,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(Israel%20OR%20Israeli)%20(donation%20OR%20gift%20OR%20grant%20OR%20pledge%20OR%20donated)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%20preview\"%2"
     },
     "g04": {
-      "status": "ok",
-      "fetched": 2,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=Israeli%20(nonprofit%20OR%20hospital%20OR%20university)%20(donation%20OR%20gift%20OR%20grant%20OR%20funding)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\""
     },
     "g05": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(Hillel%20OR%20Chabad%20OR%20Birthright%20OR%20\"Jewish%20Federation\")%20(gift%20OR%20grant%20OR%20donation%20OR%20million)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%"
     },
     "g06": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(NIS%20OR%20shekel%20OR%20shekels)%20(donation%20OR%20gift%20OR%20grant%20OR%20pledge%20OR%20donated)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-soccer%20-\"match%2"
     },
     "g07": {
-      "status": "ok",
-      "fetched": 5,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(synagogue%20OR%20yeshiva%20OR%20\"Jewish%20day%20school\"%20OR%20\"Jewish%20school\")%20(gift%20OR%20grant%20OR%20donation%20OR%20bequest)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"fr"
     },
     "g08": {
-      "status": "ok",
-      "fetched": 5,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(antisemitism%20OR%20\"Jewish%20life\"%20OR%20\"Jewish%20education\")%20(grant%20OR%20gift%20OR%20million%20OR%20funding)%20-site:ejewishphilanthropy.com%20-\"live%20stream\"%20-livestream%20-streaming%20-\"watch%20live\"%20-\"free%20stream\"%20-so"
     },
     "nyt": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:nytimes.com%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20grant%20OR%20endowment%20OR%20bequest%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "wsj": {
-      "status": "ok",
-      "fetched": 26,
-      "in_window": 88
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:wsj.com%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20grant%20OR%20endowment%20OR%20bequest%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "wapo": {
-      "status": "ok",
-      "fetched": 50,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:washingtonpost.com%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20grant%20OR%20endowment%20OR%20bequest%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "bloomberg": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:bloomberg.com%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20endowment%20OR%20bequest%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "reuters": {
-      "status": "ok",
-      "fetched": 3,
-      "in_window": 22
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:reuters.com%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20endowment%20OR%20bequest%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "ap": {
-      "status": "ok",
-      "fetched": 4,
-      "in_window": 22
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:apnews.com%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20endowment%20OR%20bequest%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "axios": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 5
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:axios.com%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20grant%20OR%20endowment%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "forbes": {
-      "status": "ok",
-      "fetched": 6,
-      "in_window": 67
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:forbes.com%20(philanthropy%20OR%20philanthropist%20OR%20donation%20OR%20gift%20OR%20endowment%20OR%20bequest)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "npr": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 5
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:npr.org%20(philanthropy%20OR%20donation%20OR%20gift%20OR%20endowment%20OR%20bequest%20OR%20foundation)%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "free_press": {
-      "status": "ok",
-      "fetched": 4,
-      "in_window": 30
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:thefp.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "inside_philanthropy": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 2
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=site:insidephilanthropy.com%20when:1d&hl=en-US&gl=US&ceid=US:en"
     },
     "org00": {
-      "status": "ok",
-      "fetched": 1,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Claims%20Conference\"%20OR%20\"Hebrew%20University%20of%20Jerusalem\"%20OR%20\"Jewish%20Community%20Federation%20of%20S%20F\"%20OR%20\"Jewish%20Agency%20for%20Israel\"%20OR%20\"Yeshiva%20University\"%20OR%20\"Jewish%20Federations%20of%20North%20A"
     },
     "org01": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 47
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Federation%20of%20Metropolitan%20Chicago\"%20OR%20\"Jewish%20Board%20of%20Family%20%26%20Childrens\"%20OR%20\"Jewish%20National%20Fund\"%20OR%20\"Jewish%20Community%20Foundation%20of%20San%20Diego\"%20OR%20\"United%20States%20Holocaust"
     },
     "org02": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Anti-Defamation%20League\"%20OR%20\"Jewish%20Community%20Foundation%20of%20Greater%20Metrowest\"%20OR%20\"American%20Jewish%20Committee\"%20OR%20\"Parker%20Jewish%20Institute%20for%20Health%20Care\"%20OR%20\"Hebrew%20Home%20for%20the%20Aged\"%20"
     },
     "org03": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 23
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Family%20Service%20of%20San%20Diego\"%20OR%20\"Jewish%20Child%20Care%20Association%20of%20New\"%20OR%20\"Miami%20Jewish%20Health%20Systems\"%20OR%20\"Jewish%20Community%20Council%20of%20Greater%20Coney\"%20OR%20\"Jewish%20Home%20Lifeca"
     },
     "org04": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 38
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Home%20for%20the%20Elderly\"%20OR%20\"Birthright%20Israel%20Foundation\"%20OR%20\"Hillel%20the%20Foundation%20for%20Jewish%20Campus\"%20OR%20\"National%20Society%20for%20Hebrew%20Day%20Schools\"%20OR%20\"Jewish%20Family%20Service%20of%"
     },
     "org05": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 0
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Federation%20Council%20of%20Greater%20Los\"%20OR%20\"Gulf%20Coast%20Jewish%20Family%20and%20Community\"%20OR%20\"Jewish%20Federation%20of%20Palm%20Beach%20County\"%20OR%20\"Jewish%20Social%20Service%20Agency\"%20OR%20\"Hadassah%20Medic"
     },
     "org06": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 32
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Community%20Centers%20of%20Chicago\"%20OR%20\"Jewish%20Home%20Lifecare%20Sarah%20Neuman%20Center\"%20OR%20\"Jewish%20Federation%20of%20Southern%20New%20Jersey\"%20OR%20\"Minneapolis%20Jewish%20Federation\"%20OR%20\"American%20Jewish%20"
     },
     "org07": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 43
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Federation%20of%20Northern%20New%20Jersey\"%20OR%20\"Jewish%20Community%20Foundation%20of%20Orange%20County\"%20OR%20\"Bnai%20Brith%20Youth%20Organization\"%20OR%20\"Westchester%20Jewish%20Community%20Services\"%20OR%20\"Jewish%20Commu"
     },
     "org08": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 15
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Federation%20of%20Greater%20Metrowest%20NJ\"%20OR%20\"Jewish%20Agency%20for%20Israel-North%20American%20Council\"%20OR%20\"Jewish%20Community%20Services%20of%20South%20Florida\"%20OR%20\"Jewish%20Community%20Center%20of%20Staten%20Is"
     },
     "org09": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 39
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Hebrew%20Academy%20for%20Special%20Children\"%20OR%20\"Jewish%20Community%20Center%20on%20the%20Palisades\"%20OR%20\"Jewish%20Federation%20of%20Cincinnati\"%20OR%20\"Jewish%20Museum\"%20OR%20\"Milwaukee%20Jewish%20Federation\"%20OR%20\"Houston%20"
     },
     "org10": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 0
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Tzur%20Foundation\"%20OR%20\"Beth%20Sholom%20Home%20of%20Virginia\"%20OR%20\"San%20Diego%20Hebrew%20Homes\"%20OR%20\"Emery-Weiner%20Center%20for%20Jewish%20Education\"%20OR%20\"Hebrew%20Day%20School%20of%20Broward%20County\"%20OR%20\"Oshman%20Fam"
     },
     "org11": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 39
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(\"Jewish%20Federation%20of%20Greater%20Houston\"%20OR%20\"Eisenberg%20Village%20of%20the%20Los%20Angeles\"%20OR%20\"Bnos%20Bais%20Yaakov%20of%20Far%20Rockaway\"%20OR%20\"Melvin%20J%20Berman%20Hebrew%20Academy\"%20OR%20\"Jewish%20Community%20Cente"
     },
     "wires_jewish": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(site:prnewswire.com%20OR%20site:businesswire.com%20OR%20site:globenewswire.com%20OR%20site:einpresswire.com)%20(Jewish%20OR%20Israel%20OR%20Israeli%20OR%20Holocaust%20OR%20synagogue%20OR%20Hillel%20OR%20yeshiva%20OR%20federation)%20(gift"
     },
     "wires_major": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 100
+      "status": "error",
+      "detail": "HTTPError: HTTP 503 from https://news.google.com/rss/search?q=(site:prnewswire.com%20OR%20site:businesswire.com%20OR%20site:globenewswire.com)%20(\"largest%20gift\"%20OR%20\"major%20gift\"%20OR%20\"record%20gift\"%20OR%20\"transformational%20gift\"%20OR%20\"landmark%20gift\"%20OR%20endowment%20OR%20bequest%20"
     },
     "jim_joseph": {
       "status": "ok",
@@ -504,101 +437,101 @@
   "consecutive_empty": {
     "jerusalem_post": 0,
     "jns": 0,
-    "jta": 76,
-    "forward": 85,
-    "algemeiner": 280,
-    "ynet": 368,
-    "times_of_israel": 0,
+    "jta": 77,
+    "forward": 86,
+    "algemeiner": 281,
+    "ynet": 369,
+    "times_of_israel": 1,
     "haaretz": 0,
-    "jewish_chronicle_uk": 117,
-    "jewish_insider": 281,
-    "matzav": 69,
-    "yeshiva_world_news": 142,
-    "jewish_press": 73,
-    "yated": 624,
-    "collive": 63,
-    "chronicle_of_philanthrop": 0,
-    "nonprofit_quarterly": 319,
-    "devex": 16,
-    "washington_jewish_week": 272,
-    "jewish_journal_la": 129,
-    "cleveland_jewish_news": 0,
-    "baltimore_jewish_times": 284,
-    "canadian_jewish_news": 128,
-    "jewish_exponent": 284,
-    "atlanta_jewish_times": 686,
-    "j_bay_area": 280,
-    "new_york_jewish_week": 290,
-    "boulder_jewish_news": 345,
-    "jewish_link": 329,
-    "australian_jewish_news": 25,
-    "j_wire_australia": 136,
-    "european_jewish_congress": 614,
-    "jewish_news_uk": 123,
-    "sa_jewish_report": 333,
+    "jewish_chronicle_uk": 118,
+    "jewish_insider": 282,
+    "matzav": 70,
+    "yeshiva_world_news": 143,
+    "jewish_press": 74,
+    "yated": 625,
+    "collive": 64,
+    "chronicle_of_philanthrop": 1,
+    "nonprofit_quarterly": 320,
+    "devex": 17,
+    "washington_jewish_week": 273,
+    "jewish_journal_la": 130,
+    "cleveland_jewish_news": 1,
+    "baltimore_jewish_times": 285,
+    "canadian_jewish_news": 129,
+    "jewish_exponent": 285,
+    "atlanta_jewish_times": 687,
+    "j_bay_area": 281,
+    "new_york_jewish_week": 291,
+    "boulder_jewish_news": 346,
+    "jewish_link": 330,
+    "australian_jewish_news": 26,
+    "j_wire_australia": 137,
+    "european_jewish_congress": 615,
+    "jewish_news_uk": 124,
+    "sa_jewish_report": 334,
     "enlace_judio_mx": 0,
-    "agencia_ajn_ar": 686,
-    "q00": 0,
-    "q01": 369,
-    "q02": 0,
-    "q03": 0,
-    "q04": 0,
-    "q05": 0,
-    "q06": 81,
-    "q07": 0,
-    "q08": 0,
-    "q09": 0,
-    "q10": 0,
-    "q11": 0,
-    "q12": 0,
-    "q13": 19,
-    "q14": 0,
-    "q15": 0,
-    "q16": 0,
-    "q17": 126,
-    "q18": 0,
-    "q19": 0,
-    "q20": 0,
-    "q21": 0,
-    "q22": 0,
-    "q23": 0,
-    "candid": 11,
-    "g01": 0,
-    "g02": 0,
-    "g03": 0,
-    "g04": 0,
-    "g05": 0,
-    "g06": 0,
-    "g07": 0,
-    "g08": 0,
-    "jim_joseph": 606,
-    "maimonides_fund": 606,
-    "wexner": 606,
-    "nyt": 0,
-    "wsj": 0,
-    "wapo": 0,
-    "bloomberg": 0,
-    "reuters": 0,
-    "ap": 0,
-    "axios": 1,
-    "forbes": 0,
-    "npr": 7,
-    "free_press": 0,
-    "inside_philanthropy": 0,
-    "org00": 0,
-    "org01": 522,
-    "org02": 522,
-    "org03": 522,
-    "org04": 522,
-    "org05": 522,
-    "org06": 522,
-    "org07": 522,
-    "org08": 522,
-    "org09": 522,
-    "org10": 522,
-    "org11": 306,
-    "wires_jewish": 269,
-    "wires_major": 288
+    "agencia_ajn_ar": 687,
+    "q00": 1,
+    "q01": 370,
+    "q02": 1,
+    "q03": 1,
+    "q04": 1,
+    "q05": 1,
+    "q06": 82,
+    "q07": 1,
+    "q08": 1,
+    "q09": 1,
+    "q10": 1,
+    "q11": 1,
+    "q12": 1,
+    "q13": 20,
+    "q14": 1,
+    "q15": 1,
+    "q16": 1,
+    "q17": 127,
+    "q18": 1,
+    "q19": 1,
+    "q20": 1,
+    "q21": 1,
+    "q22": 1,
+    "q23": 1,
+    "candid": 12,
+    "g01": 1,
+    "g02": 1,
+    "g03": 1,
+    "g04": 1,
+    "g05": 1,
+    "g06": 1,
+    "g07": 1,
+    "g08": 1,
+    "jim_joseph": 607,
+    "maimonides_fund": 607,
+    "wexner": 607,
+    "nyt": 1,
+    "wsj": 1,
+    "wapo": 1,
+    "bloomberg": 1,
+    "reuters": 1,
+    "ap": 1,
+    "axios": 2,
+    "forbes": 1,
+    "npr": 8,
+    "free_press": 1,
+    "inside_philanthropy": 1,
+    "org00": 1,
+    "org01": 523,
+    "org02": 523,
+    "org03": 523,
+    "org04": 523,
+    "org05": 523,
+    "org06": 523,
+    "org07": 523,
+    "org08": 523,
+    "org09": 523,
+    "org10": 523,
+    "org11": 307,
+    "wires_jewish": 270,
+    "wires_major": 289
   },
   "consecutive_parse_fail": {
     "jerusalem_post": 0,
