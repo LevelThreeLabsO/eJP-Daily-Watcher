@@ -19,7 +19,7 @@ counts is the tool doing its job.
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from src.score import Scorer
-from src import state, health, pending
+from src import state, health, pending, dedup
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 
@@ -140,6 +140,62 @@ def pending_test():
     return [f"{'Pending queue':<22} ok       batching + hold limits + release"], False
 
 
+def dedup_test():
+    """Cross-outlet duplicate detection, and the rollback that undoes it.
+
+    The signature rule exists because word overlap could not do this job: replayed over
+    578 real posted items, the 0.5 overlap rule caught exactly one duplicate while six
+    outlets ran the Kraft $2 million story. These are the real headlines.
+    """
+    problems = []
+
+    class FakeItem:
+        def __init__(self, title, outlet):
+            self.title, self.outlet = title, outlet
+
+    first = FakeItem("Robert Kraft Says Ed Sheeran Asked Him to Match $2M Donation", "People.com")
+    money, names = dedup.signature(first.title)
+    recent = [{"words": dedup.title_words(first.title), "outlet": first.outlet,
+               "money": sorted(money), "names": sorted(names)}]
+
+    same_story = [
+        ("Patriots owner Robert Kraft pledges $2 million donation after Macklemore", "New York Times"),
+        ("Robert Kraft says Ed Sheeran asked him to donate $2m in aid", "BBC"),
+        ("Robert Kraft donates $2 million for humanitarian crisis in Palestine", "Jerusalem Post"),
+    ]
+    for title, outlet in same_story:
+        if not dedup.signature_match(FakeItem(title, outlet), recent):
+            problems.append(f"      missed duplicate: {title[:58]}")
+
+    # Same outlet is level 2's job, not this one.
+    if dedup.signature_match(FakeItem(same_story[0][0], "People.com"), recent):
+        problems.append("      matched within the same outlet; that is level 2's job")
+
+    # Different amount, same person: a follow-up, not a duplicate.
+    other = FakeItem("Robert Kraft endows new Jewish life center at Brandeis with $10 million",
+                     "Boston Globe")
+    if dedup.signature_match(other, recent):
+        problems.append("      merged two different Kraft gifts ($2M and $10M)")
+
+    # A shared amount with no shared name must not match: a day is full of $1M gifts.
+    unrelated = FakeItem("Anonymous donor gives $2 million to Cleveland Clinic", "Crain's")
+    if dedup.signature_match(unrelated, recent):
+        problems.append("      matched on the amount alone")
+
+    # Rollback must remove what was remembered.
+    st = state.blank()
+    state.remember_title(st, dedup.title_words(first.title), first.outlet, money, names)
+    if len(st["titles"]) != 1:
+        problems.append("      remember_title did not store the headline")
+    state.forget_titles(st, [dedup.title_words(first.title)])
+    if st["titles"]:
+        problems.append("      forget_titles left the headline behind after a failed send")
+
+    if problems:
+        return [f"{'Cross-outlet dedup':<22} FAILED"] + problems, True
+    return [f"{'Cross-outlet dedup':<22} ok       signature + same-outlet + rollback"], False
+
+
 def main():
     s = Scorer()
     report, failed = [], False
@@ -184,6 +240,11 @@ def main():
     report += plines
     broke = broke or pbroke
     failed = failed or pbroke
+
+    dlines, dbroke = dedup_test()
+    report += dlines
+    broke = broke or dbroke
+    failed = failed or dbroke
 
     print("\n".join(report))
     print()

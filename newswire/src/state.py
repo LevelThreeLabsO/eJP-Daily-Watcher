@@ -34,7 +34,14 @@ REPO = STATE_FILE.parent
 
 SEEN_DAYS = 7
 FIRST_SEEN_DAYS = 7
-TITLE_HOURS = 3          # cross-outlet window; see dedup.py for why it is this short
+TITLE_HOURS = 24         # remembered-title window.
+#
+# Was 3 hours, matching the word-overlap rule, which the Gulf newswire keeps short on
+# purpose — a 12-hour overlap window there once suppressed a genuine escalation that
+# shared nouns with an earlier story. The story-signature rule added later needs a full
+# day, because a gift announced overnight is re-filed by every outlet the next morning,
+# and a signature needs BOTH a name and an amount to match, so it does not carry the
+# same risk of merging unrelated stories. Overlap still uses its own 3-hour cutoff.
 TITLE_MAX = 150
 
 GIT_ID = [
@@ -178,8 +185,38 @@ def stamp_first_seen(state: dict, key: str) -> datetime:
     return now
 
 
-def remember_title(state: dict, words: list[str], outlet: str) -> None:
-    state["titles"].append({"words": sorted(words), "at": _iso(_now()), "outlet": outlet})
+def remember_title(state: dict, words: list[str], outlet: str,
+                   money=None, names=None) -> None:
+    """Record a posted headline for the cross-outlet checks.
+
+    Stores the story signature (amounts and names) alongside the stemmed words, because
+    the two checks ask different questions: overlap asks "is this the same sentence",
+    signature asks "is this the same event".
+    """
+    state["titles"].append({
+        "words": sorted(words),
+        "at": _iso(_now()),
+        "outlet": outlet,
+        "money": sorted(money or ()),
+        "names": sorted(names or ()),
+    })
+
+
+
+def forget_titles(state: dict, remembered: list[list[str]]) -> None:
+    """Undo remember_title after a failed delivery.
+
+    Rollback must undo everything claim did. poll.py has called this since the two-stream
+    split and it did not exist, so a refused Slack post raised AttributeError instead of
+    rolling back — and any headlines already remembered stayed remembered, meaning gate 5
+    would suppress other outlets' versions of a story nobody ever received. That is the
+    exact failure the Gulf newswire's rule 14 describes, reached by a different route.
+    """
+    if not remembered:
+        return
+    drop = {tuple(sorted(words)) for words in remembered}
+    state["titles"] = [t for t in state["titles"]
+                       if tuple(sorted(t.get("words") or ())) not in drop]
 
 
 # ---- git ---------------------------------------------------------------------

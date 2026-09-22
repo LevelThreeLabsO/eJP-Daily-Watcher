@@ -285,7 +285,7 @@ def run(args) -> int:
     recent = list(live_state["titles"])
     log = postlog.load()
     for item in sorted(unseen, key=lambda i: i.effective_date or now):
-        match = dedup.cross_outlet_match(item, recent)
+        match = dedup.cross_outlet_match(item, recent) or dedup.signature_match(item, recent)
         if match:
             if args.dry_run and args.verbose:
                 print(f"  · dup of {match.get('outlet')}: {item.title[:70]}")
@@ -296,7 +296,9 @@ def run(args) -> int:
                     log, dedup.title_words(item.title), dedup.overlap, dedup.SIMILARITY)
             continue
         unique.append(item)
-        recent.append({"words": dedup.title_words(item.title), "at": "", "outlet": item.outlet})
+        money, names = dedup.signature(item.title)
+        recent.append({"words": dedup.title_words(item.title), "at": "",
+                       "outlet": item.outlet, "money": sorted(money), "names": sorted(names)})
     run_status.gate("unique", len(unique))
 
     # ---- gate 6: post ------------------------------------------------------
@@ -398,9 +400,10 @@ def run(args) -> int:
         channel = SlackClient(env)
         claimed = [k for item in included for k in dedup.keys_for(item)]
         remembered = [dedup.title_words(item.title) for item in included]
+        sigs = [dedup.signature(item.title) for item in included]
         state.claim(live_state, claimed)
-        for item, words in zip(included, remembered):
-            state.remember_title(live_state, words, item.outlet)
+        for item, words, (money, names) in zip(included, remembered, sigs):
+            state.remember_title(live_state, words, item.outlet, money, names)
         try:
             channel.post(text)
             print(f"  posted {len(included):2} to {label}")

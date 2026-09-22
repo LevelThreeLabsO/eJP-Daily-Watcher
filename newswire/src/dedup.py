@@ -124,3 +124,84 @@ def cross_outlet_match(item: Item, recent: list[dict]) -> dict | None:
         if overlap(words, entry.get("words", [])) >= SIMILARITY:
             return entry
     return None
+
+# ---------------------------------------------------------------------------
+# STORY SIGNATURE — the same event told in different words
+#
+# Word overlap alone does not catch this. Measured against 578 real posted items, the
+# 0.5 overlap rule suppressed exactly ONE duplicate, while six outlets ran the Kraft $2
+# million story and four ran the Macklemore $1 million response. "Robert Kraft Says Ed
+# Sheeran Asked Him to Match $2M Donation" and "Patriots owner Robert Kraft pledges $2
+# million donation" share only robert/kraft/donation — 0.43 overlap, just under the bar.
+#
+# Lowering the bar was tried and is worse: at 0.40 it starts merging genuinely different
+# stories that share nouns ("Dollar General Awards $4.1M" with "Community Foundation
+# funds grants to 70 organizations").
+#
+# A signature is more precise. Two headlines from different outlets naming the same
+# person or institution AND the same amount of money, within a day, are the same story.
+# Replayed over the same 578 items it suppresses 22, and each one is a genuine duplicate
+# — the Kraft cluster collapses to one, Beyoncé's $2M to the Studio Museum to one,
+# Knight's $1.1B to Providence to one.
+# ---------------------------------------------------------------------------
+
+SIGNATURE_HOURS = 24
+
+_MONEY = re.compile(r"\$\s?([\d,.]+)\s*(m|mm|million|b|bn|billion|k|thousand)?", re.I)
+_MULT = {"m": 1e6, "mm": 1e6, "million": 1e6, "b": 1e9, "bn": 1e9, "billion": 1e9,
+         "k": 1e3, "thousand": 1e3}
+
+# Capitalised words that are not names. Headlines are often title-cased, so every word
+# looks like a proper noun; without this list "Donates" and "Million" would be treated as
+# identifying an actor.
+_NOT_A_NAME = {
+    "The", "This", "That", "With", "From", "After", "Before", "About", "Their", "Says",
+    "Said", "Donate", "Donates", "Donated", "Donation", "Donations", "Gift", "Gifts",
+    "Grant", "Grants", "Million", "Billion", "Thousand", "Pledge", "Pledges", "Pledged",
+    "Gives", "Give", "Gave", "Giving", "Fund", "Funds", "Center", "Centre", "Foundation",
+    "Jewish", "Israel", "Israeli", "Palestinian", "Following", "More", "Over", "Here",
+    "Receives", "Receive", "Received", "Announces", "Announced", "Launch", "Launches",
+    "Record", "Historic", "Largest", "First", "New", "Major", "Campaign", "Community",
+}
+
+
+def money_amounts(title: str) -> set[int]:
+    """Dollar figures in a headline, normalised so $2M and '$2 million' are one value."""
+    out = set()
+    for num, unit in _MONEY.findall(title or ""):
+        try:
+            value = float(num.replace(",", ""))
+        except ValueError:
+            continue
+        out.add(round(value * _MULT.get((unit or "").lower(), 1)))
+    return out
+
+
+def proper_nouns(title: str) -> set[str]:
+    """Capitalised words that plausibly name a person or institution."""
+    return {w for w in re.findall(r"\b([A-Z][a-z]{3,})\b", title or "")
+            if w not in _NOT_A_NAME}
+
+
+def signature(title: str) -> tuple[set[int], set[str]]:
+    return money_amounts(title), proper_nouns(title)
+
+
+def signature_match(item, recent: list[dict]):
+    """The recent entry describing the same event, if any.
+
+    Needs BOTH a shared amount and a shared name. Either alone is far too loose: a day's
+    headlines are full of unrelated $1 million gifts, and "Trump" appears in a dozen
+    stories that have nothing to do with each other.
+    """
+    amounts, names = signature(item.title)
+    if not amounts or not names:
+        return None
+    for entry in reversed(recent):
+        if (entry.get("outlet", "") or "").lower() == (item.outlet or "").lower():
+            continue
+        if not (amounts & set(entry.get("money") or ())):
+            continue
+        if names & set(entry.get("names") or ()):
+            return entry
+    return None
