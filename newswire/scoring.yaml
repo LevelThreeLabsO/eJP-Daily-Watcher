@@ -131,6 +131,13 @@ watching_require_anchor: []
 # against 419 real headlines that have posted here, requiring one title axis costs
 # nothing. Two costs 8.8 points of gift recall, which is why it is 1 and not 2.
 watching_min_title_axes: 1
+# An item with no Jewish or Israel signal anywhere must clear 5, not 4. Requiring the
+# signal outright was measured and is far too expensive (68.5% recall); requiring one
+# more point without it holds recall at 82.6% while cutting noise from 9.0% to 6.2%.
+# It is what stops "Rupee declines to one-week low as oil rally fans global rate hike
+# worries" — `rally` plus `global`, scoring exactly 4.
+watching_relevance_axis: jewish
+watching_threshold_off_axis: 5
 watching_axes:
   # Measured: hosting (217), conference (213), will host (57), summit (57),
   # kicks off (56), gala (50), memorial (39), ceremony (37), dinner (36).
@@ -184,10 +191,28 @@ watching_axes:
             "through Friday", continuing, continues, resumes, "now underway"]
   - name: jewish
     points: 2
+    # Widened after measuring what the narrow list missed. "UN Watch is holding its
+    # annual gala dinner", "AIPAC's annual Congressional Summit begins on Sunday",
+    # "StandWithUs is kicking off its four-day annual conference" and "Vance is holding
+    # the vice president's annual Hanukkah party" are all unmistakably on-beat and all
+    # scored zero on this axis, because it knew none of those words. Adding them raised
+    # recall and is what makes the off-axis threshold above affordable.
     terms: [Jewish, Jew, Jews, Israel, Israeli, Hebrew, Judaism, rabbi, rabbinic,
             synagogue, yeshiva, Hillel, Chabad, Torah, Holocaust, Shoah, Zionist,
             aliyah, haredi, Hasidic, Orthodox, JCC, federation, Hadassah, Jerusalem,
-            "Tel Aviv", Knesset, Birthright, Maccabi, "Yad Vashem", kosher, shul]
+            "Tel Aviv", Knesset, Birthright, Maccabi, "Yad Vashem", kosher, shul,
+            # Holidays and observances
+            Hanukkah, Chanukah, Passover, Pesach, Purim, Sukkot, Shabbat, Shabbos,
+            "Rosh Hashanah", "Yom Kippur", "Simchat Torah", "Tisha B'Av", Shavuot,
+            Selichot, seder, shiva,
+            # Institutions the archive names constantly and this list did not know
+            AIPAC, StandWithUs, "UN Watch", ADL, "Anti-Defamation", ZOA,
+            # The subject matter itself
+            antisemitism, antisemitic, "anti-Zionism", antizionism, "anti-Israel",
+            Zionism, kibbutz, IDF, Netanyahu, Herzog, olim,
+            # Communities and culture
+            Sephardic, Ashkenazi, Mizrahi, "bar mitzvah", "bat mitzvah", Talmud,
+            Yiddish, Ladino, Judaica, Hasidim, Chassidic, shliach, shluchim]
   # Scale. A national or international convening outranks a local one, but local is
   # explicitly allowed — a city film festival's opening night runs in the real section.
   - name: scale
@@ -323,6 +348,21 @@ noise:
   - vacancy
   - "position available"
   # Business, not philanthropy
+  # Financial markets. Zero archive hits for any of these, and market copy is written
+  # in words this scorer wants: "oil rally", "relief rally", "launches a bond".
+  - rupee
+  - "rate hike"
+  - "rate cut"
+  - forex
+  - currency
+  - "bond yields"
+  - "crude oil"
+  - commodities
+  - "stock market"
+  - sensex
+  - nifty
+  - "one-week low"
+  - "one-week high"
   - "quarterly results"
   - earnings
   - IPO

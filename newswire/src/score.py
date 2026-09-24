@@ -100,6 +100,8 @@ class Scorer:
         self.thresholds: dict[str, int] = {}
         self.anchors: dict[str, set[str]] = {}
         self.min_title_axes: dict[str, int] = {}
+        self.relevance_axis: dict[str, str | None] = {}
+        self.threshold_off_axis: dict[str, int | None] = {}
         for stream, prefix in (("major_gift", "gift"), ("watching", "watching")):
             self.axes[stream] = [
                 (a["name"], int(a["points"]), _compile(a.get("terms", [])))
@@ -112,6 +114,9 @@ class Scorer:
             self.min_title_axes[stream] = int(
                 self.config.get(f"{prefix}_min_title_axes",
                                 self.config.get("min_title_axes", 0)))
+            # A relevance axis and the higher bar an item must clear without it.
+            self.relevance_axis[stream] = self.config.get(f"{prefix}_relevance_axis")
+            self.threshold_off_axis[stream] = self.config.get(f"{prefix}_threshold_off_axis")
 
     @property
     def default_threshold(self) -> int:
@@ -186,6 +191,18 @@ class Scorer:
             return False
         threshold = int(source_threshold) if source_threshold is not None \
             else self.thresholds[stream]
+        # An item with no relevance signal at all has to clear a higher bar.
+        #
+        # "Rupee declines to one-week low as oil rally fans global rate hike worries"
+        # scored exactly 4 on `rally` (a price rally, not a protest) plus `global`, and
+        # posted to What We're Watching. Requiring a Jewish word outright was measured
+        # and costs far too much — 60% of real gifts and a third of real events carry
+        # none. Requiring a POINT MORE without one is nearly free: measured at the same
+        # 82.6% recall with noise down from 9.0% to 6.2%.
+        axis = self.relevance_axis.get(stream)
+        off = self.threshold_off_axis.get(stream)
+        if axis and off and axis not in verdict.axes:
+            threshold = max(threshold, int(off))
         return verdict.score >= threshold
 
     def route(self, title: str, body: str = "", author: str = "",
