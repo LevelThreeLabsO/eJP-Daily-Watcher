@@ -1,7 +1,7 @@
 {
-  "started_at": "2026-09-26T16:01:45+00:00",
-  "finished_at": "2026-09-26T16:02:21+00:00",
-  "duration_seconds": 35.6,
+  "started_at": "2026-09-26T16:02:39+00:00",
+  "finished_at": "2026-09-26T16:02:47+00:00",
+  "duration_seconds": 7.5,
   "dispatch_interval_seconds": 900,
   "items": {
     "fetched": 112,
@@ -98,7 +98,7 @@
     "candid": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 0
+      "in_window": 1
     },
     "nonprofit_quarterly": {
       "status": "ok",
@@ -123,7 +123,7 @@
     "cleveland_jewish_news": {
       "status": "ok",
       "fetched": 4,
-      "in_window": 40
+      "in_window": 39
     },
     "baltimore_jewish_times": {
       "status": "ok",
@@ -176,13 +176,14 @@
       "in_window": 10
     },
     "european_jewish_congress": {
-      "status": "error",
-      "detail": "HTTPError: HTTP 500 from https://eurojewcong.org/feed/"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 10
     },
     "jewish_news_uk": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 7
+      "in_window": 6
     },
     "sa_jewish_report": {
       "status": "ok",
@@ -361,13 +362,13 @@
     },
     "nyt": {
       "status": "ok",
-      "fetched": 9,
+      "fetched": 8,
       "in_window": 100
     },
     "wsj": {
       "status": "ok",
       "fetched": 1,
-      "in_window": 24
+      "in_window": 23
     },
     "wapo": {
       "status": "ok",
@@ -397,7 +398,7 @@
     "forbes": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 77
+      "in_window": 78
     },
     "npr": {
       "status": "ok",
@@ -406,8 +407,8 @@
     },
     "free_press": {
       "status": "ok",
-      "fetched": 3,
-      "in_window": 29
+      "fetched": 4,
+      "in_window": 31
     },
     "inside_philanthropy": {
       "status": "ok",
@@ -422,7 +423,7 @@
     "org01": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 47
+      "in_window": 48
     },
     "org02": {
       "status": "ok",
@@ -432,12 +433,12 @@
     "org03": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 23
+      "in_window": 22
     },
     "org04": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 41
+      "in_window": 40
     },
     "org05": {
       "status": "ok",
@@ -457,7 +458,7 @@
     "org08": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 21
+      "in_window": 20
     },
     "org09": {
       "status": "ok",
