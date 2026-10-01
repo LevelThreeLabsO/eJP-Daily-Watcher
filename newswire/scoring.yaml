@@ -438,6 +438,29 @@ noise:
   - demands
   # "pledge" without money: "German minister pledges solidarity with Jewish
   # community". A pledge of support is a speech; a pledge of dollars is a gift.
+  # A pledge whose object is an abstract noun is a promise, not a gift. "Montgomery
+  # County schools superintendent admits missteps on antisemitism, pledges action"
+  # scored `pledges` + `schools` and posted to Major Gifts; nothing was given.
+  #
+  # Note what was tried and rejected instead: raising the bar for any gift with no
+  # dollar figure. That catches this but costs 15 real gifts — Kraft sponsoring 100
+  # Israeli children, a donated 1863 Thomas Nast print, a synagogue donating its
+  # property — because 18% of real gifts carry no figure at all. The abstract objects
+  # below appear in zero archive items, so they cost nothing.
+  - "pledges action"
+  - "pledged action"
+  - "pledges reform"
+  - "pledges change"
+  - "pledges accountability"
+  - "pledges transparency"
+  - "pledges support"
+  - "pledged support"
+  - "pledges to address"
+  - "pledges to do better"
+  - "pledges to improve"
+  - "pledges to fight"
+  - "vows action"
+  - "promises action"
   - "pledges solidarity"
   - "pledged solidarity"
   - "pledge allegiance"
