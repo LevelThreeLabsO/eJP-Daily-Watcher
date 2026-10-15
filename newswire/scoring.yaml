@@ -94,7 +94,43 @@ gift_axes:
             synagogue, yeshiva, Hillel, Chabad, Torah, kosher, Holocaust, Shoah,
             Zionist, aliyah, haredi, Hasidic, Satmar, Orthodox, JCC, Hadassah,
             Jerusalem, "Tel Aviv", Negev, Soroka, Beersheva, Beersheba, Knesset,
-            "Magen David", Birthright, Maccabi, Yad Vashem, mohel, kollel, mikvah]
+            "Magen David", Birthright, Maccabi, Yad Vashem, mohel, kollel, mikvah,
+            # --- widened 2026-10-15, after a week of live output showed the axis
+            # missing items that are unmistakably on-beat. "Philanthropist Hosts
+            # Mashpiim for Annual Sukkos Farbrengen", "Kvutza Bochurim Awarded
+            # Rebbe's Dollars", "UJA event marking third anniversary of Oct. 7"
+            # and "Oct. 7 Flag Memorial Returns to Livingston Oval" all scored
+            # ZERO here. Two of those failed only on the missing two points.
+            # Chassidic and yeshivish vocabulary
+            Sukkos, farbrengen, mashpia, mashpiim, bochur, bochurim, Rebbe, kvutza,
+            frum, cheder, yidden, heimish, Bobov, Belz, Skver, Vizhnitz, Lubavitch,
+            Breslov, Chasidic, Chassidus, "daf yomi", "sefer Torah", bris, chuppah,
+            # Observances and objects
+            "Simchas Torah", "Shemini Atzeret", "Lag BaOmer", "Tu BiShvat",
+            matzah, challah, shofar, sukkah, menorah, mezuzah, tzedakah, chesed,
+            kashrut, halacha, halachic, mitzvah, mitzvot, minyan, daven, shiur, kiruv,
+            # Oct. 7 and its aftermath, which the section now carries constantly
+            "October 7", "Oct. 7", "Oct 7", hostage, hostages,
+            # Communal institutions named by acronym
+            UJA, JFNA, JDC, HIAS, NCSY, Ohel, Hatzalah, ZAKA, "B'nai", Bnai,
+            "Magen David Adom", Soroka, Sheba, Technion, Weizmann, "Ben-Gurion",
+            "Bar-Ilan", Kristallnacht,
+            # Places that are the beat
+            Lakewood, Monsey, "Boro Park", "Crown Heights", Teaneck, "Five Towns",
+            "Beit Shemesh", "Bnei Brak", Efrat, Sderot, Ashkelon, Hebron, Judea,
+            Samaria, Golan, Galilee, Haifa, Herzliya, Netanya, Ashdod, Eilat,
+            # Named Jewish organizations. The off-axis threshold punishes anything whose
+            # Jewish identity lives only in a proper noun, and "Chai Lifeline Presents
+            # 'Dream Big': A First-Of-Its-Kind Benefit Event" scored 4 against the bar of
+            # 5 for exactly that reason. This list will always be incomplete; add to it
+            # whenever a real item is missed for want of a name.
+            "Chai Lifeline", Yachad, "Friendship Circle", "Bikur Cholim", Emunah,
+            AMIT, "Na'amat", WIZO, ORT, Olami, Meor, Hartman, Pardes, Drisha, Hadar,
+            Aish, "Partners in Torah", "Oorah", "Agudath", Agudah, "Young Israel",
+            "Chai Lifeline", Zioness, "Jewish Federations", "Jewish Agency",
+            "Shalom Hartman", "Nefesh B'Nefesh", "Sharsheret", "Chabad-Lubavitch",
+            "Yad Sarah", "Leket", "Pitchon Lev", "Shalva", "Beit Issie", "Ezer Mizion",
+            "Zaka", "United Hatzalah", "Mercaz", "Masorti", "Hillel International"]
 
 # ---------------------------------------------------------------------------
 # STREAM 2 — WHAT WE'RE WATCHING
@@ -124,7 +160,20 @@ gift_axes:
 # headlines frequently carry no Jewish word even when the item plainly belongs, exactly
 # as with Major Gifts, where 60% of published items have none.
 watching_threshold: 4
-watching_require_anchor: []
+# The headline must name a convening OR anchor itself in time.
+#
+# Dropping the convening anchor entirely (2026-09-15) raised archive recall from 70%
+# to 82.5%, and that was right — the section is not a calendar. But a week of live
+# output showed what it also let in: "Trump Rules Out Attack on Iran Until After
+# November", "Anne Carson has won the Nobel Prize", "Mamdani says he was proud to
+# attend Oct. 7 vigil". General news, none of it convened and none of it today.
+#
+# Allowing `today` as an alternative anchor keeps what the looser rule was FOR —
+# "the iCenter closes its doors today", "Ben Gurion Airport officially became the
+# world's most disrupted airport today" — at a measured cost of 0.1 points of recall
+# (83.5% -> 83.4%). The old convening-only rule costs 11 points, which is why it is
+# not simply restored.
+watching_require_anchor: [convening, today]
 # The headline must carry at least one signal of its own. Body text alone was dragging
 # items in: the Jewish Link's school columns are titled "JEC" or "BPY" with the content
 # in the body, and they scored on "assembly" and "gathered" from the teaser. Measured
@@ -148,7 +197,11 @@ watching_axes:
             ceremony, ceremonies, festival, premiere, screening, exhibition,
             commemoration, commemorating, memorial, yahrzeit, vigil, tribute,
             mission, delegation, "state visit", hearing, "oral argument", vote,
-            primary, primaries, hosts, hosting, "will host", "will present",
+            primary, primaries, hosts, hosting, "will host",
+            # presents/present, not only "will present": the stemmer cannot reach
+            # "presents" from that phrase, so "Chai Lifeline Presents 'Dream Big':
+            # A First-Of-Its-Kind Benefit Event" carried no convening signal.
+            "will present", present, presents, presented, presenting,
             # dedicates/dedicate, not just the noun: the stemmer cannot get from
             # "dedication" to "dedicates", so "Chabad of the Meadowlands Dedicates
             # Two New Torahs" carried no convening signal in its headline at all.
@@ -212,7 +265,43 @@ watching_axes:
             Zionism, kibbutz, IDF, Netanyahu, Herzog, olim,
             # Communities and culture
             Sephardic, Ashkenazi, Mizrahi, "bar mitzvah", "bat mitzvah", Talmud,
-            Yiddish, Ladino, Judaica, Hasidim, Chassidic, shliach, shluchim]
+            Yiddish, Ladino, Judaica, Hasidim, Chassidic, shliach, shluchim,
+            # --- widened 2026-10-15, after a week of live output showed the axis
+            # missing items that are unmistakably on-beat. "Philanthropist Hosts
+            # Mashpiim for Annual Sukkos Farbrengen", "Kvutza Bochurim Awarded
+            # Rebbe's Dollars", "UJA event marking third anniversary of Oct. 7"
+            # and "Oct. 7 Flag Memorial Returns to Livingston Oval" all scored
+            # ZERO here. Two of those failed only on the missing two points.
+            # Chassidic and yeshivish vocabulary
+            Sukkos, farbrengen, mashpia, mashpiim, bochur, bochurim, Rebbe, kvutza,
+            frum, cheder, yidden, heimish, Bobov, Belz, Skver, Vizhnitz, Lubavitch,
+            Breslov, Chasidic, Chassidus, "daf yomi", "sefer Torah", bris, chuppah,
+            # Observances and objects
+            "Simchas Torah", "Shemini Atzeret", "Lag BaOmer", "Tu BiShvat",
+            matzah, challah, shofar, sukkah, menorah, mezuzah, tzedakah, chesed,
+            kashrut, halacha, halachic, mitzvah, mitzvot, minyan, daven, shiur, kiruv,
+            # Oct. 7 and its aftermath, which the section now carries constantly
+            "October 7", "Oct. 7", "Oct 7", hostage, hostages,
+            # Communal institutions named by acronym
+            UJA, JFNA, JDC, HIAS, NCSY, Ohel, Hatzalah, ZAKA, "B'nai", Bnai,
+            "Magen David Adom", Soroka, Sheba, Technion, Weizmann, "Ben-Gurion",
+            "Bar-Ilan", Kristallnacht,
+            # Places that are the beat
+            Lakewood, Monsey, "Boro Park", "Crown Heights", Teaneck, "Five Towns",
+            "Beit Shemesh", "Bnei Brak", Efrat, Sderot, Ashkelon, Hebron, Judea,
+            Samaria, Golan, Galilee, Haifa, Herzliya, Netanya, Ashdod, Eilat,
+            # Named Jewish organizations. The off-axis threshold punishes anything whose
+            # Jewish identity lives only in a proper noun, and "Chai Lifeline Presents
+            # 'Dream Big': A First-Of-Its-Kind Benefit Event" scored 4 against the bar of
+            # 5 for exactly that reason. This list will always be incomplete; add to it
+            # whenever a real item is missed for want of a name.
+            "Chai Lifeline", Yachad, "Friendship Circle", "Bikur Cholim", Emunah,
+            AMIT, "Na'amat", WIZO, ORT, Olami, Meor, Hartman, Pardes, Drisha, Hadar,
+            Aish, "Partners in Torah", "Oorah", "Agudath", Agudah, "Young Israel",
+            "Chai Lifeline", Zioness, "Jewish Federations", "Jewish Agency",
+            "Shalom Hartman", "Nefesh B'Nefesh", "Sharsheret", "Chabad-Lubavitch",
+            "Yad Sarah", "Leket", "Pitchon Lev", "Shalva", "Beit Issie", "Ezer Mizion",
+            "Zaka", "United Hatzalah", "Mercaz", "Masorti", "Hillel International"]
   # Scale. A national or international convening outranks a local one, but local is
   # explicitly allowed — a city film festival's opening night runs in the real section.
   - name: scale
@@ -279,6 +368,24 @@ noise:
   - commentary
   - slams
   - blasts
+  # A statement is not an event. The archive excludes "a politician's statement,
+  # accusation or opinion" outright, and "Mamdani says he was 'proud to attend' Oct. 7
+  # vigil" scored on `vigil` plus `Oct. 7` and posted. Every phrase below appears in zero
+  # archive items; `rips` was measured and REJECTED because it appears in a real one.
+  - "says he"
+  - "says she"
+  - "says it"
+  - "says the"
+  - "said he"
+  - "said she"
+  - denies
+  - insists
+  - "claims that"
+  - slammed
+  - blasted
+  - defends
+  - "responds to"
+  - "hits out"
   - accuses
   - blames
   - condemns

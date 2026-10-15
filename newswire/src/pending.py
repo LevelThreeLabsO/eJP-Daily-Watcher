@@ -17,10 +17,20 @@ So generic gifts wait here until there are enough to be worth a call, or until t
 waited long enough, and go out in a screened batch. That costs a gift up to an hour of
 latency and brings the call count to roughly 24 a day.
 
-FAILURE MODE. If the judge cannot be reached, or the queue has waited too long to keep
-waiting, everything in it is RELEASED — posted unscreened, exactly as it is today.
-Holding items hostage to a model outage would turn a quality problem into a silence
-problem, and silence is the worse failure.
+FAILURE MODE — reversed 2026-10-15, and worth understanding. This queue used to RELEASE
+unscreened whenever the judge was unreachable, out of quota, or slow, on the reasoning
+that silence is worse than noise. For this particular gate that reasoning was wrong, and
+the channel showed it: a Jesuit school's bequest, a Kiwanis book donation and a trailer
+given to a veterans museum all reached Major Gifts through a release path.
+
+Major Gifts is now explicitly Jewish and Israel only. An item in this queue has already
+failed the keyword test, so it is off-beat UNLESS the judge affirms a donor or cause that
+makes it belong. Releasing it unscreened is not a safe default; it is the bug. Unscreened
+items are dropped.
+
+What still fails open: a gift carrying a Jewish signal never enters this queue, and What
+We're Watching is untouched. A model outage costs the general-philanthropy half of one
+section, not the newswire.
 """
 from __future__ import annotations
 

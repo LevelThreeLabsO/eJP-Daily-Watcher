@@ -315,19 +315,39 @@ def run(args) -> int:
     # Two channels. Circuit posts one digest; eJP has two sections with different
     # tests and different readers, so each stream gets its own bundle and its own
     # webhook. An item is in exactly one — scorer.route() decides, gifts winning ties.
-    # ---- gate 5b: hold generic gifts for batched screening ------------------
-    # Measured over seven live days: 107 items reached Major Gifts and 87 of them (81%)
-    # carried no Jewish or Israel signal at all — a Jesuit school's bequest, a Kiwanis
-    # book donation, a trailer given to a veterans museum. All real gifts; none eJP's.
+    # ---- gate 5b: Major Gifts is Jewish and Israel only ---------------------
+    # The section is now explicitly restricted to Jewish or Israel-related giving. A gift
+    # whose headline carries a Jewish signal posts straight through. A gift without one
+    # does NOT post unless the judge affirms that the donor or the cause makes it belong.
     #
-    # The vocabulary fix does not exist: requiring a Jewish word drops gift recall from
-    # 81.8% to 34.7%, because 60% of what eJP publishes is general philanthropy that
-    # belongs on the strength of who the DONOR is. Only the judge can make that call, and
-    # there is not enough quota to call it every run — so these wait in a queue until a
-    # batch is worth a call. Gifts tolerate that; "What We're Watching" would not, which
-    # is why only gifts are held. See src/pending.py.
+    # It cannot be done with vocabulary. Requiring a Jewish word outright drops gift
+    # recall from 81.8% to 30.3%, because only 39% of what eJP publishes carries one —
+    # the rest is general philanthropy that belongs on the strength of who the DONOR is,
+    # which is knowledge about people, not words. So the restriction runs through the
+    # judge, batched because there is nowhere near enough quota to call it every run.
+    #
+    # FAIL CLOSED, which reverses the earlier posture. These used to be released
+    # unscreened whenever the judge was unavailable, out of quota, or slow — and that is
+    # what put a Jesuit school's bequest, a Kiwanis book donation and a trailer given to
+    # a veterans museum in the channel. For an item that is off-beat unless proven
+    # otherwise, an unscreened release is not a safe default, it IS the bug. Unscreened
+    # gifts are now dropped.
+    #
+    # Note what still fails OPEN: anything with a Jewish signal never enters this queue,
+    # and What We're Watching is untouched. A model outage therefore costs the general
+    # philanthropy half of one section, not the newswire.
     queue = pending.load()
     released: list[Item] = []
+    if not args.dry_run:
+        generic_all = [i for i in unique
+                       if getattr(i, "category", None) == "major_gift"
+                       and "jewish" not in (getattr(i, "axes", None) or [])]
+        if generic_all and (args.no_judge or not judge.available()):
+            # No judge at all: the restriction still holds. Drop rather than post.
+            held = {i.url for i in generic_all}
+            unique = [i for i in unique if i.url not in held]
+            print(f"  dropped {len(generic_all)} gift(s) with no Jewish signal "
+                  f"(no judge available to screen them)")
     if not args.dry_run and not args.no_judge and judge.available():
         generic = [i for i in unique
                    if getattr(i, "category", None) == "major_gift"
@@ -340,21 +360,23 @@ def run(args) -> int:
 
         forced = pending.overdue(queue)
         if forced:
-            # Waited past the hard limit. Out they go, screened or not — a gift nobody
-            # sees is worse than a gift nobody wanted.
-            print(f"  releasing {len(forced)} gift(s) unscreened (held too long)")
-            released += pending.to_items(forced, Item)
+            # Waited past the hard limit without ever being screened. Dropped, not
+            # released: an unscreened gift is off-beat until proven otherwise, and the
+            # whole point of this gate is that it does not reach the channel on a guess.
+            print(f"  dropped {len(forced)} gift(s) never screened within the hold limit")
+            state.claim(live_state,
+                        [k for e in forced
+                         for k in dedup.keys_for(pending.to_items([e], Item)[0])])
             queue = pending.remove(queue, {e["url"] for e in forced})
 
         if pending.is_due(queue):
             batch = pending.to_items(queue, Item)
             verdict = judge.keep(batch, run_status, run_status.prev)
             if verdict is None:
-                # No verdict available. Release everything rather than hold it hostage
-                # to a model outage: this is exactly the pre-judge behaviour.
-                print(f"  no verdict — releasing all {len(batch)} unscreened")
-                released += batch
-                queue = []
+                # No verdict. Leave the batch queued and try again next run; the hold
+                # limit above eventually discards it. Releasing unscreened was the old
+                # behaviour and is precisely what this gate exists to stop.
+                print(f"  no verdict — {len(batch)} gift(s) stay queued, nothing posted")
             else:
                 kept = [i for i in batch if i.url in verdict]
                 dropped = [e for e in queue if e["url"] not in verdict]
