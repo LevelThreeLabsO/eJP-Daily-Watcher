@@ -229,7 +229,16 @@ def _ask(items, run_status, status_doc, system_prompt, key) -> set[str] | None:
             # at the free tier's real ceiling, and a RESOURCE_EXHAUSTED message is the
             # only thing that will ever tell us the true number.
             detail = str(e)
-            width = 400 if "RESOURCE_EXHAUSTED" in detail or "429" in detail else 90
+            quota = "RESOURCE_EXHAUSTED" in detail or "429" in detail
+            if quota:
+                # Surfaced as a health finding. Since Major Gifts now fails closed, a
+                # quota outage silently costs the general-philanthropy half of the
+                # section — exactly the kind of failure that must announce itself.
+                try:
+                    run_status.judge_blocked = "quota"
+                except Exception:  # noqa: BLE001
+                    pass
+            width = 400 if quota else 90
             print(f"  judge: {model} failed ({type(e).__name__}: {detail[:width]})")
             continue
 

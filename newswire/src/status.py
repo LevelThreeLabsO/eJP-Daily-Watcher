@@ -78,6 +78,9 @@ class Run:
         # committed every run, so it survives the fresh checkout each CI run starts from.
         # A quota file of its own was tried in this repo and caused rebase conflicts.
         self.judge_calls: dict[str, int] = dict(prev.get("judge_calls", {}))
+        # Set by judge.py when the API refuses on quota, so a silent outage
+        # becomes a health finding rather than a quietly thinner channel.
+        self.judge_blocked: str | None = None
         # {source key: stale_days}, set by poll.py from sources.yaml.
         self.slow_sources: dict[str, int] = {}
 
@@ -174,6 +177,7 @@ class Run:
             "error": self.error,
             "alerts_sent": self.alerts_sent,
             "judge_calls": self.judge_calls,
+            "judge_blocked": self.judge_blocked,
             "error_traceback": getattr(self, "error_traceback", None),
         }
 

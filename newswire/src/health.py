@@ -83,6 +83,15 @@ def check(doc: dict, now: datetime | None = None) -> list[Finding]:
     # streak in status.json forever — nothing clears it, because nothing fetches it — so
     # without this filter the first alert is about a source that was deliberately turned
     # off, which is precisely the kind of noise that gets alerting muted.
+    if doc.get("judge_blocked") == "quota":
+        out.append(Finding("judge_quota", "warning",
+                           "The relevance judge is out of API quota. Major Gifts fails "
+                           "closed, so general-philanthropy gifts with no Jewish keyword "
+                           "are being dropped rather than screened — the section is "
+                           "running on keywords alone until quota resets. If this "
+                           "persists, the key is probably shared with another tool and "
+                           "needs its own Google Cloud project."))
+
     live_keys = set(doc.get("sources") or {})
     dead = []
     for key, n in (doc.get("consecutive_empty") or {}).items():
