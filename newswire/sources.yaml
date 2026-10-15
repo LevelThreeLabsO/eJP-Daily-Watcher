@@ -92,10 +92,17 @@ sources:
     url: https://jewishinsider.com/feed/
 
   # ══ Haredi and Orthodox — the world no other feed covers ════════
+  # Disabled 2026-10-15. 80 items posted and the beat is Israeli haredi politics and
+  # the war, not philanthropy: "OVER 100 TERRORISTS ELIMINATED: IDF Destroys Five Miles
+  # of Hamas Tunnels", "FEARING ELECTION DAY CHAOS: Police Block IDF Plan for Mass
+  # Arrests", "30,000 VOTES AT RISK: Netanyahu Fears Ger Chassidim May Stay Home". Real
+  # news, covered well, and none of it is what this newswire is for. Its occasional
+  # communal item is carried by Collive, Yeshiva World and the Jewish Press.
   - key: matzav
     outlet: Matzav
     method: rss
     url: https://matzav.com/feed/
+    enabled: false
   - key: yeshiva_world_news
     outlet: Yeshiva World News
     method: rss
@@ -220,6 +227,12 @@ sources:
     method: rss
     url: https://jewishlink.news/feed/
     threshold: 7
+    # Probation ended 2026-10-15, disabled. Threshold 7 cut the volume but not the
+    # character of it: 52 items, the recent ones being a go-karting venue, "The
+    # Evolution of the Hashkama Minyan" and a community theater season launch. A Bergen
+    # County paper writes its school and shul columns in exactly the convening
+    # vocabulary this scorer looks for, and no threshold separates the two.
+    enabled: false
 
   # ══ Diaspora — Europe, Australia, South Africa, Latin America ═══
   # Also 403 from a runner only.
