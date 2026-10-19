@@ -367,12 +367,36 @@ def _mk(source: dict, title: str, url: str, published: datetime | None,
     )
 
 
+# Feed categories that mean "this is argument, not news". A commentary piece can be
+# worded exactly like a report, and the URL does not always give it away — the
+# Algemeiner files opinion at a date-based path, so the /opinion/ URL veto never fired
+# and twelve of its last fourteen items were op-eds: "How Mamdani Has Encouraged
+# Aggression Against Jews", "Israelis Should Not Feel Pressured to Vote for Any
+# Political Candidate". Its feed tags every one of them "Opinion". Most WordPress feeds
+# do the same, so this is read for every RSS source, not special-cased to one.
+OPINION_CATEGORIES = {
+    "opinion", "opinions", "op-ed", "oped", "editorial", "editorials", "commentary",
+    "columns", "columnists", "letters", "letters to the editor", "blogs", "blog",
+    "analysis", "perspectives", "viewpoint", "voices",
+}
+
+
+def _feed_categories(entry) -> set[str]:
+    out = set()
+    for tag in (getattr(entry, "tags", None) or []):
+        term = (tag.get("term") if isinstance(tag, dict) else getattr(tag, "term", "")) or ""
+        out.add(term.strip().lower())
+    return out
+
+
 def _fetch_rss(source: dict, since: datetime) -> tuple[list[Item], int]:
     parsed = parse_feed(_get(source["url"]).content)
     items: list[Item] = []
     for e in parsed.entries[:PER_SOURCE_CAP]:
         published = _aware(_entry_date(e))
         if published and published < since:
+            continue
+        if _feed_categories(e) & OPINION_CATEGORIES:
             continue
         link = (getattr(e, "link", "") or "").strip()
         title = clean(getattr(e, "title", ""))
