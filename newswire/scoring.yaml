@@ -192,46 +192,112 @@ watching_axes:
   # kicks off (56), gala (50), memorial (39), ceremony (37), dinner (36).
   - name: convening
     points: 3
-    terms: [conference, summit, convention, "general assembly", assembly, retreat,
-            convening, forum, symposium, gala, benefit, dinner, luncheon, reception,
-            ceremony, ceremonies, festival, premiere, screening, exhibition,
-            commemoration, commemorating, memorial, yahrzeit, vigil, tribute,
-            mission, delegation, "state visit", hearing, "oral argument", vote,
-            primary, primaries, hosts, hosting, "will host",
-            # presents/present, not only "will present": the stemmer cannot reach
-            # "presents" from that phrase, so "Chai Lifeline Presents 'Dream Big':
-            # A First-Of-Its-Kind Benefit Event" carried no convening signal.
-            "will present", present, presents, presented, presenting,
-            # dedicates/dedicate, not just the noun: the stemmer cannot get from
-            # "dedication" to "dedicates", so "Chabad of the Meadowlands Dedicates
-            # Two New Torahs" carried no convening signal in its headline at all.
-            dedication, dedicate, dedicates, dedicated, dedicating,
-            groundbreaking, installation, inauguration, "town hall",
-            march, rally, procession, awards, "award ceremony",
-            launch, launches, launched, launching, unveil, unveiled, unveils,
-            "opening night", reopening, reopens, "first time", anniversary,
-            observance, service, services, prayers, selichot, minyan, siyum,
-            "ribbon cutting", "book launch", parade, exhibit,
-            # Not bare `tour`: it admitted "Macklemore blames Jewish billionaire Robert
-            # Kraft for his removal from Ed Sheeran's tour". A concert tour is not a
-            # convening, and a museum tour is the routine programming the archive
-            # excludes. Real eJP usage is "mission" or "delegation", both above.
-            # Verbs that ARE the convening. From the archive's own misses: "will meet",
-            # "will hold a memorial service", "opens its exhibition", "will be awarded".
-            # Not bare `meet` — as an infinitive it fires inside negations and
-            # intentions ("says won't try to meet Mamdani"), the same failure as bare
-            # `holds` matching "Hamas still holds Gaza captive".
-            meets, meeting, "will meet", "to meet with", "met with",
-            gather, gathers, gathering,
-            "will hold", "is holding", "are holding", "to hold",
-            convene, convenes, convened, gala, gathering, gatherings,
-            prize, prizes, honoree, honorees, "will be awarded", gets, receives,
-            # Scheduled civic set-pieces the archive carries: "It's primary day in
-            # Michigan", a sentencing, a trial, a Knesset session.
-            "primary day", "election day", "voting", "polls open", session, sitting,
-            sentencing, arraignment, trial, testimony, "victim impact",
-            # Sporting and cultural convenings: the JCC Maccabi Games run every year.
-            games, tournament, championship, exhibition, showcase]
+    # TRIMMED 2026-10-19 after replaying ten days of live output. This axis was
+    # admitting general news through words that are not convenings: `vote`/`votes`
+    # carried election coverage, `trial`/`testimony` carried the Netanyahu corruption
+    # trial daily, `prize` carried the Nobel announcements, `launches` carried program
+    # launches, a public inquiry, and even "Blakeman Launches Graphic Attack on
+    # Mamdani"; `convenes` carried "Netanyahu convenes security officials".
+    #
+    # Removing them cost 2.4 points of recall and halved the off-beat volume: 44 items
+    # a day down to 33, and 201 off-beat items down to 99.
+    #
+    # Scheduled civic set-pieces are still reached by their own phrases below —
+    # "primary day", "election day", "polls open" — which name the event rather than
+    # the act. That is the rule for anything added here: a convening is something
+    # somebody CALLED, not something that happened.
+    terms:
+      - "conference"
+      - "summit"
+      - "convention"
+      - "general assembly"
+      - "assembly"
+      - "retreat"
+      - "convening"
+      - "forum"
+      - "symposium"
+      - "gala"
+      - "benefit"
+      - "dinner"
+      - "luncheon"
+      - "reception"
+      - "ceremony"
+      - "ceremonies"
+      - "festival"
+      - "premiere"
+      - "screening"
+      - "exhibition"
+      - "commemoration"
+      - "commemorating"
+      - "memorial"
+      - "yahrzeit"
+      - "vigil"
+      - "tribute"
+      - "mission"
+      - "delegation"
+      - "state visit"
+      - "hearing"
+      - "oral argument"
+      - "primary"
+      - "primaries"
+      - "hosts"
+      - "hosting"
+      - "will host"
+      - "will present"
+      - "present"
+      - "presents"
+      - "presented"
+      - "presenting"
+      - "dedication"
+      - "dedicate"
+      - "dedicates"
+      - "dedicated"
+      - "dedicating"
+      - "groundbreaking"
+      - "installation"
+      - "inauguration"
+      - "town hall"
+      - "march"
+      - "rally"
+      - "procession"
+      - "award ceremony"
+      - "opening night"
+      - "reopening"
+      - "reopens"
+      - "anniversary"
+      - "observance"
+      - "prayers"
+      - "selichot"
+      - "minyan"
+      - "siyum"
+      - "ribbon cutting"
+      - "book launch"
+      - "parade"
+      - "exhibit"
+      - "will meet"
+      - "to meet with"
+      - "met with"
+      - "gather"
+      - "gathers"
+      - "gathering"
+      - "will hold"
+      - "is holding"
+      - "are holding"
+      - "to hold"
+      - "gala"
+      - "gathering"
+      - "gatherings"
+      - "will be awarded"
+      - "primary day"
+      - "election day"
+      - "voting"
+      - "polls open"
+      - "victim impact"
+      - "games"
+      - "tournament"
+      - "championship"
+      - "exhibition"
+      - "showcase"
   # The time anchor. 59% of real items say today or tonight; 18% use span framing.
   - name: today
     points: 2
@@ -341,6 +407,20 @@ noise:
   # are explicitly 0% of the archive. Each term below appears in zero archive items;
   # `strikes in`, `strikes on`, `hezbollah`, `drone attack` and `missile attack` were
   # measured and REJECTED because each appears in real ones.
+  # Operational military reporting that survived the first pass. These are the exact
+  # headlines that kept arriving: "IDF continues search for unidentified aerial object",
+  # "IDF chief orders probe into today's deadly Hezbollah ordnance explosion", "IDF
+  # investigates last two interceptors launched in 48 hours".
+  - "idf continues"
+  - "idf investigat"
+  - "orders probe"
+  - "probe into"
+  - interceptor
+  - interceptors
+  - "aerial object"
+  - "security screening"
+  - "security concept"
+  - "war of narratives"
   - "launches strikes"
   - "launched strikes"
   - "new strikes"
