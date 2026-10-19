@@ -212,11 +212,25 @@ def _strip_publisher(title: str, publisher: str) -> str:
 # eJP's own domain, so the newswire never resurfaces a story they already published.
 SELF_DOMAINS = ("ejewishphilanthropy.com",)
 
-# Appended to every entity query. Google honours negative terms, so the streaming farms
-# drop out before they ever reach the scorer.
+# Appended to every entity query.
+#
+# NO BARE WORDS HERE, and that restriction is the whole lesson. This list used to carry
+# -livestream -streaming -soccer -highlights, inherited from the Gulf newswire where a
+# Saudi football club named NEOM really did fill every query with pirate streams.
+#
+# Google applies a negative term to the WHOLE INDEXED PAGE, not the article, and a news
+# page carries its site's navigation. "Penn appoints inaugural named professor in Jewish
+# Studies following $3M gift" was excluded by -soccer, because the Daily Pennsylvanian's
+# article page links to its sports section. Measured across four gift queries, the four
+# bare words removed 15% of all results and 37% of the main one — falling hardest on
+# exactly the student and community papers that break local gift news.
+#
+# Quoted phrases are kept: they are specific enough not to appear in page chrome. The
+# spam itself is caught by looks_like_spam() below, which reads the HEADLINE, which is
+# the right place to judge whether a story is a story.
 QUERY_EXCLUSIONS = (
-    '-"live stream" -livestream -streaming -"watch live" -"free stream" '
-    '-soccer -"match preview" -"full match" -highlights -"tv channel" '
+    '-"live stream" -"watch live" -"free stream" '
+    '-"match preview" -"full match" -"tv channel" '
     # Social and UGC platforms. The publisher blocklist already drops these, but Google
     # returns at most 100 entries per query, and a live football fixture involving a club
     # named NEOM fills that budget with tweets and TikToks — starving the real stories
