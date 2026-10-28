@@ -94,6 +94,11 @@ class Scorer:
             self.config.get("money_pattern", r"\$|\bbillion\b|\bmillion\b"), re.IGNORECASE)
         self.money_points = int(self.config.get("money_points", 1))
         self.noise = _compile(self.config.get("noise", []))
+        # A promise verb is giving vocabulary only when money is attached. "Netanyahu and
+        # Eisenkot both pledge to form government" scored `pledge` + `Israel` and posted
+        # to Major Gifts. Measured: just 2 of 429 archive gifts match a promise verb AND
+        # carry no figure, so requiring one costs almost nothing and removes the class.
+        self.promise = _compile(self.config.get("gift_promise_terms", []))
         self.bylines = [b.lower() for b in self.config.get("byline_bypass", [])]
 
         self.axes: dict[str, list[tuple[str, int, re.Pattern]]] = {}
@@ -159,15 +164,26 @@ class Scorer:
                 matched += [h if isinstance(h, str) else h[0] for h in hits[:3]]
             if pattern.search(title_text):
                 title_axes.append(name)
-        if self.money.search(text):
+        has_money = bool(self.money.search(text))
+        if has_money:
             total += self.money_points
             axes_hit.append("money")
+
+        # Giving evidence that is ONLY a promise, with no figure anywhere, is a political
+        # or rhetorical pledge rather than a gift.
+        promise_only = False
+        if stream == "major_gift" and "giving" in axes_hit and not has_money:
+            giving_pat = next((p for n, _, p in self.axes[stream] if n == "giving"), None)
+            if giving_pat is not None and self.promise.pattern:
+                hits = {h if isinstance(h, str) else h[0] for h in giving_pat.findall(text)}
+                promise_only = bool(hits) and all(self.promise.search(f" {h} ") for h in hits)
 
         seen: dict[str, None] = {}
         for m in matched:
             seen.setdefault(m.strip().lower(), None)
         return Verdict(total, axes_hit, list(seen)[:6],
-                       bypass=self._byline(author), title_axes=title_axes)
+                       bypass=self._byline(author), title_axes=title_axes,
+                       vetoed="promise without a figure" if promise_only else None)
 
     def admits_stream(self, stream: str, verdict: Verdict,
                       source_threshold: int | None = None) -> bool:

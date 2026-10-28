@@ -32,6 +32,10 @@ judge: false
 # NO DOLLAR FLOOR ANYWHERE. 18% of real gift items carry no figure at all — donated
 # medical supplies, a donated artwork, donated organs, "an undisclosed sum". Money is
 # worth 1 point, never a requirement.
+# Promise verbs. Giving vocabulary only when a figure is attached — see score.py.
+gift_promise_terms: [pledge, pledges, pledged, commit, commits, committed, committing,
+                     commitment, vow, vows, vowed, promise, promises, promised]
+
 gift_threshold: 4
 gift_require_anchor: [giving]
 gift_min_title_axes: 1
@@ -56,6 +60,21 @@ gift_axes:
             earmark, earmarked, designate, designated, underwrite, underwritten,
             "matching gift", "in memory of",
             raise, raised, raising, fundraise, fundraising, funder, funders,
+            # A campaign IS the giving act when it is a fundraising one. Phrases, not
+            # bare `campaign`, which is political far more often than philanthropic:
+            # "Jewish Federation of Cleveland launches $5 million campaign" scored only
+            # jewish + money and was rejected for want of a giving anchor.
+            "annual campaign", "fundraising campaign", "capital campaign",
+            "campaign to raise", "launches campaign", "launched a campaign",
+            "emergency fund", "relief fund", "matching campaign",
+            # Bare `campaign` too. It was left out while political fundraising was
+            # scoring as philanthropy, but that class is vetoed by name now ("campaign
+            # donation", "campaign finance", "election campaign", the party names), so
+            # the word is safe to anchor on: +0.5 gift recall for one extra negative,
+            # and it is what admits "Jewish Federation of Cleveland launches $5 million
+            # campaign" — the phrase forms above all miss it, because the amount sits
+            # between the verb and the noun.
+            campaign, campaigns,
             "stepped up", "came forward", subsidize, subsidise, sponsor, sponsored]
   # The subject, not the act — and therefore not an anchor.
   #
@@ -73,7 +92,7 @@ gift_axes:
     points: 2
     terms: [university, college, hospital, medical center, museum, theater, theatre,
             school, academy, yeshiva, seminary, synagogue, temple, congregation,
-            federation, JCC, "Jewish Community Center", Hillel, Chabad, campus,
+            JCC, "Jewish Community Center", Hillel, Chabad, campus,
             foundation, nonprofit, charity, institute, library, orchestra, symphony,
             clinic, shelter, food bank, camp, archive, "day school"]
   # The forms the archive shows: capital projects 19%, research awards and chairs 15%,
@@ -94,6 +113,11 @@ gift_axes:
             synagogue, yeshiva, Hillel, Chabad, Torah, kosher, Holocaust, Shoah,
             Zionist, aliyah, haredi, Hasidic, Satmar, Orthodox, JCC, Hadassah,
             Jerusalem, "Tel Aviv", Negev, Soroka, Beersheva, Beersheba, Knesset,
+            # NOT bare `federation` — it is a wrestling, farmers', employers' or Russian
+            # one just as often. "Barbados Wrestling Federation hosts 2026 Freestyle and
+            # Grappling Open Championships" posted on `federation` alone.
+            "Jewish Federation", "Jewish Federations", "UJA-Federation",
+            "Federation of Greater", "federation campaign", "Federation CJA",
             "Magen David", Birthright, Maccabi, Yad Vashem, mohel, kollel, mikvah,
             # --- widened 2026-10-15, after a week of live output showed the axis
             # missing items that are unmistakably on-beat. "Philanthropist Hosts
@@ -318,8 +342,10 @@ watching_axes:
     # recall and is what makes the off-axis threshold above affordable.
     terms: [Jewish, Jew, Jews, Israel, Israeli, Hebrew, Judaism, rabbi, rabbinic,
             synagogue, yeshiva, Hillel, Chabad, Torah, Holocaust, Shoah, Zionist,
-            aliyah, haredi, Hasidic, Orthodox, JCC, federation, Hadassah, Jerusalem,
+            aliyah, haredi, Hasidic, Orthodox, JCC, Hadassah, Jerusalem,
             "Tel Aviv", Knesset, Birthright, Maccabi, "Yad Vashem", kosher, shul,
+            "Jewish Federation", "Jewish Federations", "UJA-Federation",
+            "Federation of Greater", "federation campaign", "Federation CJA",
             # Holidays and observances
             Hanukkah, Chanukah, Passover, Pesach, Purim, Sukkot, Shabbat, Shabbos,
             "Rosh Hashanah", "Yom Kippur", "Simchat Torah", "Tisha B'Av", Shavuot,
