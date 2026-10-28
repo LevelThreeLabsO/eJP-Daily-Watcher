@@ -105,6 +105,7 @@ class Scorer:
         self.thresholds: dict[str, int] = {}
         self.anchors: dict[str, set[str]] = {}
         self.min_title_axes: dict[str, int] = {}
+        self.companions: dict[str, set[str]] = {}
         self.relevance_axis: dict[str, str | None] = {}
         self.threshold_off_axis: dict[str, int | None] = {}
         for stream, prefix in (("major_gift", "gift"), ("watching", "watching")):
@@ -120,6 +121,9 @@ class Scorer:
                 self.config.get(f"{prefix}_min_title_axes",
                                 self.config.get("min_title_axes", 0)))
             # A relevance axis and the higher bar an item must clear without it.
+            # At least one of these must be present, or the item is not of this kind.
+            self.companions[stream] = set(
+                self.config.get(f"{prefix}_require_companion", []) or [])
             self.relevance_axis[stream] = self.config.get(f"{prefix}_relevance_axis")
             self.threshold_off_axis[stream] = self.config.get(f"{prefix}_threshold_off_axis")
 
@@ -204,6 +208,20 @@ class Scorer:
         # carries a convening AND a time, or a gift AND a recipient.
         need = self.min_title_axes.get(stream, 0)
         if need and len(set(verdict.title_axes)) < need:
+            return False
+
+        # The anchor says an act occurred; a companion says it was an act of THIS kind.
+        #
+        # Without this, a giving verb plus the word Israel cleared the bar, and the
+        # giving axis is full of verbs that are ordinary English: "Why Israeli election
+        # deadlock RAISES prospect of yet another poll" and "Israel's election GIVES
+        # survivor Netanyahu a path to keep power" both posted to Major Gifts. Neither
+        # has money, a recipient, or a gift form, because nothing was given.
+        #
+        # Note that `jewish` is deliberately NOT a companion. It says the item is on the
+        # beat, not that it is a gift, and treating it as both is what let these through.
+        companions = self.companions.get(stream) or set()
+        if companions and not (companions & set(verdict.axes)):
             return False
         threshold = int(source_threshold) if source_threshold is not None \
             else self.thresholds[stream]

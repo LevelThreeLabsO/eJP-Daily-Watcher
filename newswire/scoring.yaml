@@ -38,6 +38,13 @@ gift_promise_terms: [pledge, pledges, pledged, commit, commits, committed, commi
 
 gift_threshold: 4
 gift_require_anchor: [giving]
+# A giving verb alone is not a gift. Something must have been given, to someone, or be
+# of a recognisable gift form — an amount, a recipient type, a named chair, a campaign.
+# `jewish` is deliberately absent: it says the item is on the beat, not that it is a
+# gift, and letting it serve as both is exactly what admitted "Israel's election gives
+# survivor Netanyahu a path to keep power". Costs 1.6 points of recall; removes the
+# class.
+gift_require_companion: [money, recipient, gift_form, giving_topic]
 gift_min_title_axes: 1
 gift_axes:
   # The act itself. Measured: donated (116), gift (48), grant (48+41), awarded (41),
@@ -542,6 +549,22 @@ noise:
   # Both posted. Every term below appears in ZERO of all 1,514 archive items, except
   # `salary` and `hiring` which appear once each and are therefore NOT vetoed.
   # ---------------------------------------------------------------------------
+  # Job titles followed by "at <employer>", which is how every recruitment board writes
+  # a listing: "SARE Grant Program Admin - Partnership Grant at University of Vermont",
+  # "Manager of Grants and Project Support at The Hastings Center". Zero archive hits.
+  # NOT " at the " on its own — that appears in 13 real gifts and 109 real events.
+  - "program admin"
+  - "manager of grants"
+  - "grants manager"
+  - "grant writer"
+  - "coordinator at"
+  - "manager at"
+  - "director at"
+  - "officer at"
+  - "specialist at"
+  - "associate at"
+  - "analyst at"
+  - " at university"
   - "associate director"
   - "assistant director"
   - "director of development"
