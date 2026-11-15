@@ -1,28 +1,28 @@
 {
-  "started_at": "2026-11-15T09:17:30+00:00",
-  "finished_at": "2026-11-15T09:17:41+00:00",
-  "duration_seconds": 11.0,
+  "started_at": "2026-11-15T09:32:25+00:00",
+  "finished_at": "2026-11-15T09:33:48+00:00",
+  "duration_seconds": 83.0,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 722,
-    "fresh": 722,
-    "relevant": 253,
-    "unseen": 113,
-    "unique": 107,
+    "fetched": 710,
+    "fresh": 710,
+    "relevant": 257,
+    "unseen": 115,
+    "unique": 110,
     "posted": 1
   },
   "posted": 1,
   "delivered": true,
-  "last_posted_at": "2026-11-15T09:17:41+00:00",
+  "last_posted_at": "2026-11-15T09:33:48+00:00",
   "sources": {
     "jerusalem_post": {
       "status": "ok",
-      "fetched": 14,
+      "fetched": 15,
       "in_window": 26
     },
     "jns": {
       "status": "ok",
-      "fetched": 6,
+      "fetched": 7,
       "in_window": 30
     },
     "jta": {
@@ -47,7 +47,7 @@
     },
     "times_of_israel": {
       "status": "ok",
-      "fetched": 12,
+      "fetched": 13,
       "in_window": 100
     },
     "haaretz": {
@@ -96,13 +96,14 @@
       "in_window": 3
     },
     "nonprofit_quarterly": {
-      "status": "error",
-      "detail": "HTTPError: 403 Client Error: Forbidden for url: https://nonprofitquarterly.org/feed/"
+      "status": "ok",
+      "fetched": 0,
+      "in_window": 12
     },
     "devex": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 1
+      "fetched": 1,
+      "in_window": 2
     },
     "washington_jewish_week": {
       "status": "ok",
@@ -152,7 +153,7 @@
     "boulder_jewish_news": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 0
+      "in_window": 1
     },
     "australian_jewish_news": {
       "status": "ok",
@@ -165,9 +166,8 @@
       "in_window": 10
     },
     "european_jewish_congress": {
-      "status": "ok",
-      "fetched": 0,
-      "in_window": 10
+      "status": "error",
+      "detail": "ReadTimeout: HTTPSConnectionPool(host='eurojewcong.org', port=443): Read timed out. (read timeout=25)"
     },
     "jewish_news_uk": {
       "status": "ok",
@@ -201,7 +201,7 @@
     },
     "q02": {
       "status": "ok",
-      "fetched": 54,
+      "fetched": 51,
       "in_window": 100
     },
     "q03": {
@@ -211,12 +211,12 @@
     },
     "q04": {
       "status": "ok",
-      "fetched": 11,
+      "fetched": 13,
       "in_window": 100
     },
     "q05": {
       "status": "ok",
-      "fetched": 10,
+      "fetched": 9,
       "in_window": 100
     },
     "q06": {
@@ -231,7 +231,7 @@
     },
     "q08": {
       "status": "ok",
-      "fetched": 35,
+      "fetched": 33,
       "in_window": 100
     },
     "q09": {
@@ -241,7 +241,7 @@
     },
     "q10": {
       "status": "ok",
-      "fetched": 48,
+      "fetched": 45,
       "in_window": 100
     },
     "q11": {
@@ -256,7 +256,7 @@
     },
     "q13": {
       "status": "ok",
-      "fetched": 5,
+      "fetched": 4,
       "in_window": 100
     },
     "q14": {
@@ -271,7 +271,7 @@
     },
     "q16": {
       "status": "ok",
-      "fetched": 7,
+      "fetched": 8,
       "in_window": 100
     },
     "q17": {
@@ -281,7 +281,7 @@
     },
     "q18": {
       "status": "ok",
-      "fetched": 3,
+      "fetched": 2,
       "in_window": 100
     },
     "q19": {
@@ -291,7 +291,7 @@
     },
     "q20": {
       "status": "ok",
-      "fetched": 6,
+      "fetched": 5,
       "in_window": 100
     },
     "q21": {
@@ -306,12 +306,12 @@
     },
     "q23": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 5,
       "in_window": 100
     },
     "g01": {
       "status": "ok",
-      "fetched": 63,
+      "fetched": 62,
       "in_window": 100
     },
     "g02": {
@@ -321,27 +321,27 @@
     },
     "g03": {
       "status": "ok",
-      "fetched": 66,
+      "fetched": 65,
       "in_window": 100
     },
     "g04": {
       "status": "ok",
-      "fetched": 43,
+      "fetched": 42,
       "in_window": 100
     },
     "g05": {
       "status": "ok",
-      "fetched": 27,
+      "fetched": 28,
       "in_window": 100
     },
     "g06": {
       "status": "ok",
-      "fetched": 25,
+      "fetched": 23,
       "in_window": 100
     },
     "g07": {
       "status": "ok",
-      "fetched": 26,
+      "fetched": 25,
       "in_window": 100
     },
     "g08": {
@@ -351,17 +351,17 @@
     },
     "nyt": {
       "status": "ok",
-      "fetched": 4,
+      "fetched": 3,
       "in_window": 100
     },
     "wsj": {
       "status": "ok",
-      "fetched": 3,
-      "in_window": 21
+      "fetched": 1,
+      "in_window": 19
     },
     "wapo": {
       "status": "ok",
-      "fetched": 16,
+      "fetched": 15,
       "in_window": 100
     },
     "bloomberg": {
@@ -386,17 +386,17 @@
     },
     "forbes": {
       "status": "ok",
-      "fetched": 3,
+      "fetched": 4,
       "in_window": 43
     },
     "npr": {
       "status": "ok",
-      "fetched": 0,
-      "in_window": 5
+      "fetched": 1,
+      "in_window": 6
     },
     "free_press": {
       "status": "ok",
-      "fetched": 3,
+      "fetched": 2,
       "in_window": 35
     },
     "inside_philanthropy": {
@@ -452,7 +452,7 @@
     "org09": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 9
+      "in_window": 10
     },
     "org10": {
       "status": "ok",
@@ -493,40 +493,40 @@
   "consecutive_empty": {
     "jerusalem_post": 0,
     "jns": 0,
-    "jta": 132,
-    "forward": 24,
-    "algemeiner": 120,
-    "ynet": 279,
+    "jta": 133,
+    "forward": 25,
+    "algemeiner": 121,
+    "ynet": 280,
     "times_of_israel": 0,
     "haaretz": 0,
     "jewish_chronicle_uk": 0,
-    "jewish_insider": 12,
+    "jewish_insider": 13,
     "matzav": 0,
-    "yeshiva_world_news": 14,
-    "jewish_press": 25,
-    "yated": 342,
-    "collive": 11,
-    "chronicle_of_philanthrop": 176,
-    "nonprofit_quarterly": 162,
-    "devex": 118,
-    "washington_jewish_week": 149,
-    "jewish_journal_la": 145,
+    "yeshiva_world_news": 15,
+    "jewish_press": 26,
+    "yated": 343,
+    "collive": 12,
+    "chronicle_of_philanthrop": 177,
+    "nonprofit_quarterly": 163,
+    "devex": 0,
+    "washington_jewish_week": 150,
+    "jewish_journal_la": 146,
     "cleveland_jewish_news": 0,
-    "baltimore_jewish_times": 146,
-    "canadian_jewish_news": 6,
-    "jewish_exponent": 146,
-    "atlanta_jewish_times": 145,
-    "j_bay_area": 122,
-    "new_york_jewish_week": 134,
-    "boulder_jewish_news": 183,
+    "baltimore_jewish_times": 147,
+    "canadian_jewish_news": 7,
+    "jewish_exponent": 147,
+    "atlanta_jewish_times": 146,
+    "j_bay_area": 123,
+    "new_york_jewish_week": 135,
+    "boulder_jewish_news": 184,
     "jewish_link": 0,
-    "australian_jewish_news": 89,
-    "j_wire_australia": 298,
-    "european_jewish_congress": 174,
-    "jewish_news_uk": 45,
-    "sa_jewish_report": 192,
-    "enlace_judio_mx": 40,
-    "agencia_ajn_ar": 831,
+    "australian_jewish_news": 90,
+    "j_wire_australia": 299,
+    "european_jewish_congress": 175,
+    "jewish_news_uk": 46,
+    "sa_jewish_report": 193,
+    "enlace_judio_mx": 41,
+    "agencia_ajn_ar": 832,
     "q00": 0,
     "q01": 0,
     "q02": 0,
@@ -546,12 +546,12 @@
     "q16": 0,
     "q17": 0,
     "q18": 0,
-    "q19": 141,
+    "q19": 142,
     "q20": 0,
-    "q21": 2,
+    "q21": 3,
     "q22": 0,
     "q23": 0,
-    "candid": 20,
+    "candid": 21,
     "g01": 0,
     "g02": 0,
     "g03": 0,
@@ -560,32 +560,32 @@
     "g06": 0,
     "g07": 0,
     "g08": 0,
-    "jim_joseph": 1459,
-    "maimonides_fund": 1975,
-    "wexner": 6094,
+    "jim_joseph": 1460,
+    "maimonides_fund": 1976,
+    "wexner": 6095,
     "nyt": 0,
     "wsj": 0,
     "wapo": 0,
     "bloomberg": 0,
-    "reuters": 78,
+    "reuters": 79,
     "ap": 0,
-    "axios": 79,
+    "axios": 80,
     "forbes": 0,
-    "npr": 33,
+    "npr": 0,
     "free_press": 0,
-    "inside_philanthropy": 131,
+    "inside_philanthropy": 132,
     "org00": 0,
-    "org01": 6010,
-    "org02": 56,
-    "org03": 6010,
-    "org04": 6010,
-    "org05": 6010,
-    "org06": 3801,
-    "org07": 4024,
-    "org08": 6010,
-    "org09": 1068,
-    "org10": 6010,
-    "org11": 782,
+    "org01": 6011,
+    "org02": 57,
+    "org03": 6011,
+    "org04": 6011,
+    "org05": 6011,
+    "org06": 3802,
+    "org07": 4025,
+    "org08": 6011,
+    "org09": 1069,
+    "org10": 6011,
+    "org11": 783,
     "wires_jewish": 0,
     "wires_major": 0
   },
