@@ -1,19 +1,19 @@
 {
-  "started_at": "2026-11-19T07:17:29+00:00",
-  "finished_at": "2026-11-19T07:18:06+00:00",
-  "duration_seconds": 37.5,
+  "started_at": "2026-11-19T07:18:23+00:00",
+  "finished_at": "2026-11-19T07:18:39+00:00",
+  "duration_seconds": 16.6,
   "dispatch_interval_seconds": 900,
   "items": {
-    "fetched": 692,
-    "fresh": 692,
+    "fetched": 691,
+    "fresh": 691,
     "relevant": 358,
-    "unseen": 211,
-    "unique": 188,
+    "unseen": 212,
+    "unique": 190,
     "posted": 1
   },
   "posted": 1,
   "delivered": true,
-  "last_posted_at": "2026-11-19T07:18:06+00:00",
+  "last_posted_at": "2026-11-19T07:18:39+00:00",
   "sources": {
     "jerusalem_post": {
       "status": "ok",
@@ -93,7 +93,7 @@
     "candid": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 10
+      "in_window": 6
     },
     "nonprofit_quarterly": {
       "status": "ok",
@@ -118,7 +118,7 @@
     "cleveland_jewish_news": {
       "status": "ok",
       "fetched": 0,
-      "in_window": 93
+      "in_window": 94
     },
     "baltimore_jewish_times": {
       "status": "ok",
@@ -153,7 +153,7 @@
     "boulder_jewish_news": {
       "status": "ok",
       "fetched": 4,
-      "in_window": 4
+      "in_window": 5
     },
     "australian_jewish_news": {
       "status": "ok",
@@ -192,7 +192,7 @@
     },
     "q00": {
       "status": "ok",
-      "fetched": 14,
+      "fetched": 15,
       "in_window": 100
     },
     "q01": {
@@ -232,7 +232,7 @@
     },
     "q08": {
       "status": "ok",
-      "fetched": 57,
+      "fetched": 56,
       "in_window": 100
     },
     "q09": {
@@ -317,7 +317,7 @@
     },
     "g02": {
       "status": "ok",
-      "fetched": 29,
+      "fetched": 30,
       "in_window": 100
     },
     "g03": {
@@ -357,12 +357,12 @@
     },
     "wsj": {
       "status": "ok",
-      "fetched": 4,
-      "in_window": 31
+      "fetched": 3,
+      "in_window": 29
     },
     "wapo": {
       "status": "ok",
-      "fetched": 17,
+      "fetched": 18,
       "in_window": 100
     },
     "bloomberg": {
@@ -377,8 +377,8 @@
     },
     "ap": {
       "status": "ok",
-      "fetched": 3,
-      "in_window": 49
+      "fetched": 1,
+      "in_window": 20
     },
     "axios": {
       "status": "ok",
@@ -393,7 +393,7 @@
     "npr": {
       "status": "ok",
       "fetched": 2,
-      "in_window": 13
+      "in_window": 14
     },
     "free_press": {
       "status": "ok",
@@ -710,8 +710,8 @@
   "judge_calls": {
     "2026-11-17": 26,
     "2026-11-18": 26,
-    "2026-11-19": 9
+    "2026-11-19": 8
   },
-  "judge_blocked": null,
+  "judge_blocked": "quota",
   "error_traceback": null
 }
